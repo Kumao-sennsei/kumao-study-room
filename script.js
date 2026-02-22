@@ -152,6 +152,7 @@ function updateRing(sec, maxSec){
 // UI制御（表示のルール）
 // ======================
 function showHomeUI(){
+  elBgVideo.style.display = "none";
   // 左：開始画面
   elProductName.classList.remove("hidden");
   elSubTitle.classList.remove("hidden");
@@ -179,6 +180,7 @@ function showHomeUI(){
 }
 
 function showFocusUI(){
+  elBgVideo.style.display = "none";
   // 左：集中画面
   elProductName.classList.add("hidden");
   elSubTitle.classList.add("hidden");
@@ -199,6 +201,7 @@ function showFocusUI(){
 }
 
 function showBreakUI(){
+  elBgVideo.style.display = "none";
   // 左：休憩も集中レイアウトのまま
   elModeTitle.textContent = "休憩TIME";
   elQuote.textContent = "";
@@ -320,3 +323,4 @@ function speak(text){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
+
