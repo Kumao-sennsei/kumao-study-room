@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KUMAO STUDY ROOM</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- 左 -->
+    <div id="left">
+      <h1 id="productName">KUMAO STUDY ROOM</h1>
+      <div id="subTitle">集中する場所を選びな 😎💣</div>
+
+      <!-- 集中/休憩用 -->
+      <h2 id="modeTitle" class="hidden">集中TIME</h2>
+      <div id="quote" class="hidden"></div>
+
+      <!-- ring -->
+      <div id="ringWrap" class="hidden">
+        <svg class="ring" viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+          <circle class="ring-fg" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div id="timer">25:00</div>
+      </div>
+
+      <div id="lap" class="hidden">1周目</div>
+
+      <div id="bears" class="hidden">
+        <span class="bear">🐻</span>
+        <span class="bear">🐻</span>
+        <span class="bear">🐻</span>
+        <span class="bear">🐻</span>
+      </div>
+
+      <!-- メニュー -->
+      <div id="startMenu">
+        <button class="modeBtn" onclick="startStudy('fire')">🔥　闘志の火を燃やす</button>
+        <button class="modeBtn" onclick="startStudy('forest')">🌲　思考の森に入る</button>
+        <button class="modeBtn" onclick="startStudy('sea')">🌊　静寂の海に沈む</button>
+      </div>
+    </div>
+
+    <!-- 右 -->
+    <div id="right">
+         
+
+      <!-- ドンくまお（開始・休憩で表示） -->
+      <img id="character" src="don.png" alt="don kumao" />
+
+     
+      <!-- 右下クレジット（開始画面だけ表示） -->
+      <div id="brandBox">
+        <img id="goodayLogo" src="gooday.png" alt="Gooday logo" />
+        <div id="poweredBy">Powered by Kumao Labo</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
