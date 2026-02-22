@@ -1,36 +1,28 @@
-
-//===== 追加：画像＆音管理 =====
+// ======================
+// 追加：画像＆音管理
+// ======================
 const bgImages = {
   fire: ["fire1.png", "fire2.png", "fire3.png", "fire4.png"],
   forest: ["forest1.png", "forest2.png", "forest3.png", "forest4.png"],
   sea: ["sea1.png", "sea2.png", "sea3.png", "sea4.png"]
 };
-function speakThenAmbient(text, mode){
-  const setInRound = getSetInRound();
 
-  const audio = new Audio(`quote${setInRound}.mp3`);
-  audio.volume = 1;
-
-  audio.onended = () => {
-    startAmbient(mode);
-  };
-
-  audio.play().catch(()=>{
-    startAmbient(mode);
-  });
-}
 let currentAudio = null;
 let currentAudioMode = "";
 
 function stopAmbient(){
   if(currentAudio){
-    try{ currentAudio.pause(); }catch(e){}
+    try{
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }catch(e){}
     currentAudio = null;
   }
   currentAudioMode = "";
 }
 
 function startAmbient(mode){
+  if(!mode) return;
   if(currentAudioMode === mode && currentAudio) return;
 
   stopAmbient();
@@ -51,22 +43,27 @@ function setCharacterImage(mode, setInRound){
   elCharacter.src = bgImages[mode][idx];
 }
 
-function speakThenAmbient(text, mode){
+function speakThenAmbient(_text, mode){
+  // quote1.mp3〜quote4.mp3 を再生 → 終わったら環境音
+  const setInRound = getSetInRound();
+
   const audio = new Audio(`quote${setInRound}.mp3`);
   audio.volume = 1;
 
-  audio.onended = () => {
-    startAmbient(mode);
-  };
+  audio.onended = () => startAmbient(mode);
 
-  audio.play();
+  audio.play().catch(() => {
+    // 自動再生ブロック/ファイル不在などでも環境音へ
+    startAmbient(mode);
+  });
 }
 
 function playBreakVoice() {
   const audio = new Audio("break_normal.mp3");
   audio.volume = 0.9;
-  audio.play();
+  audio.play().catch(()=>{});
 }
+
 // ======================
 // 設定
 // ======================
@@ -96,7 +93,7 @@ const elBears = document.getElementById("bears");
 const elBearSpans = Array.from(document.querySelectorAll(".bear"));
 
 const elStartMenu = document.getElementById("startMenu");
-const elCharacter = document.getElementById("character"); // ★重複してたのでここだけに統一
+const elCharacter = document.getElementById("character"); // ★統一
 const elBrandBox = document.getElementById("brandBox");
 
 // SVG ring
@@ -126,6 +123,7 @@ function setTimerText(sec){
 function getRound(){
   return Math.floor((totalSetIndex - 1) / SETS_PER_ROUND) + 1;
 }
+
 function getSetInRound(){
   return ((totalSetIndex - 1) % SETS_PER_ROUND) + 1;
 }
@@ -157,7 +155,6 @@ function updateRing(sec, maxSec){
 // UI制御（表示のルール）
 // ======================
 function showHomeUI(){
- 
   // 左：開始画面
   elProductName.classList.remove("hidden");
   elSubTitle.classList.remove("hidden");
@@ -171,6 +168,7 @@ function showHomeUI(){
   elLap.classList.add("hidden");
   elBears.classList.add("hidden");
 
+  // 右：画像は出す（ホーム絵があるならそのまま）
   elCharacter.style.display = "block";
   elCharacter.style.opacity = "1";
 
@@ -179,13 +177,12 @@ function showHomeUI(){
   currentTime = FOCUS_SEC;
   setTimerText(currentTime);
 
-  stopAmbient(); // ★開始では環境音止める
+  stopAmbient();     // ★開始では環境音止める
   stopTimer();
   updateRing(currentTime, FOCUS_SEC);
 }
 
 function showFocusUI(){
- 
   // 左：集中画面
   elProductName.classList.add("hidden");
   elSubTitle.classList.add("hidden");
@@ -200,18 +197,17 @@ function showFocusUI(){
 
   elModeTitle.textContent = "集中TIME";
 
-  // 右：集中は画像（★ここが①の修正点）
+  // 右：集中は画像
   elCharacter.style.display = "block";
   elCharacter.style.opacity = "1";
 }
 
 function showBreakUI(){
-  
   // 左：休憩も集中レイアウトのまま
   elModeTitle.textContent = "休憩TIME";
   elQuote.textContent = "";
 
-  // 右：休憩はドンくまお（今はそのまま）
+  // 右：休憩も画像は出す（ドン画像にしたいならここで差し替え）
   elCharacter.style.display = "block";
   elCharacter.style.opacity = "1";
 }
@@ -258,16 +254,24 @@ function startFocusPhase(){
 
   const setInRound = getSetInRound();
 
- 
-  // ★①：森モードなら forest1〜4 をセット番号で差し込み
+  // 画像：set番号で差し込み
   setCharacterImage(currentMode, setInRound);
 
-  // ★②：名言は消さない（元のまま表示）
+  // 名言：表示は維持
   elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
 
-   speakThenAmbient(KUMAO_QUOTES[setInRound] || "", currentMode);
-  // ★③：名言を読んでから環境音（森/海/焚き火）
+  // 名言音声→環境音
+  speakThenAmbient(KUMAO_QUOTES[setInRound] || "", currentMode);
 
+  updateLap();
+  updateBears();
+
+  setTimerText(currentTime);
+  updateRing(currentTime, FOCUS_SEC);
+
+  // タイマー開始
+  startTimerLoop(FOCUS_SEC);
+}
 
 function startBreakPhase(){
   isBreak = true;
@@ -275,9 +279,10 @@ function startBreakPhase(){
 
   showBreakUI();
 
-  // 休憩では環境音はいったん止める（休憩音は後で作る想定）
+  // 休憩では環境音いったん止める
   stopAmbient();
 
+  // 休憩開始ボイス（ドンくまお）
   playBreakVoice();
 
   updateLap();
@@ -305,7 +310,8 @@ showHomeUI();
 window.startStudy = startStudy;
 
 // ======================
-// ドンくまお音声
+// （残してOK）WebSpeech用：ドンくまお読み上げ
+// ※今は使ってなくても害なし
 // ======================
 function speak(text){
   if(!("speechSynthesis" in window)) return;
@@ -320,13 +326,3 @@ function speak(text){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
-
-
-
-
-
-
-
-
-
-
