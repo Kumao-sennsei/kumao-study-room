@@ -1,4 +1,5 @@
-// ===== 追加：画像＆音管理 =====
+let setInRound = 1;/
+/ ===== 追加：画像＆音管理 =====
 const bgImages = {
   fire: ["fire1.png", "fire2.png", "fire3.png", "fire4.png"],
   forest: ["forest1.png", "forest2.png", "forest3.png", "forest4.png"],
@@ -314,6 +315,7 @@ function speak(text){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
+
 
 
 
