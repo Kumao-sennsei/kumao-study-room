@@ -5,7 +5,20 @@ const bgImages = {
   forest: ["forest1.png", "forest2.png", "forest3.png", "forest4.png"],
   sea: ["sea1.png", "sea2.png", "sea3.png", "sea4.png"]
 };
+function speakThenAmbient(text, mode){
+  const setInRound = getSetInRound();
 
+  const audio = new Audio(`quote${setInRound}.mp3`);
+  audio.volume = 1;
+
+  audio.onended = () => {
+    startAmbient(mode);
+  };
+
+  audio.play().catch(()=>{
+    startAmbient(mode);
+  });
+}
 let currentAudio = null;
 let currentAudioMode = "";
 
@@ -245,27 +258,16 @@ function startFocusPhase(){
 
   const setInRound = getSetInRound();
 
+ 
   // ★①：森モードなら forest1〜4 をセット番号で差し込み
   setCharacterImage(currentMode, setInRound);
 
   // ★②：名言は消さない（元のまま表示）
   elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
 
+   speakThenAmbient(KUMAO_QUOTES[setInRound] || "", currentMode);
   // ★③：名言を読んでから環境音（森/海/焚き火）
-function speakThenAmbient(text, mode){
-  const setInRound = getSetInRound();   // ★ 追加
 
-  const audio = new Audio(`quote${setInRound}.mp3`);
-  audio.volume = 1;
-
-  audio.onended = () => {
-    startAmbient(mode);
-  };
-
-  audio.play().catch(()=>{   // ★ 念のため安全処理
-    startAmbient(mode);
-  });
-}
 
 function startBreakPhase(){
   isBreak = true;
@@ -318,6 +320,7 @@ function speak(text){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
+
 
 
 
