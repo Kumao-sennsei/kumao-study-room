@@ -38,29 +38,16 @@ function setCharacterImage(mode, setInRound){
 }
 
 function speakThenAmbient(text, mode){
-  // 名言を読んでから環境音
-  if(!("speechSynthesis" in window) || !text){
-    // 音声合成が無い/テキスト無い場合は即環境音
-    startAmbient(mode);
-    return;
-  }
+  const audio = new Audio(`quote${setInRound}.mp3`);
+  audio.volume = 1;
 
-  const uttr = new SpeechSynthesisUtterance(text);
-  uttr.lang = "ja-JP";
-  uttr.rate = 0.9;
-  uttr.pitch = 0.8;
-  uttr.volume = 1;
-
-  uttr.onend = () => {
-    startAmbient(mode);
-  };
-  uttr.onerror = () => {
+  audio.onended = () => {
     startAmbient(mode);
   };
 
-  speechSynthesis.cancel();
-  speechSynthesis.speak(uttr);
+  audio.play();
 }
+
 function playBreakVoice() {
   const audio = new Audio("break_normal.mp3");
   audio.volume = 0.9;
@@ -327,6 +314,7 @@ function speak(text){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
+
 
 
 
