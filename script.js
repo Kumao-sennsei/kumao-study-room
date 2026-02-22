@@ -1,4 +1,4 @@
-let setInRound = 1;/
+
 / ===== 追加：画像＆音管理 =====
 const bgImages = {
   fire: ["fire1.png", "fire2.png", "fire3.png", "fire4.png"],
@@ -252,16 +252,19 @@ function startFocusPhase(){
   elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
 
   // ★③：名言を読んでから環境音（森/海/焚き火）
-  speakThenAmbient(KUMAO_QUOTES[setInRound] || "", currentMode);
+function speakThenAmbient(text, mode){
+  const setInRound = getSetInRound();   // ★ 追加
 
-  updateLap();
-  updateBears();
+  const audio = new Audio(`quote${setInRound}.mp3`);
+  audio.volume = 1;
 
-  setTimerText(currentTime);
-  updateRing(currentTime, FOCUS_SEC);
+  audio.onended = () => {
+    startAmbient(mode);
+  };
 
-  // ★④：タイマー開始（ここが動かない＝JS停止の可能性が高かった）
-  startTimerLoop(FOCUS_SEC);
+  audio.play().catch(()=>{   // ★ 念のため安全処理
+    startAmbient(mode);
+  });
 }
 
 function startBreakPhase(){
@@ -315,6 +318,7 @@ function speak(text){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
+
 
 
 
