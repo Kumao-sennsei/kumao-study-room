@@ -61,7 +61,11 @@ function speakThenAmbient(text, mode){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
-
+function playBreakVoice() {
+  const audio = new Audio("break_normal.mp3");
+  audio.volume = 0.9;
+  audio.play();
+}
 // ======================
 // 設定
 // ======================
@@ -281,7 +285,7 @@ function startBreakPhase(){
   // 休憩では環境音はいったん止める（休憩音は後で作る想定）
   stopAmbient();
 
-  speak("よくやった。一度整えろ。");
+  playBreakVoice();
 
   updateLap();
   updateBears();
@@ -323,5 +327,6 @@ function speak(text){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
+
 
 
