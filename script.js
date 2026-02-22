@@ -27,13 +27,82 @@ const elBears = document.getElementById("bears");
 const elBearSpans = Array.from(document.querySelectorAll(".bear"));
 
 const elStartMenu = document.getElementById("startMenu");
+const elBgVideo = document.getElementById("bgVideo");
 const elCharacter = document.getElementById("character");
+const elSensei = document.getElementById("sensei");
 const elBrandBox = document.getElementById("brandBox");
 
 // SVG ring
 const ringFg = document.querySelector(".ring-fg");
 const RADIUS = 52;
 const CIRC = 2 * Math.PI * RADIUS;
+
+// ======================
+// 追加：画像＆音（動画を使わない）
+// ======================
+const BG_IMAGES = {
+  fire: ["fire1.png", "fire2.png", "fire3.png", "fire4.png"],
+  forest: ["forest1.png", "forest2.png", "forest3.png", "forest4.png"],
+  sea: ["sea1.png", "sea2.png", "sea3.png", "sea4.png"]
+};
+
+let currentAudio = null;
+let currentAudioMode = "";
+
+function stopVideo(){
+  try{
+    elBgVideo.style.opacity = "0";
+    elBgVideo.pause();
+    elBgVideo.removeAttribute("src");
+    elBgVideo.load();
+  }catch(e){}
+}
+
+function startAmbient(mode){
+  if(currentAudioMode === mode && currentAudio) return;
+
+  if(currentAudio){
+    try{ currentAudio.pause(); }catch(e){}
+    currentAudio = null;
+  }
+
+  currentAudioMode = mode;
+
+  currentAudio = new Audio(mode + ".mp3");
+  currentAudio.loop = true;
+  currentAudio.volume = 0.5;
+  currentAudio.play().catch(()=>{});
+}
+
+function setCharacterImage(mode, setInRound){
+  if(!BG_IMAGES[mode]) return;
+  const idx = setInRound - 1;
+  if(idx < 0) return;
+  if(idx >= BG_IMAGES[mode].length) return;
+
+  elCharacter.src = BG_IMAGES[mode][idx];
+}
+
+function applyFocusMedia(mode, setInRound){
+  stopVideo();
+
+  elCharacter.style.display = "block";
+  elCharacter.style.opacity = "1";
+
+  if(elSensei) elSensei.style.opacity = "0";
+
+  setCharacterImage(mode, setInRound);
+  startAmbient(mode);
+}
+
+function applyBreakMedia(){
+  stopVideo();
+
+  elCharacter.style.display = "block";
+  elCharacter.style.opacity = "1";
+
+  if(elSensei) elSensei.style.opacity = "0";
+}
 
 // ======================
 // 名言（セット固定）
@@ -104,11 +173,17 @@ function showHomeUI(){
   elLap.classList.add("hidden");
   elBears.classList.add("hidden");
 
-  
+  // 右：開始は写真のみ
+  elBgVideo.style.opacity = "0";
+  elBgVideo.pause();
+  elBgVideo.removeAttribute("src");
+  elBgVideo.load();
+
   elCharacter.style.display = "block";
   elCharacter.style.opacity = "1";
 
- 
+  elSensei.style.opacity = "0"; // 先生は常に開始では消す
+
   // 初期化
   isBreak = false;
   currentTime = FOCUS_SEC;
@@ -134,8 +209,10 @@ function showFocusUI(){
   elModeTitle.textContent = "集中TIME";
 
   // 右：集中は動画＋先生
+  elBgVideo.style.opacity = "1";
 
   elCharacter.style.display = "none"; // ドンくまおは集中だけ消す
+  elSensei.style.opacity = "1";       // 先生は集中だけ出す
 }
 
 function showBreakUI(){
@@ -144,12 +221,56 @@ function showBreakUI(){
   elQuote.textContent = "";
 
   // 右：休憩はカフェ動画＋ドンくまお、先生は消す
- 
+  elBgVideo.style.opacity = "1";
 
-   elCharacter.style.display = "block";
+  elSensei.style.opacity = "0";
+  elCharacter.style.display = "block";
   elCharacter.style.opacity = "1";
 }
 
+// ======================
+// 動画切替（黒画面対策込み）
+// ======================
+function setVideoSrcSafe(src){
+  if(!elBgVideo) return;
+  if(!src) return;
+
+  // いったん完全リセット
+  try{
+    elBgVideo.pause();
+    elBgVideo.removeAttribute("src");
+    elBgVideo.load();
+  }catch(e){}
+
+  // 少し待ってから差し替え（これで黒になりにくい）
+  setTimeout(() => {
+    elBgVideo.src = src;
+    elBgVideo.loop = true;
+    elBgVideo.muted = false;  // ボタン押下後なら基本OK
+    elBgVideo.volume = 1.0;
+
+    elBgVideo.load();
+
+    elBgVideo.play().then(()=>{
+      elBgVideo.style.opacity = "1";
+    }).catch(()=>{
+      // 自動再生がブロックされた場合：映像は出ることが多いが、環境依存
+      elBgVideo.style.opacity = "1";
+    });
+  }, 80);
+}
+
+function setModeVideo(mode){
+  let src = "";
+  if(mode === "fire")   src = "fire.mp4";
+  if(mode === "forest") src = "forest.mp4";
+  if(mode === "sea")    src = "sea.mp4";
+  setVideoSrcSafe(src);
+}
+
+function setBreakCafeVideo(){
+  setVideoSrcSafe("cafe.mp4");
+}
 
 // ======================
 // タイマー制御
@@ -192,6 +313,8 @@ function startFocusPhase(){
   showFocusUI();
 
   const setInRound = getSetInRound();
+  applyFocusMedia(currentMode, setInRound);
+
   elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
   speak(KUMAO_QUOTES[setInRound] || "");
 
@@ -209,7 +332,8 @@ function startBreakPhase(){
   currentTime = BREAK_SEC;
 
   showBreakUI();
- 
+  applyBreakMedia();
+
   speak("よくやった。一度整えろ。");
 
   updateLap();
