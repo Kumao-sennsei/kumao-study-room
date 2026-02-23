@@ -314,6 +314,11 @@ function startBreakPhase(){
 function startStudy(mode){
   currentMode = mode;
   totalSetIndex = 1;
+
+  // 🔥 テスト用：開始時にレア表示
+  rareBtn.style.display = "block";
+  playRareVoice();
+
   startFocusPhase();
 }
 
@@ -350,6 +355,7 @@ function playRareTest() {
 
   audioEn.play();
 }
+
 
 
 
