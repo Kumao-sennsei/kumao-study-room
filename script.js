@@ -2,9 +2,9 @@
 // 追加：画像＆音管理
 // ======================
 const bgImages = {
-  fire: ["fire1.png", "fire2.png", "fire3.png", "fire4.png"],
-  forest: ["forest1.png", "forest2.png", "forest3.png", "forest4.png"],
-  sea: ["sea1.png", "sea2.png", "sea3.png", "sea4.png"]
+  fire: ["fire_round1.png", "fire_round2.png", "fire_round3.png"],
+  forest: ["forest_round1.png", "forest_round2.png", "forest_round3.png"],
+  sea: ["sea_round1.png", "sea_round2.png", "sea_round3.png"]
 };
 
 let currentAudio = null;
@@ -34,15 +34,16 @@ function startAmbient(mode){
   currentAudio.play().catch(()=>{});
 }
 
-function setCharacterImage(mode, setInRound){
+function setCharacterImage(mode){
   if(!bgImages[mode]) return;
-  const idx = setInRound - 1;
-  if(idx < 0) return;
-  if(idx >= bgImages[mode].length) return;
 
-  elCharacter.src = bgImages[mode][idx];
+  const roundIndex = getRound() - 1;  // 0始まり
+
+  const images = bgImages[mode];
+  const safeIndex = Math.min(roundIndex, images.length - 1);
+
+  elCharacter.src = images[safeIndex];
 }
-
 function speakThenAmbient(_text, mode){
   // quote1.mp3〜quote4.mp3 を再生 → 終わったら環境音
   const setInRound = getSetInRound();
@@ -255,7 +256,7 @@ function startFocusPhase(){
   const setInRound = getSetInRound();
 
   // 画像：set番号で差し込み
-  setCharacterImage(currentMode, setInRound);
+  setCharacterImage(currentMode);
 
   // 名言：表示は維持
   elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
@@ -326,3 +327,4 @@ function speak(text){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
+
