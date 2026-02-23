@@ -96,6 +96,7 @@ const elBearSpans = Array.from(document.querySelectorAll(".bear"));
 const elStartMenu = document.getElementById("startMenu");
 const elCharacter = document.getElementById("character"); // ★統一
 const elBrandBox = document.getElementById("brandBox");
+const rareBtn = document.getElementById("rareBtn");
 
 // SVG ring
 const ringFg = document.querySelector(".ring-fg");
@@ -338,6 +339,7 @@ function playRareTest() {
 
   audioEn.play();
 }
+
 
 
 
