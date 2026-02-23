@@ -1,4 +1,15 @@
 // ======================
+// グローバル状態管理
+// ======================
+let currentMode = null;
+let totalSetIndex = 1;
+
+let currentAudio = null;
+let currentAudioMode = "";
+
+// DOM取得
+const rareBtn = document.getElementById("rareBtn");
+// ======================
 // 追加：画像＆音管理
 // ======================
 const bgImages = {
@@ -84,10 +95,10 @@ const BREAK_SEC = 5 * 60;
 
 const SETS_PER_ROUND = 4;
 
-let currentMode = "";
+
 let isBreak = false;
 
-let totalSetIndex = 1;
+
 let currentTime = FOCUS_SEC;
 let intervalId = null;
 
@@ -107,7 +118,7 @@ const elBearSpans = Array.from(document.querySelectorAll(".bear"));
 const elStartMenu = document.getElementById("startMenu");
 const elCharacter = document.getElementById("character"); // ★統一
 const elBrandBox = document.getElementById("brandBox");
-const rareBtn = document.getElementById("rareBtn");
+
 
 // SVG ring
 const ringFg = document.querySelector(".ring-fg");
@@ -355,6 +366,7 @@ function playRareTest() {
 
   audioEn.play();
 }
+
 
 
 
