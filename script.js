@@ -6,7 +6,7 @@ const bgImages = {
   forest: ["forest_round1.png", "forest_round2.png", "forest_round3.png"],
   sea: ["sea_round1.png", "sea_round2.png", "sea_round3.png"]
 };
-
+const breakImages = ["break1.png", "break2.png", "break3.png", "break4.png"];
 let currentAudio = null;
 let currentAudioMode = "";
 
@@ -327,4 +327,5 @@ function speak(text){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
+
 
