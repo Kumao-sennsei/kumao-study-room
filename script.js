@@ -47,7 +47,7 @@ function playRareVoice() {
 }
 
 function checkRare(){
-  rareBtn.style.display = "block";
+  rareBtn.style.display = "none";
 }
 
 rareBtn.addEventListener("click", playRareVoice);
@@ -224,4 +224,5 @@ window.onload = function(){
 };
 
 window.startStudy = startStudy;
+
 
