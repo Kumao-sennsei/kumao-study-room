@@ -64,7 +64,18 @@ function playBreakVoice() {
   audio.volume = 0.9;
   audio.play().catch(()=>{});
 }
+function playRareVoice() {
+  const audioEn = new Audio("rare_praise_01_en.mp3");
+  const audioJp = new Audio("rare_praise_01_jp.mp3");
 
+  audioEn.volume = 1;
+  audioJp.volume = 1;
+
+  audioEn.onended = () => audioJp.play();
+  audioEn.play().catch(()=>{});
+}
+
+rareBtn.addEventListener("click", playRareVoice);
 // ======================
 // 設定
 // ======================
@@ -339,6 +350,7 @@ function playRareTest() {
 
   audioEn.play();
 }
+
 
 
 
