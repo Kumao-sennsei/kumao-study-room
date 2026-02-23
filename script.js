@@ -18,8 +18,7 @@ const bgImages = {
   sea: ["sea_round1.png", "sea_round2.png", "sea_round3.png"]
 };
 const breakImages = ["break1.png", "break2.png", "break3.png", "break4.png"];
-let currentAudio = null;
-let currentAudioMode = "";
+
 
 function stopAmbient(){
   if(currentAudio){
@@ -366,6 +365,7 @@ function playRareTest() {
 
   audioEn.play();
 }
+
 
 
 
