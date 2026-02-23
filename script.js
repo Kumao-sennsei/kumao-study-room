@@ -47,12 +47,7 @@ function playRareVoice() {
 }
 
 function checkRare(){
-  const r = Math.random();
-  if(r < 0.1){ // 今は10%テスト
-    rareBtn.style.display = "block";
-  } else {
-    rareBtn.style.display = "none";
-  }
+  rareBtn.style.display = "block";
 }
 
 rareBtn.addEventListener("click", playRareVoice);
@@ -229,3 +224,4 @@ window.onload = function(){
 };
 
 window.startStudy = startStudy;
+
