@@ -328,6 +328,16 @@ function speak(text){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
+function playRareTest() {
+  const audioEn = new Audio("rare_praise_01_en.mp3");
+  const audioJp = new Audio("rare_praise_01_jp.mp3");
+
+  audioEn.onended = () => {
+    audioJp.play();
+  };
+
+  audioEn.play();
+}
 
 
 
