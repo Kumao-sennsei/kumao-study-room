@@ -279,7 +279,8 @@ function startBreakPhase(){
   currentTime = BREAK_SEC;
 
   showBreakUI();
-
+  const setInRound = getSetInRound(); // 1〜4
+  elCharacter.src = breakImages[setInRound - 1];
   // 休憩では環境音いったん止める
   stopAmbient();
 
@@ -327,5 +328,6 @@ function speak(text){
   speechSynthesis.cancel();
   speechSynthesis.speak(uttr);
 }
+
 
 
