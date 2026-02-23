@@ -84,7 +84,14 @@ function playRareVoice() {
   audioEn.onended = () => audioJp.play();
   audioEn.play().catch(()=>{});
 }
-
+function checkRare(){
+  const r = Math.random();
+  if(r < 0.1){   // 今は10%でテスト
+    rareBtn.style.display = "block";
+  } else {
+    rareBtn.style.display = "none";
+  }
+}
 rareBtn.addEventListener("click", playRareVoice);
 // ======================
 // 設定
@@ -365,6 +372,7 @@ function playRareTest() {
 
   audioEn.play();
 }
+
 
 
 
