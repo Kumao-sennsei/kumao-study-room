@@ -210,6 +210,7 @@ function startTimerLoop(phaseMaxSec){
 // ======================
 // 入口
 // ======================
+console.log("startFocusPhase入った");
 function startStudy(mode){
   currentMode = mode;
   totalSetIndex = 1;
@@ -224,5 +225,6 @@ window.onload = function(){
 };
 
 window.startStudy = startStudy;
+
 
 
