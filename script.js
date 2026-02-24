@@ -169,10 +169,28 @@ function startFocusPhase(){
   isBreak = false;
   currentTime = FOCUS_SEC;
 
-  rareBtn.style.display = "none"; // 集中入ったら消す
+  // 🔥 ここ追加
+  elProductName.classList.add("hidden");
+  elSubTitle.classList.add("hidden");
+  elStartMenu.classList.add("hidden");
+  elBrandBox.classList.add("hidden");
+
+  elModeTitle.classList.remove("hidden");
+  elQuote.classList.remove("hidden");
+  elRingWrap.classList.remove("hidden");
+  elLap.classList.remove("hidden");
+  elBears.classList.remove("hidden");
+
+  elModeTitle.textContent = "集中TIME";
+
+  rareBtn.style.display = "none";
 
   const setInRound = getSetInRound();
   elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
+
+  setTimerText(currentTime);
+  updateLap();
+  updateBears();
 
   startTimerLoop(FOCUS_SEC);
 }
@@ -225,6 +243,7 @@ window.onload = function(){
 };
 
 window.startStudy = startStudy;
+
 
 
 
