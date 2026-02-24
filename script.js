@@ -262,6 +262,16 @@ function startBreakPhase(){
 
   showBreakUI();
 
+  // 🔥 ここ追加
+  const setInRound = getSetInRound();
+  const breakImages = [
+    "break1.png",
+    "break2.png",
+    "break3.png",
+    "break4.png"
+  ];
+  elCharacter.src = breakImages[setInRound - 1] || "break1.png";
+
   stopAmbient();
   playBreakVoice();
 
@@ -288,3 +298,4 @@ function startStudy(mode){
 // ======================
 showHomeUI();
 window.startStudy = startStudy;
+
