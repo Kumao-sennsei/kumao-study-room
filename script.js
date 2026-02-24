@@ -242,9 +242,15 @@ function startFocusPhase(){
   showFocusUI();
 
   const setInRound = getSetInRound();
+
+  // 画像切り替え
   setCharacterImage(currentMode, setInRound);
 
+  // 名言表示
   elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
+
+  // 🔥 重要：環境音を止めてから名言再生
+  stopAmbient();
   speakThenAmbient(KUMAO_QUOTES[setInRound] || "", currentMode);
 
   updateLap();
@@ -262,7 +268,7 @@ function startBreakPhase(){
 
   showBreakUI();
 
-  // 🔥 ここ追加
+  // 🔥 休憩用画像切り替え
   const setInRound = getSetInRound();
   const breakImages = [
     "break1.png",
@@ -284,6 +290,7 @@ function startBreakPhase(){
   startTimerLoop(BREAK_SEC);
 }
 
+
 // ======================
 // 入口
 // ======================
@@ -298,4 +305,5 @@ function startStudy(mode){
 // ======================
 showHomeUI();
 window.startStudy = startStudy;
+
 
