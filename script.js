@@ -28,38 +28,38 @@ function startAmbient(mode){
   stopAmbient();
 
   currentAudioMode = mode;
-  currentAudio = new Audio(mode + ".mp3");
+  currentAudio = new Audio(`/${mode}.mp3`);   // ← 念のためルート指定
   currentAudio.loop = true;
   currentAudio.volume = 0.5;
   currentAudio.play().catch(()=>{});
 }
 
+// ★★★ ここだけ修正（画像パスを /images/ に）★★★
 function setCharacterImage(mode, setInRound){
   if(!bgImages[mode]) return;
+
   const idx = setInRound - 1;
   if(idx < 0) return;
   if(idx >= bgImages[mode].length) return;
 
-  elCharacter.src = bgImages[mode][idx];
+  elCharacter.src = `/images/${bgImages[mode][idx]}`;
 }
 
 function speakThenAmbient(_text, mode){
-  // quote1.mp3〜quote4.mp3 を再生 → 終わったら環境音
   const setInRound = getSetInRound();
 
-  const audio = new Audio(`quote${setInRound}.mp3`);
+  const audio = new Audio(`/quote${setInRound}.mp3`); // ← ルート指定
   audio.volume = 1;
 
   audio.onended = () => startAmbient(mode);
 
   audio.play().catch(() => {
-    // 自動再生ブロック/ファイル不在などでも環境音へ
     startAmbient(mode);
   });
 }
 
 function playBreakVoice() {
-  const audio = new Audio("break_normal.mp3");
+  const audio = new Audio("/break_normal.mp3"); // ← ルート指定
   audio.volume = 0.9;
   audio.play().catch(()=>{});
 }
@@ -93,7 +93,7 @@ const elBears = document.getElementById("bears");
 const elBearSpans = Array.from(document.querySelectorAll(".bear"));
 
 const elStartMenu = document.getElementById("startMenu");
-const elCharacter = document.getElementById("character"); // ★統一
+const elCharacter = document.getElementById("character");
 const elBrandBox = document.getElementById("brandBox");
 
 // SVG ring
@@ -102,7 +102,7 @@ const RADIUS = 52;
 const CIRC = 2 * Math.PI * RADIUS;
 
 // ======================
-// 名言（セット固定）
+// 名言
 // ======================
 const KUMAO_QUOTES = {
   1: "静かに積め。焦るな。\n積み上げた者だけが強くなる。",
@@ -140,7 +140,6 @@ function updateLap(){
   elLap.textContent = `${getRound()}周目`;
 }
 
-// ring更新：時計回り（経過時間ベース）
 function updateRing(sec, maxSec){
   ringFg.style.strokeDasharray = `${CIRC}`;
 
@@ -152,38 +151,33 @@ function updateRing(sec, maxSec){
 }
 
 // ======================
-// UI制御（表示のルール）
+// UI制御
 // ======================
 function showHomeUI(){
-  // 左：開始画面
   elProductName.classList.remove("hidden");
   elSubTitle.classList.remove("hidden");
   elStartMenu.classList.remove("hidden");
   elBrandBox.classList.remove("hidden");
 
-  // 左：集中UIを隠す
   elModeTitle.classList.add("hidden");
   elQuote.classList.add("hidden");
   elRingWrap.classList.add("hidden");
   elLap.classList.add("hidden");
   elBears.classList.add("hidden");
 
-  // 右：画像は出す（ホーム絵があるならそのまま）
   elCharacter.style.display = "block";
   elCharacter.style.opacity = "1";
 
-  // 初期化
   isBreak = false;
   currentTime = FOCUS_SEC;
   setTimerText(currentTime);
 
-  stopAmbient();     // ★開始では環境音止める
+  stopAmbient();
   stopTimer();
   updateRing(currentTime, FOCUS_SEC);
 }
 
 function showFocusUI(){
-  // 左：集中画面
   elProductName.classList.add("hidden");
   elSubTitle.classList.add("hidden");
   elStartMenu.classList.add("hidden");
@@ -197,17 +191,14 @@ function showFocusUI(){
 
   elModeTitle.textContent = "集中TIME";
 
-  // 右：集中は画像
   elCharacter.style.display = "block";
   elCharacter.style.opacity = "1";
 }
 
 function showBreakUI(){
-  // 左：休憩も集中レイアウトのまま
   elModeTitle.textContent = "休憩TIME";
   elQuote.textContent = "";
 
-  // 右：休憩も画像は出す（ドン画像にしたいならここで差し替え）
   elCharacter.style.display = "block";
   elCharacter.style.opacity = "1";
 }
@@ -230,10 +221,10 @@ function startTimerLoop(phaseMaxSec){
 
     if(currentTime < 0){
       if(!isBreak){
-        startBreakPhase(); // 集中 -> 休憩
+        startBreakPhase();
       }else{
         totalSetIndex++;
-        startFocusPhase(); // 休憩 -> 次セット集中
+        startFocusPhase();
       }
       return;
     }
@@ -254,13 +245,10 @@ function startFocusPhase(){
 
   const setInRound = getSetInRound();
 
-  // 画像：set番号で差し込み
   setCharacterImage(currentMode, setInRound);
 
-  // 名言：表示は維持
   elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
 
-  // 名言音声→環境音
   speakThenAmbient(KUMAO_QUOTES[setInRound] || "", currentMode);
 
   updateLap();
@@ -269,7 +257,6 @@ function startFocusPhase(){
   setTimerText(currentTime);
   updateRing(currentTime, FOCUS_SEC);
 
-  // タイマー開始
   startTimerLoop(FOCUS_SEC);
 }
 
@@ -279,10 +266,7 @@ function startBreakPhase(){
 
   showBreakUI();
 
-  // 休憩では環境音いったん止める
   stopAmbient();
-
-  // 休憩開始ボイス（ドンくまお）
   playBreakVoice();
 
   updateLap();
@@ -308,21 +292,3 @@ function startStudy(mode){
 // ======================
 showHomeUI();
 window.startStudy = startStudy;
-
-// ======================
-// （残してOK）WebSpeech用：ドンくまお読み上げ
-// ※今は使ってなくても害なし
-// ======================
-function speak(text){
-  if(!("speechSynthesis" in window)) return;
-  if(!text) return;
-
-  const uttr = new SpeechSynthesisUtterance(text);
-  uttr.lang = "ja-JP";
-  uttr.rate = 0.9;
-  uttr.pitch = 0.8;
-  uttr.volume = 1;
-
-  speechSynthesis.cancel();
-  speechSynthesis.speak(uttr);
-}
