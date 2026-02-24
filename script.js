@@ -28,13 +28,12 @@ function startAmbient(mode){
   stopAmbient();
 
   currentAudioMode = mode;
-  currentAudio = new Audio(`/${mode}.mp3`);   // ← 念のためルート指定
+  currentAudio = new Audio(`${mode}.mp3`); // ← ルート直下
   currentAudio.loop = true;
   currentAudio.volume = 0.5;
   currentAudio.play().catch(()=>{});
 }
 
-// ★★★ ここだけ修正（画像パスを /images/ に）★★★
 function setCharacterImage(mode, setInRound){
   if(!bgImages[mode]) return;
 
@@ -42,13 +41,14 @@ function setCharacterImage(mode, setInRound){
   if(idx < 0) return;
   if(idx >= bgImages[mode].length) return;
 
-  elCharacter.src = `/images/${bgImages[mode][idx]}`;
+  // ★ imagesフォルダは存在しないので付けない
+  elCharacter.src = bgImages[mode][idx];
 }
 
 function speakThenAmbient(_text, mode){
   const setInRound = getSetInRound();
 
-  const audio = new Audio(`/quote${setInRound}.mp3`); // ← ルート指定
+  const audio = new Audio(`quote${setInRound}.mp3`); // ← ルート直下
   audio.volume = 1;
 
   audio.onended = () => startAmbient(mode);
@@ -59,7 +59,7 @@ function speakThenAmbient(_text, mode){
 }
 
 function playBreakVoice() {
-  const audio = new Audio("/break_normal.mp3"); // ← ルート指定
+  const audio = new Audio("break_normal.mp3"); // ← ルート直下
   audio.volume = 0.9;
   audio.play().catch(()=>{});
 }
@@ -142,10 +142,8 @@ function updateLap(){
 
 function updateRing(sec, maxSec){
   ringFg.style.strokeDasharray = `${CIRC}`;
-
   const elapsed = maxSec - sec;
   const ratio = Math.max(0, Math.min(1, elapsed / maxSec));
-
   const offset = CIRC * (1 - ratio);
   ringFg.style.strokeDashoffset = `${offset}`;
 }
@@ -244,11 +242,9 @@ function startFocusPhase(){
   showFocusUI();
 
   const setInRound = getSetInRound();
-
   setCharacterImage(currentMode, setInRound);
 
   elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
-
   speakThenAmbient(KUMAO_QUOTES[setInRound] || "", currentMode);
 
   updateLap();
@@ -292,4 +288,3 @@ function startStudy(mode){
 // ======================
 showHomeUI();
 window.startStudy = startStudy;
-
