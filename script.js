@@ -2,9 +2,9 @@
 // 追加：画像＆音管理
 // ======================
 const bgImages = {
-  fire: ["fire1.png", "fire2.png", "fire3.png", "fire4.png"],
-  forest: ["forest1.png", "forest2.png", "forest3.png", "forest4.png"],
-  sea: ["sea1.png", "sea2.png", "sea3.png", "sea4.png"]
+  fire: ["fire_round1.png", "fire_round2.png", "fire_round3.png", "fire_round4.png"],
+  forest: ["forest_round1.png", "forest_round2.png", "forest_round3.png", "forest_round4.png"],
+  sea: ["sea_round1.png", "sea_round2.png", "sea_round3.png", "sea_round4.png"]
 };
 
 let currentAudio = null;
@@ -292,3 +292,4 @@ function startStudy(mode){
 // ======================
 showHomeUI();
 window.startStudy = startStudy;
+
