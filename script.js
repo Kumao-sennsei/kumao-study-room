@@ -9,6 +9,7 @@ const bgImages = {
 
 let currentAudio = null;
 let currentAudioMode = "";
+let phaseEndTime = null;   // ★ 実時間管理用
 
 function stopAmbient(){
   if(currentAudio){
@@ -28,40 +29,42 @@ function startAmbient(mode){
   stopAmbient();
 
   currentAudioMode = mode;
-  currentAudio = new Audio(`${mode}.mp3`); // ← ルート直下
+  currentAudio = new Audio(`${mode}.mp3`);
   currentAudio.loop = true;
   currentAudio.volume = 0.5;
-  currentAudio.play().catch(()=>{});
+  currentAudio.currentTime = 0;
+
+  currentAudio.play().then(()=>{}).catch(()=>{});
 }
 
 function setCharacterImage(mode, setInRound){
   if(!bgImages[mode]) return;
 
   const idx = setInRound - 1;
-  if(idx < 0) return;
-  if(idx >= bgImages[mode].length) return;
+  if(idx < 0 || idx >= bgImages[mode].length) return;
 
-  // ★ imagesフォルダは存在しないので付けない
   elCharacter.src = bgImages[mode][idx];
 }
 
 function speakThenAmbient(_text, mode){
   const setInRound = getSetInRound();
 
-  const audio = new Audio(`quote${setInRound}.mp3`); // ← ルート直下
+  const audio = new Audio(`quote${setInRound}.mp3`);
   audio.volume = 1;
+  audio.currentTime = 0;
 
   audio.onended = () => startAmbient(mode);
 
-  audio.play().catch(() => {
+  audio.play().then(()=>{}).catch(()=>{
     startAmbient(mode);
   });
 }
 
 function playBreakVoice() {
-  const audio = new Audio("break_normal.mp3"); // ← ルート直下
+  const audio = new Audio("break_normal.mp3");
   audio.volume = 0.9;
-  audio.play().catch(()=>{});
+  audio.currentTime = 0;
+  audio.play().then(()=>{}).catch(()=>{});
 }
 
 // ======================
@@ -69,7 +72,6 @@ function playBreakVoice() {
 // ======================
 const FOCUS_SEC = 25 * 60;
 const BREAK_SEC = 5 * 60;
-
 const SETS_PER_ROUND = 4;
 
 let currentMode = "";
@@ -96,7 +98,6 @@ const elStartMenu = document.getElementById("startMenu");
 const elCharacter = document.getElementById("character");
 const elBrandBox = document.getElementById("brandBox");
 
-// SVG ring
 const ringFg = document.querySelector(".ring-fg");
 const RADIUS = 52;
 const CIRC = 2 * Math.PI * RADIUS;
@@ -142,10 +143,90 @@ function updateLap(){
 
 function updateRing(sec, maxSec){
   ringFg.style.strokeDasharray = `${CIRC}`;
-  const elapsed = maxSec - sec;
-  const ratio = Math.max(0, Math.min(1, elapsed / maxSec));
+  const ratio = Math.max(0, Math.min(1, 1 - sec / maxSec));
   const offset = CIRC * (1 - ratio);
   ringFg.style.strokeDashoffset = `${offset}`;
+}
+
+// ======================
+// タイマー制御（実時間ベース）
+// ======================
+function stopTimer(){
+  if(intervalId){
+    clearInterval(intervalId);
+    intervalId = null;
+  }
+}
+
+function startTimerLoop(phaseMaxSec){
+  stopTimer();
+
+  phaseEndTime = Date.now() + phaseMaxSec * 1000;
+
+  intervalId = setInterval(() => {
+    const remaining = Math.max(0, Math.ceil((phaseEndTime - Date.now()) / 1000));
+    currentTime = remaining;
+
+    setTimerText(currentTime);
+    updateRing(currentTime, phaseMaxSec);
+
+    if(remaining <= 0){
+      if(!isBreak){
+        startBreakPhase();
+      }else{
+        totalSetIndex++;
+        startFocusPhase();
+      }
+    }
+  }, 500);
+}
+
+// ======================
+// フェーズ
+// ======================
+function startFocusPhase(){
+  isBreak = false;
+  currentTime = FOCUS_SEC;
+
+  showFocusUI();
+
+  const setInRound = getSetInRound();
+
+  setCharacterImage(currentMode, setInRound);
+  elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
+
+  stopAmbient();
+  speakThenAmbient(KUMAO_QUOTES[setInRound] || "", currentMode);
+
+  updateLap();
+  updateBears();
+
+  setTimerText(currentTime);
+  updateRing(currentTime, FOCUS_SEC);
+
+  startTimerLoop(FOCUS_SEC);
+}
+
+function startBreakPhase(){
+  isBreak = true;
+  currentTime = BREAK_SEC;
+
+  showBreakUI();
+
+  const setInRound = getSetInRound();
+  const breakImages = ["break1.png","break2.png","break3.png","break4.png"];
+  elCharacter.src = breakImages[setInRound - 1] || "break1.png";
+
+  stopAmbient();
+  playBreakVoice();
+
+  updateLap();
+  updateBears();
+
+  setTimerText(currentTime);
+  updateRing(currentTime, BREAK_SEC);
+
+  startTimerLoop(BREAK_SEC);
 }
 
 // ======================
@@ -168,7 +249,6 @@ function showHomeUI(){
 
   isBreak = false;
   currentTime = FOCUS_SEC;
-  setTimerText(currentTime);
 
   stopAmbient();
   stopTimer();
@@ -202,96 +282,6 @@ function showBreakUI(){
 }
 
 // ======================
-// タイマー制御
-// ======================
-function stopTimer(){
-  if(intervalId){
-    clearInterval(intervalId);
-    intervalId = null;
-  }
-}
-
-function startTimerLoop(phaseMaxSec){
-  stopTimer();
-
-  intervalId = setInterval(() => {
-    currentTime--;
-
-    if(currentTime < 0){
-      if(!isBreak){
-        startBreakPhase();
-      }else{
-        totalSetIndex++;
-        startFocusPhase();
-      }
-      return;
-    }
-
-    setTimerText(currentTime);
-    updateRing(currentTime, phaseMaxSec);
-  }, 1000);
-}
-
-// ======================
-// フェーズ
-// ======================
-function startFocusPhase(){
-  isBreak = false;
-  currentTime = FOCUS_SEC;
-
-  showFocusUI();
-
-  const setInRound = getSetInRound();
-
-  // 画像切り替え
-  setCharacterImage(currentMode, setInRound);
-
-  // 名言表示
-  elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
-
-  // 🔥 重要：環境音を止めてから名言再生
-  stopAmbient();
-  speakThenAmbient(KUMAO_QUOTES[setInRound] || "", currentMode);
-
-  updateLap();
-  updateBears();
-
-  setTimerText(currentTime);
-  updateRing(currentTime, FOCUS_SEC);
-
-  startTimerLoop(FOCUS_SEC);
-}
-
-function startBreakPhase(){
-  isBreak = true;
-  currentTime = BREAK_SEC;
-
-  showBreakUI();
-
-  // 🔥 休憩用画像切り替え
-  const setInRound = getSetInRound();
-  const breakImages = [
-    "break1.png",
-    "break2.png",
-    "break3.png",
-    "break4.png"
-  ];
-  elCharacter.src = breakImages[setInRound - 1] || "break1.png";
-
-  stopAmbient();
-  playBreakVoice();
-
-  updateLap();
-  updateBears();
-
-  setTimerText(currentTime);
-  updateRing(currentTime, BREAK_SEC);
-
-  startTimerLoop(BREAK_SEC);
-}
-
-
-// ======================
 // 入口
 // ======================
 function startStudy(mode){
@@ -305,5 +295,3 @@ function startStudy(mode){
 // ======================
 showHomeUI();
 window.startStudy = startStudy;
-
-
