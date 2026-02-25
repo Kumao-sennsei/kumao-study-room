@@ -190,9 +190,13 @@ function startFocusPhase(){
 
   showFocusUI();
 
-  const setInRound = getSetInRound();
+  const round = getRound(); // ★ ここ変更
 
-  setCharacterImage(currentMode, setInRound);
+  // 画像は「周」で決める
+  setCharacterImage(currentMode, round);
+
+  // 名言はセットでOK（今まで通り）
+  const setInRound = getSetInRound();
   elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
 
   stopAmbient();
@@ -295,3 +299,4 @@ function startStudy(mode){
 // ======================
 showHomeUI();
 window.startStudy = startStudy;
+
