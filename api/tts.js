@@ -1,9 +1,21 @@
 export default async function handler(req, res) {
   try {
-    const { text } = req.body;
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
+    }
+
+    const { text } = req.body || {};
 
     if (!text) {
       return res.status(400).json({ error: "text required" });
+    }
+
+    if (!process.env.ELEVEN_API_KEY) {
+      return res.status(500).json({ error: "ELEVEN_API_KEY is missing" });
+    }
+
+    if (!process.env.ELEVEN_VOICE_ID) {
+      return res.status(500).json({ error: "ELEVEN_VOICE_ID is missing" });
     }
 
     const response = await fetch(
@@ -29,16 +41,26 @@ export default async function handler(req, res) {
     );
 
     if (!response.ok) {
-      const err = await response.text();
-      return res.status(500).send(err);
+      const errText = await response.text();
+      console.error("ElevenLabs error:", errText);
+      return res.status(response.status).json({
+        error: "ElevenLabs request failed",
+        details: errText
+      });
     }
 
-    const buffer = await response.arrayBuffer();
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     res.setHeader("Content-Type", "audio/mpeg");
-    res.send(Buffer.from(buffer));
+    res.setHeader("Content-Length", buffer.length);
+    return res.status(200).send(buffer);
 
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    console.error("TTS route error:", e);
+    return res.status(500).json({
+      error: "Server error",
+      details: e.message
+    });
   }
 }
