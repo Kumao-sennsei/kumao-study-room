@@ -75,6 +75,8 @@ function pickRandom(arr){
 // ======================
 async function speakWithDonKumao(text, onEnded){
   try {
+    console.log("TTS request text:", text);
+
     const res = await fetch("/api/tts", {
       method: "POST",
       headers: {
@@ -83,6 +85,8 @@ async function speakWithDonKumao(text, onEnded){
       body: JSON.stringify({ text })
     });
 
+    console.log("TTS status:", res.status, res.headers.get("content-type"));
+
     if (!res.ok) {
       const errText = await res.text();
       console.error("TTS API failed:", errText);
@@ -90,22 +94,27 @@ async function speakWithDonKumao(text, onEnded){
     }
 
     const blob = await res.blob();
+    console.log("TTS blob:", blob.size, blob.type);
+
     const audioUrl = URL.createObjectURL(blob);
     const audio = new Audio(audioUrl);
     audio.volume = 1;
     audio.currentTime = 0;
 
     audio.onended = () => {
+      console.log("audio ended");
       URL.revokeObjectURL(audioUrl);
       if (onEnded) onEnded();
     };
 
-    audio.onerror = () => {
+    audio.onerror = (e) => {
+      console.error("audio element error:", e);
       URL.revokeObjectURL(audioUrl);
       if (onEnded) onEnded();
     };
 
     await audio.play();
+    console.log("audio play started");
   } catch (err) {
     console.error("TTS再生エラー:", err);
     if (onEnded) onEnded();
