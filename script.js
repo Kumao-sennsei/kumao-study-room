@@ -9,8 +9,41 @@ const bgImages = {
 
 let currentAudio = null;
 let currentAudioMode = "";
-let currentVoiceAudio = null;
 let phaseEndTime = null;
+
+// ======================
+// AudioContext（TTS安定化用）
+// ======================
+let audioCtx = null;
+let currentVoiceSource = null;
+let voiceRequestToken = 0;
+
+async function unlockAudioSystem() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
+    }
+  }
+
+  if (audioCtx && audioCtx.state !== "running") {
+    await audioCtx.resume();
+  }
+}
+
+function stopVoice() {
+  voiceRequestToken++;
+
+  if (currentVoiceSource) {
+    try {
+      currentVoiceSource.stop(0);
+    } catch (e) {}
+    try {
+      currentVoiceSource.disconnect();
+    } catch (e) {}
+    currentVoiceSource = null;
+  }
+}
 
 function stopAmbient(){
   if(currentAudio){
@@ -23,8 +56,9 @@ function stopAmbient(){
   currentAudioMode = "";
 }
 
-function startAmbient(mode){
+async function startAmbient(mode){
   if(!mode) return;
+  if(currentAudioMode === mode && currentAudio) return;
 
   stopAmbient();
 
@@ -33,20 +67,12 @@ function startAmbient(mode){
   currentAudio.loop = true;
   currentAudio.volume = 0.5;
   currentAudio.currentTime = 0;
+  currentAudio.playsInline = true;
 
-  currentAudio.play().then(()=>{}).catch(()=>{});
-}
-
-function stopVoice(){
-  if(currentVoiceAudio){
-    try{
-      currentVoiceAudio.pause();
-      currentVoiceAudio.currentTime = 0;
-      if(currentVoiceAudio.dataset && currentVoiceAudio.dataset.objectUrl){
-        URL.revokeObjectURL(currentVoiceAudio.dataset.objectUrl);
-      }
-    }catch(e){}
-    currentVoiceAudio = null;
+  try{
+    await currentAudio.play();
+  }catch(e){
+    console.error("環境音再生エラー:", e);
   }
 }
 
@@ -87,9 +113,11 @@ function pickRandom(arr){
 // /api/tts に { text } をPOSTして音声を返す想定
 // ======================
 async function speakWithDonKumao(text, onEnded){
-  stopVoice();
+  const myToken = ++voiceRequestToken;
 
   try {
+    await unlockAudioSystem();
+
     console.log("TTS request text:", text);
 
     const res = await fetch("/api/tts", {
@@ -108,36 +136,37 @@ async function speakWithDonKumao(text, onEnded){
       throw new Error("TTS API failed");
     }
 
-    const blob = await res.blob();
-    console.log("TTS blob:", blob.size, blob.type);
+    const arrayBuffer = await res.arrayBuffer();
 
-    const audioUrl = URL.createObjectURL(blob);
-    const audio = new Audio(audioUrl);
-    audio.volume = 1;
-    audio.currentTime = 0;
-    audio.dataset.objectUrl = audioUrl;
+    if (myToken !== voiceRequestToken) {
+      if (onEnded) onEnded();
+      return;
+    }
 
-    currentVoiceAudio = audio;
+    if (!audioCtx) {
+      throw new Error("AudioContext is not available");
+    }
 
-    audio.onended = () => {
-      console.log("audio ended");
-      URL.revokeObjectURL(audioUrl);
-      if(currentVoiceAudio === audio){
-        currentVoiceAudio = null;
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer.slice(0));
+
+    if (myToken !== voiceRequestToken) {
+      if (onEnded) onEnded();
+      return;
+    }
+
+    const source = audioCtx.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(audioCtx.destination);
+    currentVoiceSource = source;
+
+    source.onended = () => {
+      if (currentVoiceSource === source) {
+        currentVoiceSource = null;
       }
       if (onEnded) onEnded();
     };
 
-    audio.onerror = (e) => {
-      console.error("audio element error:", e);
-      URL.revokeObjectURL(audioUrl);
-      if(currentVoiceAudio === audio){
-        currentVoiceAudio = null;
-      }
-      if (onEnded) onEnded();
-    };
-
-    await audio.play();
+    source.start(0);
     console.log("audio play started");
   } catch (err) {
     console.error("TTS再生エラー:", err);
@@ -253,7 +282,7 @@ function startTimerLoop(phaseMaxSec){
       stopTimer();
       handlePhaseEnd();
     }
-  }, 500);
+  }, 250);
 }
 
 // ======================
@@ -317,19 +346,9 @@ function showBreakUI(){
 }
 
 // ======================
-// フェーズ本体
+// フェーズ準備
 // ======================
-function runFocusPhase(){
-  startAmbient(currentMode);
-  startTimerLoop(FOCUS_SEC);
-}
-
-function runBreakPhase(){
-  stopAmbient();
-  startTimerLoop(BREAK_SEC);
-}
-
-function startFocusPhase(){
+function prepareFocusUI(){
   phase = "focus";
   currentTime = FOCUS_SEC;
 
@@ -343,17 +362,9 @@ function startFocusPhase(){
 
   setTimerText(currentTime);
   updateRing(currentTime, FOCUS_SEC);
-
-  const text = pickRandom(SPRING_START_QUOTES);
-  elQuote.textContent = text;
-
-  speakWithDonKumao(text, () => {
-    if(phase !== "focus") return;
-    runFocusPhase();
-  });
 }
 
-function startBreakPhase(){
+function prepareBreakUI(){
   phase = "break";
   currentTime = BREAK_SEC;
 
@@ -368,14 +379,19 @@ function startBreakPhase(){
 
   setTimerText(currentTime);
   updateRing(currentTime, BREAK_SEC);
+}
 
-  const text = pickRandom(SPRING_BREAK_QUOTES);
-  elQuote.textContent = text;
+// ======================
+// フェーズ開始
+// ======================
+async function beginFocusPhase(){
+  await startAmbient(currentMode);
+  startTimerLoop(FOCUS_SEC);
+}
 
-  speakWithDonKumao(text, () => {
-    if(phase !== "break") return;
-    runBreakPhase();
-  });
+function beginBreakPhase(){
+  stopAmbient();
+  startTimerLoop(BREAK_SEC);
 }
 
 // ======================
@@ -390,12 +406,32 @@ function goToPhase(nextPhase){
   stopAmbient();
 
   if(nextPhase === "focus"){
-    startFocusPhase();
-  }else{
-    startBreakPhase();
-  }
+    prepareFocusUI();
+    const text = pickRandom(SPRING_START_QUOTES);
+    elQuote.textContent = text;
 
-  transitionLock = false;
+    speakWithDonKumao(text, async () => {
+      if(phase !== "focus") {
+        transitionLock = false;
+        return;
+      }
+      await beginFocusPhase();
+      transitionLock = false;
+    });
+  }else{
+    prepareBreakUI();
+    const text = pickRandom(SPRING_BREAK_QUOTES);
+    elQuote.textContent = text;
+
+    speakWithDonKumao(text, () => {
+      if(phase !== "break") {
+        transitionLock = false;
+        return;
+      }
+      beginBreakPhase();
+      transitionLock = false;
+    });
+  }
 }
 
 function handlePhaseEnd(){
@@ -422,7 +458,14 @@ function startStudy(mode){
   stopVoice();
   stopAmbient();
 
-  goToPhase("focus");
+  unlockAudioSystem()
+    .then(() => {
+      goToPhase("focus");
+    })
+    .catch((e) => {
+      console.error("Audio unlock error:", e);
+      goToPhase("focus");
+    });
 }
 
 // ======================
