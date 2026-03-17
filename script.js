@@ -13,43 +13,32 @@ let phaseEndTime = null;
 
 function stopAmbient(){
   if(currentAudio){
-    try{
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-    }catch(e){}
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
     currentAudio = null;
   }
   currentAudioMode = "";
 }
 
 function startAmbient(mode){
-  if(!mode) return;
-  if(currentAudioMode === mode && currentAudio) return;
-
   stopAmbient();
 
   currentAudioMode = mode;
   currentAudio = new Audio(`${mode}.mp3`);
   currentAudio.loop = true;
   currentAudio.volume = 0.5;
-  currentAudio.currentTime = 0;
 
-  currentAudio.play().then(() => {}).catch((e) => {
-    console.error("環境音再生エラー:", e);
-  });
+  currentAudio.play().catch(()=>{});
 }
 
 function setCharacterImage(mode, setInRound){
-  if(!bgImages[mode]) return;
-
-  const idx = setInRound - 1;
-  if(idx < 0 || idx >= bgImages[mode].length) return;
-
-  elCharacter.src = bgImages[mode][idx];
+  const arr = bgImages[mode];
+  if(!arr) return;
+  elCharacter.src = arr[setInRound - 1] || arr[0];
 }
 
 // ======================
-// 春ボイス（開始時 / 休憩開始時）
+// セリフ（変更禁止）
 // ======================
 const SPRING_START_QUOTES = [
   "立て。春は始まりだ。お前もまだ始まったばかりだろ？",
@@ -72,108 +61,37 @@ function pickRandom(arr){
 }
 
 // ======================
-// ElevenLabs TTS 再生
-// /api/tts に { text } をPOSTして音声を返す想定
+// TTS（そのまま使用）
 // ======================
-let audioCtx = null;
-let currentVoiceSource = null;
-let voiceRequestToken = 0;
+let currentVoice = null;
 
-async function unlockAudioSystem(){
-  if(!audioCtx){
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if(AudioContextClass){
-      audioCtx = new AudioContextClass();
-    }
-  }
-
-  if(audioCtx && audioCtx.state !== "running"){
-    try{
-      await audioCtx.resume();
-    }catch(e){
-      console.error("AudioContext resume error:", e);
-    }
+function stopVoice(){
+  if(currentVoice){
+    currentVoice.pause();
+    currentVoice = null;
   }
 }
 
-function stopDonKumaoVoice(){
-  voiceRequestToken++;
+async function speak(text){
+  stopVoice();
 
-  if(currentVoiceSource){
-    try{
-      currentVoiceSource.stop(0);
-    }catch(e){}
-    try{
-      currentVoiceSource.disconnect();
-    }catch(e){}
-    currentVoiceSource = null;
-  }
-}
+  const res = await fetch("/api/tts", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ text })
+  });
 
-async function speakWithDonKumao(text){
-  const myToken = ++voiceRequestToken;
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
 
-  try {
-    await unlockAudioSystem();
+  const audio = new Audio(url);
+  currentVoice = audio;
 
-    console.log("TTS request text:", text);
-
-    const res = await fetch("/api/tts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ text })
-    });
-
-    console.log("TTS status:", res.status, res.headers.get("content-type"));
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("TTS API failed:", errText);
-      throw new Error("TTS API failed");
-    }
-
-    const arrayBuffer = await res.arrayBuffer();
-
-    if(myToken !== voiceRequestToken){
-      return;
-    }
-
-    if(!audioCtx){
-      throw new Error("AudioContext is not available");
-    }
-
-    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer.slice(0));
-
-    if(myToken !== voiceRequestToken){
-      return;
-    }
-
-    await new Promise((resolve, reject) => {
-      const source = audioCtx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(audioCtx.destination);
-      currentVoiceSource = source;
-
-      source.onended = () => {
-        if(currentVoiceSource === source){
-          currentVoiceSource = null;
-        }
-        resolve();
-      };
-
-      try{
-        source.start(0);
-      }catch(e){
-        reject(e);
-      }
-    });
-
-    console.log("audio play started");
-  } catch (err) {
-    console.error("TTS再生エラー:", err);
-  }
+  return new Promise(resolve=>{
+    audio.onended = resolve;
+    audio.onerror = resolve;
+    audio.play().catch(resolve);
+  });
 }
 
 // ======================
@@ -181,266 +99,75 @@ async function speakWithDonKumao(text){
 // ======================
 const FOCUS_SEC = 25 * 60;
 const BREAK_SEC = 5 * 60;
-const SETS_PER_ROUND = 4;
 
-let currentMode = "";
 let phase = "focus";
-
-let totalSetIndex = 1;
-let currentTime = FOCUS_SEC;
+let currentMode = "";
 let intervalId = null;
-let transitionLock = false;
 
 // ======================
 // DOM
 // ======================
-const elProductName = document.getElementById("productName");
-const elSubTitle = document.getElementById("subTitle");
-const elModeTitle = document.getElementById("modeTitle");
-const elQuote = document.getElementById("quote");
-const elRingWrap = document.getElementById("ringWrap");
 const elTimer = document.getElementById("timer");
-const elLap = document.getElementById("lap");
-const elBears = document.getElementById("bears");
-const elBearSpans = Array.from(document.querySelectorAll(".bear"));
-
-const elStartMenu = document.getElementById("startMenu");
+const elQuote = document.getElementById("quote");
+const elModeTitle = document.getElementById("modeTitle");
 const elCharacter = document.getElementById("character");
-const elBrandBox = document.getElementById("brandBox");
-
-const ringFg = document.querySelector(".ring-fg");
-const RADIUS = 52;
-const CIRC = 2 * Math.PI * RADIUS;
 
 // ======================
-// 名言（未使用でも残してOK）
+// Timer
 // ======================
-const KUMAO_QUOTES = {
-  1: "静かに積め。焦るな。\n積み上げた者だけが強くなる。",
-  2: "思考を深めよ。\n答えは外ではなく、内にある。",
-  3: "昨日の自分を超えろ。\n勝つべき相手は自分だ。",
-  4: "最終セット。\nここを越えれば、景色が変わる。"
-};
+function startTimer(sec){
+  clearInterval(intervalId);
 
-// ======================
-// Utils
-// ======================
-function setTimerText(sec){
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  elTimer.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-}
+  let end = Date.now() + sec*1000;
 
-function getRound(){
-  return Math.floor((totalSetIndex - 1) / SETS_PER_ROUND) + 1;
-}
+  intervalId = setInterval(()=>{
+    let remain = Math.max(0, Math.ceil((end-Date.now())/1000));
+    elTimer.textContent =
+      `${String(Math.floor(remain/60)).padStart(2,"0")}:${String(remain%60).padStart(2,"0")}`;
 
-function getSetInRound(){
-  return ((totalSetIndex - 1) % SETS_PER_ROUND) + 1;
-}
-
-function updateBears(){
-  const setInRound = getSetInRound();
-  elBearSpans.forEach((sp, idx) => {
-    if (idx < setInRound) sp.classList.add("on");
-    else sp.classList.remove("on");
-  });
-}
-
-function updateLap(){
-  elLap.textContent = `${getRound()}周目`;
-}
-
-function updateRing(sec, maxSec){
-  ringFg.style.strokeDasharray = `${CIRC}`;
-  const ratio = Math.max(0, Math.min(1, 1 - sec / maxSec));
-  const offset = CIRC * (1 - ratio);
-  ringFg.style.strokeDashoffset = `${offset}`;
-}
-
-// ======================
-// タイマー制御（実時間ベース）
-// ======================
-function stopTimer(){
-  if(intervalId){
-    clearInterval(intervalId);
-    intervalId = null;
-  }
-}
-
-function startTimerLoop(phaseMaxSec){
-  stopTimer();
-
-  phaseEndTime = Date.now() + phaseMaxSec * 1000;
-
-  intervalId = setInterval(() => {
-    const remaining = Math.max(0, Math.ceil((phaseEndTime - Date.now()) / 1000));
-    currentTime = remaining;
-
-    setTimerText(currentTime);
-    updateRing(currentTime, phaseMaxSec);
-
-    if(remaining <= 0){
-      stopTimer();
-      handlePhaseEnd();
+    if(remain<=0){
+      clearInterval(intervalId);
+      nextPhase();
     }
-  }, 250);
+  },300);
 }
 
 // ======================
-// UI制御
+// フェーズ制御
 // ======================
-function showHomeUI(){
-  elProductName.classList.remove("hidden");
-  elSubTitle.classList.remove("hidden");
-  elStartMenu.classList.remove("hidden");
-  elBrandBox.classList.remove("hidden");
-
-  elModeTitle.classList.add("hidden");
-  elQuote.classList.add("hidden");
-  elRingWrap.classList.add("hidden");
-  elLap.classList.add("hidden");
-  elBears.classList.add("hidden");
-
-  elCharacter.style.display = "block";
-  elCharacter.style.opacity = "1";
-
+async function startFocus(){
   phase = "focus";
-  currentTime = FOCUS_SEC;
-
-  stopDonKumaoVoice();
-  stopAmbient();
-  stopTimer();
-  updateRing(currentTime, FOCUS_SEC);
-  setTimerText(currentTime);
-}
-
-function showFocusUI(){
-  elProductName.classList.add("hidden");
-  elSubTitle.classList.add("hidden");
-  elStartMenu.classList.add("hidden");
-  elBrandBox.classList.add("hidden");
-
-  elModeTitle.classList.remove("hidden");
-  elQuote.classList.remove("hidden");
-  elRingWrap.classList.remove("hidden");
-  elLap.classList.remove("hidden");
-  elBears.classList.remove("hidden");
 
   elModeTitle.textContent = "集中TIME";
 
-  elCharacter.style.display = "block";
-  elCharacter.style.opacity = "1";
+  const text = pickRandom(SPRING_START_QUOTES);
+  elQuote.textContent = text;
+
+  await speak(text); // ★ここが最重要
+
+  startAmbient(currentMode);
+  startTimer(FOCUS_SEC);
 }
 
-function showBreakUI(){
-  elModeTitle.classList.remove("hidden");
-  elQuote.classList.remove("hidden");
-  elRingWrap.classList.remove("hidden");
-  elLap.classList.remove("hidden");
-  elBears.classList.remove("hidden");
+async function startBreak(){
+  phase = "break";
 
   elModeTitle.textContent = "休憩TIME";
-  elQuote.textContent = "";
 
-  elCharacter.style.display = "block";
-  elCharacter.style.opacity = "1";
-}
+  const text = pickRandom(SPRING_BREAK_QUOTES);
+  elQuote.textContent = text;
 
-// ======================
-// フェーズ準備
-// ======================
-function prepareFocusUI(){
-  phase = "focus";
-  currentTime = FOCUS_SEC;
+  await speak(text); // ★ここが最重要
 
-  showFocusUI();
-
-  const round = getRound();
-  setCharacterImage(currentMode, round);
-
-  updateLap();
-  updateBears();
-
-  setTimerText(currentTime);
-  updateRing(currentTime, FOCUS_SEC);
-}
-
-function prepareBreakUI(){
-  phase = "break";
-  currentTime = BREAK_SEC;
-
-  showBreakUI();
-
-  const setInRound = getSetInRound();
-  const breakImages = ["break1.png","break2.png","break3.png","break4.png"];
-  elCharacter.src = breakImages[setInRound - 1] || "break1.png";
-
-  updateLap();
-  updateBears();
-
-  setTimerText(currentTime);
-  updateRing(currentTime, BREAK_SEC);
-}
-
-// ======================
-// フェーズ開始
-// ======================
-function beginFocusPhase(){
-  startAmbient(currentMode);
-  startTimerLoop(FOCUS_SEC);
-}
-
-function beginBreakPhase(){
   stopAmbient();
-  startTimerLoop(BREAK_SEC);
+  startTimer(BREAK_SEC);
 }
 
-// ======================
-// フェーズ遷移
-// ======================
-async function goToPhase(nextPhase){
-  if(transitionLock) return;
-  transitionLock = true;
-
-  stopTimer();
-  stopDonKumaoVoice();
-
-  try{
-    if(nextPhase === "focus"){
-      prepareFocusUI();
-      const text = pickRandom(SPRING_START_QUOTES);
-      elQuote.textContent = text;
-      await speakWithDonKumao(text);
-      beginFocusPhase();
-    }else{
-      prepareBreakUI();
-      stopAmbient();
-      const text = pickRandom(SPRING_BREAK_QUOTES);
-      elQuote.textContent = text;
-      await speakWithDonKumao(text);
-      beginBreakPhase();
-    }
-  } catch (e){
-    console.error("フェーズ遷移エラー:", e);
-    if(nextPhase === "focus"){
-      beginFocusPhase();
-    }else{
-      beginBreakPhase();
-    }
-  } finally {
-    transitionLock = false;
-  }
-}
-
-function handlePhaseEnd(){
-  if(transitionLock) return;
-
+function nextPhase(){
   if(phase === "focus"){
-    goToPhase("break");
+    startBreak();
   }else{
-    totalSetIndex++;
-    goToPhase("focus");
+    startFocus();
   }
 }
 
@@ -449,20 +176,9 @@ function handlePhaseEnd(){
 // ======================
 async function startStudy(mode){
   currentMode = mode;
-  totalSetIndex = 1;
-  phase = "focus";
-  transitionLock = false;
-
-  stopTimer();
-  stopDonKumaoVoice();
   stopAmbient();
-
-  await unlockAudioSystem();
-  await goToPhase("focus");
+  stopVoice();
+  startFocus();
 }
 
-// ======================
-// 初期化
-// ======================
-showHomeUI();
 window.startStudy = startStudy;
