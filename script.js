@@ -47,7 +47,7 @@ function setCharacterImage(mode, setInRound){
 }
 
 // ======================
-// 春ボイス（開始前 / 休憩開始）
+// 春ボイス（開始時 / 休憩開始時）
 // ======================
 const SPRING_START_QUOTES = [
   "立て。春は始まりだ。お前もまだ始まったばかりだろ？",
@@ -84,6 +84,8 @@ async function speakWithDonKumao(text, onEnded){
     });
 
     if (!res.ok) {
+      const errText = await res.text();
+      console.error("TTS API failed:", errText);
       throw new Error("TTS API failed");
     }
 
@@ -98,6 +100,11 @@ async function speakWithDonKumao(text, onEnded){
       if (onEnded) onEnded();
     };
 
+    audio.onerror = () => {
+      URL.revokeObjectURL(audioUrl);
+      if (onEnded) onEnded();
+    };
+
     await audio.play();
   } catch (err) {
     console.error("TTS再生エラー:", err);
@@ -106,32 +113,28 @@ async function speakWithDonKumao(text, onEnded){
 }
 
 // ======================
-// 開始前ボイス → 環境音 → タイマー開始
+// 開始時ボイス（タイマーと同時）
 // ======================
-function playSpringStartVoiceThenStart(mode){
+function playSpringStartVoice(mode){
   const text = pickRandom(SPRING_START_QUOTES);
   elQuote.textContent = text;
 
-  stopAmbient();
+  // 環境音を開始
+  startAmbient(mode);
 
-  speakWithDonKumao(text, () => {
-    startAmbient(mode);
-    startTimerLoop(FOCUS_SEC);
-  });
+  // ドンくまお音声を同時再生
+  speakWithDonKumao(text);
 }
 
 // ======================
-// 休憩開始ボイス → 休憩タイマー開始
+// 休憩開始時ボイス（休憩タイマーと同時）
 // ======================
-function playSpringBreakVoiceThenStartBreak(){
+function playSpringBreakVoice(){
   const text = pickRandom(SPRING_BREAK_QUOTES);
   elQuote.textContent = text;
 
-  stopAmbient();
-
-  speakWithDonKumao(text, () => {
-    startTimerLoop(BREAK_SEC);
-  });
+  // ドンくまお音声を同時再生
+  speakWithDonKumao(text);
 }
 
 // ======================
@@ -170,7 +173,7 @@ const RADIUS = 52;
 const CIRC = 2 * Math.PI * RADIUS;
 
 // ======================
-// 名言（今回は未使用でも残してOK）
+// 名言（未使用でも残してOK）
 // ======================
 const KUMAO_QUOTES = {
   1: "静かに積め。焦るな。\n積み上げた者だけが強くなる。",
@@ -268,8 +271,11 @@ function startFocusPhase(){
   setTimerText(currentTime);
   updateRing(currentTime, FOCUS_SEC);
 
-  // 授業開始前に春ボイスを流してからタイマー開始
-  playSpringStartVoiceThenStart(currentMode);
+  // タイマー即スタート
+  startTimerLoop(FOCUS_SEC);
+
+  // 開始時ボイスも同時に流す
+  playSpringStartVoice(currentMode);
 }
 
 function startBreakPhase(){
@@ -288,8 +294,11 @@ function startBreakPhase(){
   setTimerText(currentTime);
   updateRing(currentTime, BREAK_SEC);
 
-  // 休憩開始時に春ボイスを流してから休憩タイマー開始
-  playSpringBreakVoiceThenStartBreak();
+  // 休憩タイマー即スタート
+  startTimerLoop(BREAK_SEC);
+
+  // 休憩開始時ボイスも同時に流す
+  playSpringBreakVoice();
 }
 
 // ======================
