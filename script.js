@@ -109,6 +109,24 @@ function stopDonKumaoVoice(){
   }
 }
 
+let currentVoiceAudio = null;
+let voiceRequestToken = 0;
+
+function stopDonKumaoVoice(){
+  voiceRequestToken++;
+
+  if(currentVoiceAudio){
+    try{
+      currentVoiceAudio.pause();
+      currentVoiceAudio.currentTime = 0;
+      if(currentVoiceAudio.dataset && currentVoiceAudio.dataset.objectUrl){
+        URL.revokeObjectURL(currentVoiceAudio.dataset.objectUrl);
+      }
+    }catch(e){}
+    currentVoiceAudio = null;
+  }
+}
+
 async function speakWithDonKumao(text, onEnded){
   const myToken = ++voiceRequestToken;
 
@@ -140,13 +158,9 @@ async function speakWithDonKumao(text, onEnded){
     }
 
     const audioUrl = URL.createObjectURL(blob);
-    const audio = new Audio();
-    audio.src = audioUrl;
-    audio.dataset.objectUrl = audioUrl;
+    const audio = new Audio(audioUrl);
     audio.volume = 1;
     audio.currentTime = 0;
-    audio.preload = "auto";
-    audio.playsInline = true;
 
     currentVoiceAudio = audio;
 
@@ -154,6 +168,8 @@ async function speakWithDonKumao(text, onEnded){
       console.log("audio ended");
       if(audio.dataset && audio.dataset.objectUrl){
         URL.revokeObjectURL(audio.dataset.objectUrl);
+      } else {
+        URL.revokeObjectURL(audioUrl);
       }
       if(currentVoiceAudio === audio){
         currentVoiceAudio = null;
@@ -165,6 +181,8 @@ async function speakWithDonKumao(text, onEnded){
       console.error("audio element error:", e);
       if(audio.dataset && audio.dataset.objectUrl){
         URL.revokeObjectURL(audio.dataset.objectUrl);
+      } else {
+        URL.revokeObjectURL(audioUrl);
       }
       if(currentVoiceAudio === audio){
         currentVoiceAudio = null;
@@ -188,6 +206,10 @@ function playSpringStartVoice(mode){
   elQuote.textContent = text;
 
   stopDonKumaoVoice();
+  startAmbient(mode);
+  speakWithDonKumao(text);
+}
+
 
   // 環境音を開始
   startAmbient(mode);
@@ -205,6 +227,9 @@ function playSpringBreakVoice(){
 
   stopDonKumaoVoice();
   stopAmbient();
+  speakWithDonKumao(text);
+}
+
 
   // ドンくまお音声を同時再生
   speakWithDonKumao(text);
@@ -457,12 +482,16 @@ function showBreakUI(){
 // ======================
 // 入口
 // ======================
-async function startStudy(mode){
-  await unlockAudio();
+function startStudy(mode){
   currentMode = mode;
   totalSetIndex = 1;
-  startFocusPhase();
+  transitionLock = false;
+  stopTimer();
+  stopDonKumaoVoice();
+  stopAmbient();
+  goToFocusPhase();
 }
+
 
 
 // ======================
