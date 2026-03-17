@@ -34,7 +34,9 @@ function startAmbient(mode){
   currentAudio.volume = 0.5;
   currentAudio.currentTime = 0;
 
-  currentAudio.play().then(() => {}).catch(() => {});
+  currentAudio.play().then(() => {}).catch((e) => {
+    console.error("環境音再生エラー:", e);
+  });
 }
 
 function setCharacterImage(mode, setInRound){
@@ -73,21 +75,38 @@ function pickRandom(arr){
 // ElevenLabs TTS 再生
 // /api/tts に { text } をPOSTして音声を返す想定
 // ======================
-let currentVoiceAudio = null;
+let audioCtx = null;
+let currentVoiceSource = null;
 let voiceRequestToken = 0;
+
+async function unlockAudioSystem(){
+  if(!audioCtx){
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if(AudioContextClass){
+      audioCtx = new AudioContextClass();
+    }
+  }
+
+  if(audioCtx && audioCtx.state !== "running"){
+    try{
+      await audioCtx.resume();
+    }catch(e){
+      console.error("AudioContext resume error:", e);
+    }
+  }
+}
 
 function stopDonKumaoVoice(){
   voiceRequestToken++;
 
-  if(currentVoiceAudio){
+  if(currentVoiceSource){
     try{
-      currentVoiceAudio.pause();
-      currentVoiceAudio.currentTime = 0;
-      if(currentVoiceAudio.dataset && currentVoiceAudio.dataset.objectUrl){
-        URL.revokeObjectURL(currentVoiceAudio.dataset.objectUrl);
-      }
+      currentVoiceSource.stop(0);
     }catch(e){}
-    currentVoiceAudio = null;
+    try{
+      currentVoiceSource.disconnect();
+    }catch(e){}
+    currentVoiceSource = null;
   }
 }
 
@@ -95,6 +114,8 @@ async function speakWithDonKumao(text){
   const myToken = ++voiceRequestToken;
 
   try {
+    await unlockAudioSystem();
+
     console.log("TTS request text:", text);
 
     const res = await fetch("/api/tts", {
@@ -113,44 +134,42 @@ async function speakWithDonKumao(text){
       throw new Error("TTS API failed");
     }
 
-    const blob = await res.blob();
-    console.log("TTS blob:", blob.size, blob.type);
+    const arrayBuffer = await res.arrayBuffer();
 
     if(myToken !== voiceRequestToken){
       return;
     }
 
-    const audioUrl = URL.createObjectURL(blob);
-    const audio = new Audio(audioUrl);
-    audio.dataset.objectUrl = audioUrl;
-    audio.volume = 1;
-    audio.currentTime = 0;
-    audio.preload = "auto";
-    audio.playsInline = true;
+    if(!audioCtx){
+      throw new Error("AudioContext is not available");
+    }
 
-    currentVoiceAudio = audio;
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer.slice(0));
 
-    audio.onended = () => {
-      console.log("audio ended");
-      if(audio.dataset && audio.dataset.objectUrl){
-        URL.revokeObjectURL(audio.dataset.objectUrl);
-      }
-      if(currentVoiceAudio === audio){
-        currentVoiceAudio = null;
-      }
-    };
+    if(myToken !== voiceRequestToken){
+      return;
+    }
 
-    audio.onerror = (e) => {
-      console.error("audio element error:", e);
-      if(audio.dataset && audio.dataset.objectUrl){
-        URL.revokeObjectURL(audio.dataset.objectUrl);
-      }
-      if(currentVoiceAudio === audio){
-        currentVoiceAudio = null;
-      }
-    };
+    await new Promise((resolve, reject) => {
+      const source = audioCtx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioCtx.destination);
+      currentVoiceSource = source;
 
-    await audio.play();
+      source.onended = () => {
+        if(currentVoiceSource === source){
+          currentVoiceSource = null;
+        }
+        resolve();
+      };
+
+      try{
+        source.start(0);
+      }catch(e){
+        reject(e);
+      }
+    });
+
     console.log("audio play started");
   } catch (err) {
     console.error("TTS再生エラー:", err);
@@ -329,30 +348,9 @@ function showBreakUI(){
 }
 
 // ======================
-// フェーズ演出
+// フェーズ準備
 // ======================
-function playSpringStartVoice(mode){
-  const text = pickRandom(SPRING_START_QUOTES);
-  elQuote.textContent = text;
-
-  stopDonKumaoVoice();
-  startAmbient(mode);
-  speakWithDonKumao(text);
-}
-
-function playSpringBreakVoice(){
-  const text = pickRandom(SPRING_BREAK_QUOTES);
-  elQuote.textContent = text;
-
-  stopDonKumaoVoice();
-  stopAmbient();
-  speakWithDonKumao(text);
-}
-
-// ======================
-// フェーズ本体
-// ======================
-function beginFocusPhase(){
+function prepareFocusUI(){
   phase = "focus";
   currentTime = FOCUS_SEC;
 
@@ -366,12 +364,9 @@ function beginFocusPhase(){
 
   setTimerText(currentTime);
   updateRing(currentTime, FOCUS_SEC);
-
-  startTimerLoop(FOCUS_SEC);
-  playSpringStartVoice(currentMode);
 }
 
-function beginBreakPhase(){
+function prepareBreakUI(){
   phase = "break";
   currentTime = BREAK_SEC;
 
@@ -386,15 +381,25 @@ function beginBreakPhase(){
 
   setTimerText(currentTime);
   updateRing(currentTime, BREAK_SEC);
+}
 
+// ======================
+// フェーズ開始
+// ======================
+function beginFocusPhase(){
+  startAmbient(currentMode);
+  startTimerLoop(FOCUS_SEC);
+}
+
+function beginBreakPhase(){
+  stopAmbient();
   startTimerLoop(BREAK_SEC);
-  playSpringBreakVoice();
 }
 
 // ======================
 // フェーズ遷移
 // ======================
-function goToPhase(nextPhase){
+async function goToPhase(nextPhase){
   if(transitionLock) return;
   transitionLock = true;
 
@@ -402,6 +407,22 @@ function goToPhase(nextPhase){
   stopDonKumaoVoice();
 
   try{
+    if(nextPhase === "focus"){
+      prepareFocusUI();
+      const text = pickRandom(SPRING_START_QUOTES);
+      elQuote.textContent = text;
+      await speakWithDonKumao(text);
+      beginFocusPhase();
+    }else{
+      prepareBreakUI();
+      stopAmbient();
+      const text = pickRandom(SPRING_BREAK_QUOTES);
+      elQuote.textContent = text;
+      await speakWithDonKumao(text);
+      beginBreakPhase();
+    }
+  } catch (e){
+    console.error("フェーズ遷移エラー:", e);
     if(nextPhase === "focus"){
       beginFocusPhase();
     }else{
@@ -426,7 +447,7 @@ function handlePhaseEnd(){
 // ======================
 // 入口
 // ======================
-function startStudy(mode){
+async function startStudy(mode){
   currentMode = mode;
   totalSetIndex = 1;
   phase = "focus";
@@ -436,7 +457,8 @@ function startStudy(mode){
   stopDonKumaoVoice();
   stopAmbient();
 
-  goToPhase("focus");
+  await unlockAudioSystem();
+  await goToPhase("focus");
 }
 
 // ======================
