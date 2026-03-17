@@ -1,5 +1,5 @@
 // ======================
-// 追加：画像＆音管理
+// 画像＆音管理
 // ======================
 const bgImages = {
   fire: ["fire_round1.png", "fire_round2.png", "fire_round3.png", "fire_round4.png"],
@@ -25,7 +25,6 @@ async function unlockAudioSystem() {
       audioCtx = new AudioContextClass();
     }
   }
-
   if (audioCtx && audioCtx.state !== "running") {
     await audioCtx.resume();
   }
@@ -33,7 +32,6 @@ async function unlockAudioSystem() {
 
 function stopVoice() {
   voiceRequestToken++;
-
   if (currentVoiceSource) {
     try {
       currentVoiceSource.stop(0);
@@ -45,20 +43,20 @@ function stopVoice() {
   }
 }
 
-function stopAmbient(){
-  if(currentAudio){
-    try{
+function stopAmbient() {
+  if (currentAudio) {
+    try {
       currentAudio.pause();
       currentAudio.currentTime = 0;
-    }catch(e){}
+    } catch (e) {}
     currentAudio = null;
   }
   currentAudioMode = "";
 }
 
-async function startAmbient(mode){
-  if(!mode) return;
-  if(currentAudioMode === mode && currentAudio) return;
+async function startAmbient(mode) {
+  if (!mode) return;
+  if (currentAudioMode === mode && currentAudio) return;
 
   stopAmbient();
 
@@ -69,24 +67,22 @@ async function startAmbient(mode){
   currentAudio.currentTime = 0;
   currentAudio.playsInline = true;
 
-  try{
+  try {
     await currentAudio.play();
-  }catch(e){
+  } catch (e) {
     console.error("環境音再生エラー:", e);
   }
 }
 
-function setCharacterImage(mode, setInRound){
-  if(!bgImages[mode]) return;
-
+function setCharacterImage(mode, setInRound) {
+  if (!bgImages[mode]) return;
   const idx = setInRound - 1;
-  if(idx < 0 || idx >= bgImages[mode].length) return;
-
+  if (idx < 0 || idx >= bgImages[mode].length) return;
   elCharacter.src = bgImages[mode][idx];
 }
 
 // ======================
-// 春ボイス（開始時 / 休憩開始時）
+// セリフ設定
 // ======================
 const SPRING_START_QUOTES = [
   "立て。春は始まりだ。お前もまだ始まったばかりだろ？",
@@ -104,78 +100,52 @@ const SPRING_BREAK_QUOTES = [
   "今日ちょっと重かったな。それでもやった。そこが頑張りだ。とりあえず5分、肩の力抜け。"
 ];
 
-function pickRandom(arr){
+function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
 // ======================
 // ElevenLabs TTS 再生
-// /api/tts に { text } をPOSTして音声を返す想定
 // ======================
-async function speakWithDonKumao(text, onEnded){
+async function speakWithDonKumao(text, onEnded) {
   const myToken = ++voiceRequestToken;
 
   try {
     await unlockAudioSystem();
-
-    console.log("TTS request text:", text);
-
     const res = await fetch("/api/tts", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text })
     });
 
-    console.log("TTS status:", res.status, res.headers.get("content-type"));
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("TTS API failed:", errText);
-      throw new Error("TTS API failed");
-    }
+    if (!res.ok) throw new Error("TTS API failed");
 
     const arrayBuffer = await res.arrayBuffer();
-
     if (myToken !== voiceRequestToken) {
       if (onEnded) onEnded();
       return;
     }
 
-    if (!audioCtx) {
-      throw new Error("AudioContext is not available");
-    }
-
-    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer.slice(0));
-
-    if (myToken !== voiceRequestToken) {
-      if (onEnded) onEnded();
-      return;
-    }
-
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
     const source = audioCtx.createBufferSource();
     source.buffer = audioBuffer;
     source.connect(audioCtx.destination);
     currentVoiceSource = source;
 
     source.onended = () => {
-      if (currentVoiceSource === source) {
-        currentVoiceSource = null;
-      }
+      if (currentVoiceSource === source) currentVoiceSource = null;
       if (onEnded) onEnded();
     };
 
     source.start(0);
-    console.log("audio play started");
   } catch (err) {
     console.error("TTS再生エラー:", err);
-    if (onEnded) onEnded();
+    if (onEnded) onEnded(); // エラー時もタイマーが止まらないよう実行
   }
 }
 
 // ======================
-// 設定
+// 設定・状態管理
 // ======================
 const FOCUS_SEC = 25 * 60;
 const BREAK_SEC = 5 * 60;
@@ -183,15 +153,12 @@ const SETS_PER_ROUND = 4;
 
 let currentMode = "";
 let phase = "focus";
-
 let totalSetIndex = 1;
 let currentTime = FOCUS_SEC;
 let intervalId = null;
 let transitionLock = false;
 
-// ======================
-// DOM
-// ======================
+// DOM取得
 const elProductName = document.getElementById("productName");
 const elSubTitle = document.getElementById("subTitle");
 const elModeTitle = document.getElementById("modeTitle");
@@ -201,84 +168,52 @@ const elTimer = document.getElementById("timer");
 const elLap = document.getElementById("lap");
 const elBears = document.getElementById("bears");
 const elBearSpans = Array.from(document.querySelectorAll(".bear"));
-
 const elStartMenu = document.getElementById("startMenu");
 const elCharacter = document.getElementById("character");
 const elBrandBox = document.getElementById("brandBox");
-
 const ringFg = document.querySelector(".ring-fg");
+
 const RADIUS = 52;
 const CIRC = 2 * Math.PI * RADIUS;
 
 // ======================
-// 名言（未使用でも残してOK）
+// UI & タイマー更新
 // ======================
-const KUMAO_QUOTES = {
-  1: "静かに積め。焦るな。\n積み上げた者だけが強くなる。",
-  2: "思考を深めよ。\n答えは外ではなく、内にある。",
-  3: "昨日の自分を超えろ。\n勝つべき相手は自分だ。",
-  4: "最終セット。\nここを越えれば、景色が変わる。"
-};
-
-// ======================
-// Utils
-// ======================
-function setTimerText(sec){
+function setTimerText(sec) {
   const m = Math.floor(sec / 60);
   const s = sec % 60;
-  elTimer.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  elTimer.textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-function getRound(){
-  return Math.floor((totalSetIndex - 1) / SETS_PER_ROUND) + 1;
-}
+function getRound() { return Math.floor((totalSetIndex - 1) / SETS_PER_ROUND) + 1; }
+function getSetInRound() { return ((totalSetIndex - 1) % SETS_PER_ROUND) + 1; }
 
-function getSetInRound(){
-  return ((totalSetIndex - 1) % SETS_PER_ROUND) + 1;
-}
-
-function updateBears(){
+function updateBears() {
   const setInRound = getSetInRound();
   elBearSpans.forEach((sp, idx) => {
-    if (idx < setInRound) sp.classList.add("on");
-    else sp.classList.remove("on");
+    idx < setInRound ? sp.classList.add("on") : sp.classList.remove("on");
   });
 }
 
-function updateLap(){
-  elLap.textContent = `${getRound()}周目`;
-}
-
-function updateRing(sec, maxSec){
+function updateRing(sec, maxSec) {
   ringFg.style.strokeDasharray = `${CIRC}`;
   const ratio = Math.max(0, Math.min(1, 1 - sec / maxSec));
-  const offset = CIRC * (1 - ratio);
-  ringFg.style.strokeDashoffset = `${offset}`;
+  ringFg.style.strokeDashoffset = CIRC * (1 - ratio);
 }
 
-// ======================
-// タイマー制御（実時間ベース）
-// ======================
-function stopTimer(){
-  if(intervalId){
-    clearInterval(intervalId);
-    intervalId = null;
-  }
+function stopTimer() {
+  if (intervalId) { clearInterval(intervalId); intervalId = null; }
 }
 
-function startTimerLoop(phaseMaxSec){
+function startTimerLoop(phaseMaxSec) {
   stopTimer();
-
   phaseEndTime = Date.now() + phaseMaxSec * 1000;
-
   intervalId = setInterval(() => {
     const remaining = Math.max(0, Math.ceil((phaseEndTime - Date.now()) / 1000));
     currentTime = remaining;
-
     setTimerText(currentTime);
     updateRing(currentTime, phaseMaxSec);
-
-    if(remaining <= 0){
+    if (remaining <= 0) {
       stopTimer();
       handlePhaseEnd();
     }
@@ -286,26 +221,14 @@ function startTimerLoop(phaseMaxSec){
 }
 
 // ======================
-// UI制御
+// UI切り替え
 // ======================
-function showHomeUI(){
-  elProductName.classList.remove("hidden");
-  elSubTitle.classList.remove("hidden");
-  elStartMenu.classList.remove("hidden");
-  elBrandBox.classList.remove("hidden");
-
-  elModeTitle.classList.add("hidden");
-  elQuote.classList.add("hidden");
-  elRingWrap.classList.add("hidden");
-  elLap.classList.add("hidden");
-  elBears.classList.add("hidden");
-
-  elCharacter.style.display = "block";
+function showHomeUI() {
+  [elProductName, elSubTitle, elStartMenu, elBrandBox].forEach(el => el.classList.remove("hidden"));
+  [elModeTitle, elQuote, elRingWrap, elLap, elBears].forEach(el => el.classList.add("hidden"));
   elCharacter.style.opacity = "1";
-
   phase = "focus";
   currentTime = FOCUS_SEC;
-
   stopVoice();
   stopAmbient();
   stopTimer();
@@ -313,163 +236,89 @@ function showHomeUI(){
   setTimerText(currentTime);
 }
 
-function showFocusUI(){
-  elProductName.classList.add("hidden");
-  elSubTitle.classList.add("hidden");
-  elStartMenu.classList.add("hidden");
-  elBrandBox.classList.add("hidden");
-
-  elModeTitle.classList.remove("hidden");
-  elQuote.classList.remove("hidden");
-  elRingWrap.classList.remove("hidden");
-  elLap.classList.remove("hidden");
-  elBears.classList.remove("hidden");
-
-  elModeTitle.textContent = "集中TIME";
-
-  elCharacter.style.display = "block";
-  elCharacter.style.opacity = "1";
-}
-
-function showBreakUI(){
-  elModeTitle.classList.remove("hidden");
-  elQuote.classList.remove("hidden");
-  elRingWrap.classList.remove("hidden");
-  elLap.classList.remove("hidden");
-  elBears.classList.remove("hidden");
-
-  elModeTitle.textContent = "休憩TIME";
-  elQuote.textContent = "";
-
-  elCharacter.style.display = "block";
-  elCharacter.style.opacity = "1";
-}
-
-// ======================
-// フェーズ準備
-// ======================
-function prepareFocusUI(){
+function prepareFocusUI() {
   phase = "focus";
   currentTime = FOCUS_SEC;
-
-  showFocusUI();
-
-  const round = getRound();
-  setCharacterImage(currentMode, round);
-
-  updateLap();
+  [elProductName, elSubTitle, elStartMenu, elBrandBox].forEach(el => el.classList.add("hidden"));
+  [elModeTitle, elQuote, elRingWrap, elLap, elBears].forEach(el => el.classList.remove("hidden"));
+  elModeTitle.textContent = "集中TIME";
+  setCharacterImage(currentMode, getRound());
+  elLap.textContent = `${getRound()}周目`;
   updateBears();
-
   setTimerText(currentTime);
   updateRing(currentTime, FOCUS_SEC);
 }
 
-function prepareBreakUI(){
+function prepareBreakUI() {
   phase = "break";
   currentTime = BREAK_SEC;
-
-  showBreakUI();
-
-  const setInRound = getSetInRound();
-  const breakImages = ["break1.png","break2.png","break3.png","break4.png"];
-  elCharacter.src = breakImages[setInRound - 1] || "break1.png";
-
-  updateLap();
+  elModeTitle.textContent = "休憩TIME";
+  elQuote.textContent = "";
+  const breakImages = ["break1.png", "break2.png", "break3.png", "break4.png"];
+  elCharacter.src = breakImages[getSetInRound() - 1] || "break1.png";
   updateBears();
-
   setTimerText(currentTime);
   updateRing(currentTime, BREAK_SEC);
 }
 
 // ======================
-// フェーズ開始
+// フェーズ遷移ロジック（ここがメインの修正箇所）
 // ======================
-async function beginFocusPhase(){
-  await startAmbient(currentMode);
-  startTimerLoop(FOCUS_SEC);
-}
-
-function beginBreakPhase(){
-  stopAmbient();
-  startTimerLoop(BREAK_SEC);
-}
-
-// ======================
-// フェーズ遷移
-// ======================
-function goToPhase(nextPhase){
-  if(transitionLock) return;
+async function goToPhase(nextPhase) {
+  if (transitionLock) return;
   transitionLock = true;
 
+  // 1. 全て停止
   stopTimer();
   stopVoice();
   stopAmbient();
 
-  if(nextPhase === "focus"){
+  if (nextPhase === "focus") {
     prepareFocusUI();
     const text = pickRandom(SPRING_START_QUOTES);
     elQuote.textContent = text;
 
+    // 2. 音声再生。終わってからタイマーと環境音を開始。
     speakWithDonKumao(text, async () => {
-      if(phase !== "focus") {
-        transitionLock = false;
-        return;
-      }
-      await beginFocusPhase();
+      if (phase !== "focus") { transitionLock = false; return; }
+      
+      await startAmbient(currentMode); // 環境音開始
+      startTimerLoop(FOCUS_SEC);      // タイマー開始
       transitionLock = false;
     });
-  }else{
+
+  } else {
     prepareBreakUI();
     const text = pickRandom(SPRING_BREAK_QUOTES);
     elQuote.textContent = text;
 
+    // 2. 音声再生。終わってから休憩タイマーを開始。
     speakWithDonKumao(text, () => {
-      if(phase !== "break") {
-        transitionLock = false;
-        return;
-      }
-      beginBreakPhase();
+      if (phase !== "break") { transitionLock = false; return; }
+      
+      startTimerLoop(BREAK_SEC);      // タイマー開始
       transitionLock = false;
     });
   }
 }
 
-function handlePhaseEnd(){
-  if(transitionLock) return;
-
-  if(phase === "focus"){
+function handlePhaseEnd() {
+  if (transitionLock) return;
+  if (phase === "focus") {
     goToPhase("break");
-  }else{
+  } else {
     totalSetIndex++;
     goToPhase("focus");
   }
 }
 
-// ======================
-// 入口
-// ======================
-function startStudy(mode){
+function startStudy(mode) {
   currentMode = mode;
   totalSetIndex = 1;
-  phase = "focus";
   transitionLock = false;
-
-  stopTimer();
-  stopVoice();
-  stopAmbient();
-
-  unlockAudioSystem()
-    .then(() => {
-      goToPhase("focus");
-    })
-    .catch((e) => {
-      console.error("Audio unlock error:", e);
-      goToPhase("focus");
-    });
+  unlockAudioSystem().then(() => goToPhase("focus"));
 }
 
-// ======================
 // 初期化
-// ======================
 showHomeUI();
 window.startStudy = startStudy;
