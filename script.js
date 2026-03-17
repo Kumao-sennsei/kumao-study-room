@@ -34,7 +34,7 @@ function startAmbient(mode){
   currentAudio.volume = 0.5;
   currentAudio.currentTime = 0;
 
-  currentAudio.play().then(()=>{}).catch(()=>{});
+  currentAudio.play().then(() => {}).catch(() => {});
 }
 
 function setCharacterImage(mode, setInRound){
@@ -75,24 +75,6 @@ function pickRandom(arr){
 // ======================
 let currentVoiceAudio = null;
 let voiceRequestToken = 0;
-let audioUnlocked = false;
-
-async function unlockAudio(){
-  if(audioUnlocked) return;
-
-  try{
-    const a = new Audio();
-    a.muted = true;
-    a.playsInline = true;
-    a.src = "data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAFAAAGkQCA";
-    await a.play().catch(() => {});
-    a.pause();
-    a.removeAttribute("src");
-    a.load();
-  }catch(e){}
-
-  audioUnlocked = true;
-}
 
 function stopDonKumaoVoice(){
   voiceRequestToken++;
@@ -148,35 +130,28 @@ async function speakWithDonKumao(text){
 
     currentVoiceAudio = audio;
 
-    await new Promise((resolve, reject) => {
-      audio.onended = () => {
-        console.log("audio ended");
-        if(audio.dataset && audio.dataset.objectUrl){
-          URL.revokeObjectURL(audio.dataset.objectUrl);
-        }
-        if(currentVoiceAudio === audio){
-          currentVoiceAudio = null;
-        }
-        resolve();
-      };
+    audio.onended = () => {
+      console.log("audio ended");
+      if(audio.dataset && audio.dataset.objectUrl){
+        URL.revokeObjectURL(audio.dataset.objectUrl);
+      }
+      if(currentVoiceAudio === audio){
+        currentVoiceAudio = null;
+      }
+    };
 
-      audio.onerror = (e) => {
-        console.error("audio element error:", e);
-        if(audio.dataset && audio.dataset.objectUrl){
-          URL.revokeObjectURL(audio.dataset.objectUrl);
-        }
-        if(currentVoiceAudio === audio){
-          currentVoiceAudio = null;
-        }
-        reject(e);
-      };
+    audio.onerror = (e) => {
+      console.error("audio element error:", e);
+      if(audio.dataset && audio.dataset.objectUrl){
+        URL.revokeObjectURL(audio.dataset.objectUrl);
+      }
+      if(currentVoiceAudio === audio){
+        currentVoiceAudio = null;
+      }
+    };
 
-      audio.play()
-        .then(() => {
-          console.log("audio play started");
-        })
-        .catch(reject);
-    });
+    await audio.play();
+    console.log("audio play started");
   } catch (err) {
     console.error("TTS再生エラー:", err);
   }
@@ -290,7 +265,7 @@ function startTimerLoop(phaseMaxSec){
       stopTimer();
       handlePhaseEnd();
     }
-  }, 500);
+  }, 250);
 }
 
 // ======================
@@ -354,20 +329,24 @@ function showBreakUI(){
 }
 
 // ======================
-// フェーズ開始前演出
+// フェーズ演出
 // ======================
-async function announceFocusPhase(){
+function playSpringStartVoice(mode){
   const text = pickRandom(SPRING_START_QUOTES);
   elQuote.textContent = text;
+
   stopDonKumaoVoice();
-  await speakWithDonKumao(text);
+  startAmbient(mode);
+  speakWithDonKumao(text);
 }
 
-async function announceBreakPhase(){
+function playSpringBreakVoice(){
   const text = pickRandom(SPRING_BREAK_QUOTES);
   elQuote.textContent = text;
+
   stopDonKumaoVoice();
-  await speakWithDonKumao(text);
+  stopAmbient();
+  speakWithDonKumao(text);
 }
 
 // ======================
@@ -388,8 +367,8 @@ function beginFocusPhase(){
   setTimerText(currentTime);
   updateRing(currentTime, FOCUS_SEC);
 
-  startAmbient(currentMode);
   startTimerLoop(FOCUS_SEC);
+  playSpringStartVoice(currentMode);
 }
 
 function beginBreakPhase(){
@@ -408,68 +387,27 @@ function beginBreakPhase(){
   setTimerText(currentTime);
   updateRing(currentTime, BREAK_SEC);
 
-  stopAmbient();
   startTimerLoop(BREAK_SEC);
+  playSpringBreakVoice();
 }
 
 // ======================
 // フェーズ遷移
 // ======================
-async function goToFocusPhase(){
+function goToPhase(nextPhase){
   if(transitionLock) return;
   transitionLock = true;
 
   stopTimer();
-  stopAmbient();
-
-  phase = "focus";
-  currentTime = FOCUS_SEC;
-
-  showFocusUI();
-
-  const round = getRound();
-  setCharacterImage(currentMode, round);
-
-  updateLap();
-  updateBears();
-
-  setTimerText(currentTime);
-  updateRing(currentTime, FOCUS_SEC);
+  stopDonKumaoVoice();
 
   try{
-    await announceFocusPhase();
-  }finally{
-    beginFocusPhase();
-    transitionLock = false;
-  }
-}
-
-async function goToBreakPhase(){
-  if(transitionLock) return;
-  transitionLock = true;
-
-  stopTimer();
-  stopAmbient();
-
-  phase = "break";
-  currentTime = BREAK_SEC;
-
-  showBreakUI();
-
-  const setInRound = getSetInRound();
-  const breakImages = ["break1.png","break2.png","break3.png","break4.png"];
-  elCharacter.src = breakImages[setInRound - 1] || "break1.png";
-
-  updateLap();
-  updateBears();
-
-  setTimerText(currentTime);
-  updateRing(currentTime, BREAK_SEC);
-
-  try{
-    await announceBreakPhase();
-  }finally{
-    beginBreakPhase();
+    if(nextPhase === "focus"){
+      beginFocusPhase();
+    }else{
+      beginBreakPhase();
+    }
+  } finally {
     transitionLock = false;
   }
 }
@@ -478,28 +416,27 @@ function handlePhaseEnd(){
   if(transitionLock) return;
 
   if(phase === "focus"){
-    goToBreakPhase();
+    goToPhase("break");
   }else{
     totalSetIndex++;
-    goToFocusPhase();
+    goToPhase("focus");
   }
 }
 
 // ======================
 // 入口
 // ======================
-async function startStudy(mode){
-  await unlockAudio();
-
+function startStudy(mode){
   currentMode = mode;
   totalSetIndex = 1;
+  phase = "focus";
   transitionLock = false;
 
   stopTimer();
   stopDonKumaoVoice();
   stopAmbient();
 
-  goToFocusPhase();
+  goToPhase("focus");
 }
 
 // ======================
