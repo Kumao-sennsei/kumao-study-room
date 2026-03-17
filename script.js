@@ -9,53 +9,58 @@ const bgImages = {
 
 let currentAudio = null;
 let currentAudioMode = "";
+let currentVoiceAudio = null;
 let phaseEndTime = null;
 
 function stopAmbient(){
   if(currentAudio){
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-    currentAudio = null;// ======================
-// 追加：画像＆音管理
-// ======================
-const bgImages = {
-  fire: ["fire_round1.png", "fire_round2.png", "fire_round3.png", "fire_round4.png"],
-  forest: ["forest_round1.png", "forest_round2.png", "forest_round3.png", "forest_round4.png"],
-  sea: ["sea_round1.png", "sea_round2.png", "sea_round3.png", "sea_round4.png"]
-};
-
-let currentAudio = null;
-let currentAudioMode = "";
-let phaseEndTime = null;
-
-function stopAmbient(){
-  if(currentAudio){
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
+    try{
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }catch(e){}
     currentAudio = null;
   }
   currentAudioMode = "";
 }
 
 function startAmbient(mode){
+  if(!mode) return;
+
   stopAmbient();
 
   currentAudioMode = mode;
   currentAudio = new Audio(`${mode}.mp3`);
   currentAudio.loop = true;
   currentAudio.volume = 0.5;
+  currentAudio.currentTime = 0;
 
-  currentAudio.play().catch(()=>{});
+  currentAudio.play().then(()=>{}).catch(()=>{});
+}
+
+function stopVoice(){
+  if(currentVoiceAudio){
+    try{
+      currentVoiceAudio.pause();
+      currentVoiceAudio.currentTime = 0;
+      if(currentVoiceAudio.dataset && currentVoiceAudio.dataset.objectUrl){
+        URL.revokeObjectURL(currentVoiceAudio.dataset.objectUrl);
+      }
+    }catch(e){}
+    currentVoiceAudio = null;
+  }
 }
 
 function setCharacterImage(mode, setInRound){
-  const arr = bgImages[mode];
-  if(!arr) return;
-  elCharacter.src = arr[setInRound - 1] || arr[0];
+  if(!bgImages[mode]) return;
+
+  const idx = setInRound - 1;
+  if(idx < 0 || idx >= bgImages[mode].length) return;
+
+  elCharacter.src = bgImages[mode][idx];
 }
 
 // ======================
-// セリフ（変更禁止）
+// 春ボイス（開始時 / 休憩開始時）
 // ======================
 const SPRING_START_QUOTES = [
   "立て。春は始まりだ。お前もまだ始まったばかりだろ？",
@@ -78,37 +83,66 @@ function pickRandom(arr){
 }
 
 // ======================
-// TTS（そのまま使用）
+// ElevenLabs TTS 再生
+// /api/tts に { text } をPOSTして音声を返す想定
 // ======================
-let currentVoice = null;
-
-function stopVoice(){
-  if(currentVoice){
-    currentVoice.pause();
-    currentVoice = null;
-  }
-}
-
-async function speak(text){
+async function speakWithDonKumao(text, onEnded){
   stopVoice();
 
-  const res = await fetch("/api/tts", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({ text })
-  });
+  try {
+    console.log("TTS request text:", text);
 
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
+    const res = await fetch("/api/tts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ text })
+    });
 
-  const audio = new Audio(url);
-  currentVoice = audio;
+    console.log("TTS status:", res.status, res.headers.get("content-type"));
 
-  return new Promise(resolve=>{
-    audio.onended = resolve;
-    audio.onerror = resolve;
-    audio.play().catch(resolve);
-  });
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("TTS API failed:", errText);
+      throw new Error("TTS API failed");
+    }
+
+    const blob = await res.blob();
+    console.log("TTS blob:", blob.size, blob.type);
+
+    const audioUrl = URL.createObjectURL(blob);
+    const audio = new Audio(audioUrl);
+    audio.volume = 1;
+    audio.currentTime = 0;
+    audio.dataset.objectUrl = audioUrl;
+
+    currentVoiceAudio = audio;
+
+    audio.onended = () => {
+      console.log("audio ended");
+      URL.revokeObjectURL(audioUrl);
+      if(currentVoiceAudio === audio){
+        currentVoiceAudio = null;
+      }
+      if (onEnded) onEnded();
+    };
+
+    audio.onerror = (e) => {
+      console.error("audio element error:", e);
+      URL.revokeObjectURL(audioUrl);
+      if(currentVoiceAudio === audio){
+        currentVoiceAudio = null;
+      }
+      if (onEnded) onEnded();
+    };
+
+    await audio.play();
+    console.log("audio play started");
+  } catch (err) {
+    console.error("TTS再生エラー:", err);
+    if (onEnded) onEnded();
+  }
 }
 
 // ======================
@@ -116,252 +150,283 @@ async function speak(text){
 // ======================
 const FOCUS_SEC = 25 * 60;
 const BREAK_SEC = 5 * 60;
+const SETS_PER_ROUND = 4;
 
-let phase = "focus";
 let currentMode = "";
+let phase = "focus";
+
+let totalSetIndex = 1;
+let currentTime = FOCUS_SEC;
 let intervalId = null;
+let transitionLock = false;
 
 // ======================
 // DOM
 // ======================
-const elTimer = document.getElementById("timer");
-const elQuote = document.getElementById("quote");
+const elProductName = document.getElementById("productName");
+const elSubTitle = document.getElementById("subTitle");
 const elModeTitle = document.getElementById("modeTitle");
+const elQuote = document.getElementById("quote");
+const elRingWrap = document.getElementById("ringWrap");
+const elTimer = document.getElementById("timer");
+const elLap = document.getElementById("lap");
+const elBears = document.getElementById("bears");
+const elBearSpans = Array.from(document.querySelectorAll(".bear"));
+
+const elStartMenu = document.getElementById("startMenu");
 const elCharacter = document.getElementById("character");
+const elBrandBox = document.getElementById("brandBox");
+
+const ringFg = document.querySelector(".ring-fg");
+const RADIUS = 52;
+const CIRC = 2 * Math.PI * RADIUS;
 
 // ======================
-// Timer
+// 名言（未使用でも残してOK）
 // ======================
-function startTimer(sec){
-  clearInterval(intervalId);
+const KUMAO_QUOTES = {
+  1: "静かに積め。焦るな。\n積み上げた者だけが強くなる。",
+  2: "思考を深めよ。\n答えは外ではなく、内にある。",
+  3: "昨日の自分を超えろ。\n勝つべき相手は自分だ。",
+  4: "最終セット。\nここを越えれば、景色が変わる。"
+};
 
-  let end = Date.now() + sec*1000;
+// ======================
+// Utils
+// ======================
+function setTimerText(sec){
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  elTimer.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
 
-  intervalId = setInterval(()=>{
-    let remain = Math.max(0, Math.ceil((end-Date.now())/1000));
-    elTimer.textContent =
-      `${String(Math.floor(remain/60)).padStart(2,"0")}:${String(remain%60).padStart(2,"0")}`;
+function getRound(){
+  return Math.floor((totalSetIndex - 1) / SETS_PER_ROUND) + 1;
+}
 
-    if(remain<=0){
-      clearInterval(intervalId);
-      nextPhase();
-    }
-  },300);
+function getSetInRound(){
+  return ((totalSetIndex - 1) % SETS_PER_ROUND) + 1;
+}
+
+function updateBears(){
+  const setInRound = getSetInRound();
+  elBearSpans.forEach((sp, idx) => {
+    if (idx < setInRound) sp.classList.add("on");
+    else sp.classList.remove("on");
+  });
+}
+
+function updateLap(){
+  elLap.textContent = `${getRound()}周目`;
+}
+
+function updateRing(sec, maxSec){
+  ringFg.style.strokeDasharray = `${CIRC}`;
+  const ratio = Math.max(0, Math.min(1, 1 - sec / maxSec));
+  const offset = CIRC * (1 - ratio);
+  ringFg.style.strokeDashoffset = `${offset}`;
 }
 
 // ======================
-// フェーズ制御
+// タイマー制御（実時間ベース）
 // ======================
-async function startFocus(){
+function stopTimer(){
+  if(intervalId){
+    clearInterval(intervalId);
+    intervalId = null;
+  }
+}
+
+function startTimerLoop(phaseMaxSec){
+  stopTimer();
+
+  phaseEndTime = Date.now() + phaseMaxSec * 1000;
+
+  intervalId = setInterval(() => {
+    const remaining = Math.max(0, Math.ceil((phaseEndTime - Date.now()) / 1000));
+    currentTime = remaining;
+
+    setTimerText(currentTime);
+    updateRing(currentTime, phaseMaxSec);
+
+    if(remaining <= 0){
+      stopTimer();
+      handlePhaseEnd();
+    }
+  }, 500);
+}
+
+// ======================
+// UI制御
+// ======================
+function showHomeUI(){
+  elProductName.classList.remove("hidden");
+  elSubTitle.classList.remove("hidden");
+  elStartMenu.classList.remove("hidden");
+  elBrandBox.classList.remove("hidden");
+
+  elModeTitle.classList.add("hidden");
+  elQuote.classList.add("hidden");
+  elRingWrap.classList.add("hidden");
+  elLap.classList.add("hidden");
+  elBears.classList.add("hidden");
+
+  elCharacter.style.display = "block";
+  elCharacter.style.opacity = "1";
+
   phase = "focus";
+  currentTime = FOCUS_SEC;
+
+  stopVoice();
+  stopAmbient();
+  stopTimer();
+  updateRing(currentTime, FOCUS_SEC);
+  setTimerText(currentTime);
+}
+
+function showFocusUI(){
+  elProductName.classList.add("hidden");
+  elSubTitle.classList.add("hidden");
+  elStartMenu.classList.add("hidden");
+  elBrandBox.classList.add("hidden");
+
+  elModeTitle.classList.remove("hidden");
+  elQuote.classList.remove("hidden");
+  elRingWrap.classList.remove("hidden");
+  elLap.classList.remove("hidden");
+  elBears.classList.remove("hidden");
 
   elModeTitle.textContent = "集中TIME";
+
+  elCharacter.style.display = "block";
+  elCharacter.style.opacity = "1";
+}
+
+function showBreakUI(){
+  elModeTitle.classList.remove("hidden");
+  elQuote.classList.remove("hidden");
+  elRingWrap.classList.remove("hidden");
+  elLap.classList.remove("hidden");
+  elBears.classList.remove("hidden");
+
+  elModeTitle.textContent = "休憩TIME";
+  elQuote.textContent = "";
+
+  elCharacter.style.display = "block";
+  elCharacter.style.opacity = "1";
+}
+
+// ======================
+// フェーズ本体
+// ======================
+function runFocusPhase(){
+  startAmbient(currentMode);
+  startTimerLoop(FOCUS_SEC);
+}
+
+function runBreakPhase(){
+  stopAmbient();
+  startTimerLoop(BREAK_SEC);
+}
+
+function startFocusPhase(){
+  phase = "focus";
+  currentTime = FOCUS_SEC;
+
+  showFocusUI();
+
+  const round = getRound();
+  setCharacterImage(currentMode, round);
+
+  updateLap();
+  updateBears();
+
+  setTimerText(currentTime);
+  updateRing(currentTime, FOCUS_SEC);
 
   const text = pickRandom(SPRING_START_QUOTES);
   elQuote.textContent = text;
 
-  await speak(text); // ★ここが最重要
-
-  startAmbient(currentMode);
-  startTimer(FOCUS_SEC);
+  speakWithDonKumao(text, () => {
+    if(phase !== "focus") return;
+    runFocusPhase();
+  });
 }
 
-async function startBreak(){
+function startBreakPhase(){
   phase = "break";
+  currentTime = BREAK_SEC;
 
-  elModeTitle.textContent = "休憩TIME";
+  showBreakUI();
+
+  const setInRound = getSetInRound();
+  const breakImages = ["break1.png","break2.png","break3.png","break4.png"];
+  elCharacter.src = breakImages[setInRound - 1] || "break1.png";
+
+  updateLap();
+  updateBears();
+
+  setTimerText(currentTime);
+  updateRing(currentTime, BREAK_SEC);
 
   const text = pickRandom(SPRING_BREAK_QUOTES);
   elQuote.textContent = text;
 
-  await speak(text); // ★ここが最重要
-
-  stopAmbient();
-  startTimer(BREAK_SEC);
+  speakWithDonKumao(text, () => {
+    if(phase !== "break") return;
+    runBreakPhase();
+  });
 }
 
-function nextPhase(){
-  if(phase === "focus"){
-    startBreak();
+// ======================
+// フェーズ遷移
+// ======================
+function goToPhase(nextPhase){
+  if(transitionLock) return;
+  transitionLock = true;
+
+  stopTimer();
+  stopVoice();
+  stopAmbient();
+
+  if(nextPhase === "focus"){
+    startFocusPhase();
   }else{
-    startFocus();
+    startBreakPhase();
+  }
+
+  transitionLock = false;
+}
+
+function handlePhaseEnd(){
+  if(transitionLock) return;
+
+  if(phase === "focus"){
+    goToPhase("break");
+  }else{
+    totalSetIndex++;
+    goToPhase("focus");
   }
 }
 
 // ======================
 // 入口
 // ======================
-async function startStudy(mode){
+function startStudy(mode){
   currentMode = mode;
-  stopAmbient();
-  stopVoice();
-  startFocus();
-}
-
-window.startStudy = startStudy;
-  }
-  currentAudioMode = "";
-}
-
-function startAmbient(mode){
-  stopAmbient();
-
-  currentAudioMode = mode;
-  currentAudio = new Audio(`${mode}.mp3`);
-  currentAudio.loop = true;
-  currentAudio.volume = 0.5;
-
-  currentAudio.play().catch(()=>{});
-}
-
-function setCharacterImage(mode, setInRound){
-  const arr = bgImages[mode];
-  if(!arr) return;
-  elCharacter.src = arr[setInRound - 1] || arr[0];
-}
-
-// ======================
-// セリフ（変更禁止）
-// ======================
-const SPRING_START_QUOTES = [
-  "立て。春は始まりだ。お前もまだ始まったばかりだろ？",
-  "桜は散ってもな、お前はまだ咲ける。次の25分、いけるだろ？",
-  "風向きが変わる。今のお前ならいける。始めるぞ。",
-  "甘える時間は終わりだ。だがな、お前はもう走れる状態だ。行くぞ。",
-  "桜が舞ってるな。だが、お前は散る側じゃねぇ。今日も咲きにいけ。"
-];
-
-const SPRING_BREAK_QUOTES = [
-  "桜の花だって25分じゃ咲かねえ。お前、ちゃんと頑張ってる。とりあえず5分休憩しな。",
-  "春の風、落ち着かねぇか？ 周りが速く見えてもな、お前はちゃんと頑張ってる。5分だけ、呼吸整えろ。",
-  "新学期でバタついてるか？ それでも座った。ちゃんと頑張ってる。5分後にまた続きやろうぜ。",
-  "桜は一気に咲かねえ。お前も今、ちゃんと頑張ってる最中だ。5分ゆっくりしな。命令だ。",
-  "今日ちょっと重かったな。それでもやった。そこが頑張りだ。とりあえず5分、肩の力抜け。"
-];
-
-function pickRandom(arr){
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-// ======================
-// TTS（そのまま使用）
-// ======================
-let currentVoice = null;
-
-function stopVoice(){
-  if(currentVoice){
-    currentVoice.pause();
-    currentVoice = null;
-  }
-}
-
-async function speak(text){
-  stopVoice();
-
-  const res = await fetch("/api/tts", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({ text })
-  });
-
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
-
-  const audio = new Audio(url);
-  currentVoice = audio;
-
-  return new Promise(resolve=>{
-    audio.onended = resolve;
-    audio.onerror = resolve;
-    audio.play().catch(resolve);
-  });
-}
-
-// ======================
-// 設定
-// ======================
-const FOCUS_SEC = 25 * 60;
-const BREAK_SEC = 5 * 60;
-
-let phase = "focus";
-let currentMode = "";
-let intervalId = null;
-
-// ======================
-// DOM
-// ======================
-const elTimer = document.getElementById("timer");
-const elQuote = document.getElementById("quote");
-const elModeTitle = document.getElementById("modeTitle");
-const elCharacter = document.getElementById("character");
-
-// ======================
-// Timer
-// ======================
-function startTimer(sec){
-  clearInterval(intervalId);
-
-  let end = Date.now() + sec*1000;
-
-  intervalId = setInterval(()=>{
-    let remain = Math.max(0, Math.ceil((end-Date.now())/1000));
-    elTimer.textContent =
-      `${String(Math.floor(remain/60)).padStart(2,"0")}:${String(remain%60).padStart(2,"0")}`;
-
-    if(remain<=0){
-      clearInterval(intervalId);
-      nextPhase();
-    }
-  },300);
-}
-
-// ======================
-// フェーズ制御
-// ======================
-async function startFocus(){
+  totalSetIndex = 1;
   phase = "focus";
+  transitionLock = false;
 
-  elModeTitle.textContent = "集中TIME";
-
-  const text = pickRandom(SPRING_START_QUOTES);
-  elQuote.textContent = text;
-
-  await speak(text); // ★ここが最重要
-
-  startAmbient(currentMode);
-  startTimer(FOCUS_SEC);
-}
-
-async function startBreak(){
-  phase = "break";
-
-  elModeTitle.textContent = "休憩TIME";
-
-  const text = pickRandom(SPRING_BREAK_QUOTES);
-  elQuote.textContent = text;
-
-  await speak(text); // ★ここが最重要
-
-  stopAmbient();
-  startTimer(BREAK_SEC);
-}
-
-function nextPhase(){
-  if(phase === "focus"){
-    startBreak();
-  }else{
-    startFocus();
-  }
-}
-
-// ======================
-// 入口
-// ======================
-async function startStudy(mode){
-  currentMode = mode;
-  stopAmbient();
+  stopTimer();
   stopVoice();
-  await startFocus();
+  stopAmbient();
+
+  goToPhase("focus");
 }
 
+// ======================
+// 初期化
+// ======================
+showHomeUI();
 window.startStudy = startStudy;
