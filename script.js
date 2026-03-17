@@ -46,25 +46,92 @@ function setCharacterImage(mode, setInRound){
   elCharacter.src = bgImages[mode][idx];
 }
 
-function speakThenAmbient(_text, mode){
-  const setInRound = getSetInRound();
+// ======================
+// 春ボイス（開始前 / 休憩開始）
+// ======================
+const SPRING_START_QUOTES = [
+  "立て。春は始まりだ。お前もまだ始まったばかりだろ？",
+  "桜は散ってもな、お前はまだ咲ける。次の25分、いけるだろ？",
+  "風向きが変わる。今のお前ならいける。始めるぞ。",
+  "甘える時間は終わりだ。だがな、お前はもう走れる状態だ。行くぞ。",
+  "桜が舞ってるな。だが、お前は散る側じゃねぇ。今日も咲きにいけ。"
+];
 
-  const audio = new Audio(`quote${setInRound}.mp3`);
-  audio.volume = 1;
-  audio.currentTime = 0;
+const SPRING_BREAK_QUOTES = [
+  "桜の花だって25分じゃ咲かねえ。お前、ちゃんと頑張ってる。とりあえず5分休憩しな。",
+  "春の風、落ち着かねぇか？ 周りが速く見えてもな、お前はちゃんと頑張ってる。5分だけ、呼吸整えろ。",
+  "新学期でバタついてるか？ それでも座った。ちゃんと頑張ってる。5分後にまた続きやろうぜ。",
+  "桜は一気に咲かねえ。お前も今、ちゃんと頑張ってる最中だ。5分ゆっくりしな。命令だ。",
+  "今日ちょっと重かったな。それでもやった。そこが頑張りだ。とりあえず5分、肩の力抜け。"
+];
 
-  audio.onended = () => startAmbient(mode);
+function pickRandom(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
-  audio.play().then(()=>{}).catch(()=>{
+// ======================
+// ElevenLabs TTS 再生
+// /api/tts に { text } をPOSTして音声を返す想定
+// ======================
+async function speakWithDonKumao(text, onEnded){
+  try {
+    const res = await fetch("/api/tts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ text })
+    });
+
+    if (!res.ok) {
+      throw new Error("TTS API failed");
+    }
+
+    const blob = await res.blob();
+    const audioUrl = URL.createObjectURL(blob);
+    const audio = new Audio(audioUrl);
+    audio.volume = 1;
+    audio.currentTime = 0;
+
+    audio.onended = () => {
+      URL.revokeObjectURL(audioUrl);
+      if (onEnded) onEnded();
+    };
+
+    await audio.play();
+  } catch (err) {
+    console.error("TTS再生エラー:", err);
+    if (onEnded) onEnded();
+  }
+}
+
+// ======================
+// 開始前ボイス → 環境音 → タイマー開始
+// ======================
+function playSpringStartVoiceThenStart(mode){
+  const text = pickRandom(SPRING_START_QUOTES);
+  elQuote.textContent = text;
+
+  stopAmbient();
+
+  speakWithDonKumao(text, () => {
     startAmbient(mode);
+    startTimerLoop(FOCUS_SEC);
   });
 }
 
-function playBreakVoice() {
-  const audio = new Audio("break_normal.mp3");
-  audio.volume = 0.9;
-  audio.currentTime = 0;
-  audio.play().then(()=>{}).catch(()=>{});
+// ======================
+// 休憩開始ボイス → 休憩タイマー開始
+// ======================
+function playSpringBreakVoiceThenStartBreak(){
+  const text = pickRandom(SPRING_BREAK_QUOTES);
+  elQuote.textContent = text;
+
+  stopAmbient();
+
+  speakWithDonKumao(text, () => {
+    startTimerLoop(BREAK_SEC);
+  });
 }
 
 // ======================
@@ -103,7 +170,7 @@ const RADIUS = 52;
 const CIRC = 2 * Math.PI * RADIUS;
 
 // ======================
-// 名言
+// 名言（今回は未使用でも残してOK）
 // ======================
 const KUMAO_QUOTES = {
   1: "静かに積め。焦るな。\n積み上げた者だけが強くなる。",
@@ -190,17 +257,10 @@ function startFocusPhase(){
 
   showFocusUI();
 
-  const round = getRound(); // ★ ここ変更
+  const round = getRound();
 
   // 画像は「周」で決める
   setCharacterImage(currentMode, round);
-
-  // 名言はセットでOK（今まで通り）
-  const setInRound = getSetInRound();
-  elQuote.textContent = KUMAO_QUOTES[setInRound] || "";
-
-  stopAmbient();
-  speakThenAmbient(KUMAO_QUOTES[setInRound] || "", currentMode);
 
   updateLap();
   updateBears();
@@ -208,7 +268,8 @@ function startFocusPhase(){
   setTimerText(currentTime);
   updateRing(currentTime, FOCUS_SEC);
 
-  startTimerLoop(FOCUS_SEC);
+  // 授業開始前に春ボイスを流してからタイマー開始
+  playSpringStartVoiceThenStart(currentMode);
 }
 
 function startBreakPhase(){
@@ -221,16 +282,14 @@ function startBreakPhase(){
   const breakImages = ["break1.png","break2.png","break3.png","break4.png"];
   elCharacter.src = breakImages[setInRound - 1] || "break1.png";
 
-  stopAmbient();
-  playBreakVoice();
-
   updateLap();
   updateBears();
 
   setTimerText(currentTime);
   updateRing(currentTime, BREAK_SEC);
 
-  startTimerLoop(BREAK_SEC);
+  // 休憩開始時に春ボイスを流してから休憩タイマー開始
+  playSpringBreakVoiceThenStartBreak();
 }
 
 // ======================
@@ -299,4 +358,3 @@ function startStudy(mode){
 // ======================
 showHomeUI();
 window.startStudy = startStudy;
-
