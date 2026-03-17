@@ -75,42 +75,6 @@ function pickRandom(arr){
 // ======================
 let currentVoiceAudio = null;
 let voiceRequestToken = 0;
-let audioUnlocked = false;
-
-async function unlockAudio(){
-  if(audioUnlocked) return;
-
-  try{
-    const a = new Audio();
-    a.playsInline = true;
-    a.muted = true;
-    a.src = "data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAFAAAGkQCA" ;
-    await a.play().catch(() => {});
-    a.pause();
-    a.removeAttribute("src");
-    a.load();
-  }catch(e){}
-
-  audioUnlocked = true;
-}
-
-function stopDonKumaoVoice(){
-  voiceRequestToken++;
-
-  if(currentVoiceAudio){
-    try{
-      currentVoiceAudio.pause();
-      currentVoiceAudio.currentTime = 0;
-      if(currentVoiceAudio.dataset && currentVoiceAudio.dataset.objectUrl){
-        URL.revokeObjectURL(currentVoiceAudio.dataset.objectUrl);
-      }
-    }catch(e){}
-    currentVoiceAudio = null;
-  }
-}
-
-let currentVoiceAudio = null;
-let voiceRequestToken = 0;
 
 function stopDonKumaoVoice(){
   voiceRequestToken++;
@@ -159,6 +123,7 @@ async function speakWithDonKumao(text, onEnded){
 
     const audioUrl = URL.createObjectURL(blob);
     const audio = new Audio(audioUrl);
+    audio.dataset.objectUrl = audioUrl;
     audio.volume = 1;
     audio.currentTime = 0;
 
@@ -168,8 +133,6 @@ async function speakWithDonKumao(text, onEnded){
       console.log("audio ended");
       if(audio.dataset && audio.dataset.objectUrl){
         URL.revokeObjectURL(audio.dataset.objectUrl);
-      } else {
-        URL.revokeObjectURL(audioUrl);
       }
       if(currentVoiceAudio === audio){
         currentVoiceAudio = null;
@@ -181,8 +144,6 @@ async function speakWithDonKumao(text, onEnded){
       console.error("audio element error:", e);
       if(audio.dataset && audio.dataset.objectUrl){
         URL.revokeObjectURL(audio.dataset.objectUrl);
-      } else {
-        URL.revokeObjectURL(audioUrl);
       }
       if(currentVoiceAudio === audio){
         currentVoiceAudio = null;
@@ -206,10 +167,6 @@ function playSpringStartVoice(mode){
   elQuote.textContent = text;
 
   stopDonKumaoVoice();
-  startAmbient(mode);
-  speakWithDonKumao(text);
-}
-
 
   // 環境音を開始
   startAmbient(mode);
@@ -227,13 +184,6 @@ function playSpringBreakVoice(){
 
   stopDonKumaoVoice();
   stopAmbient();
-  speakWithDonKumao(text);
-}
-
-
-  // ドンくまお音声を同時再生
-  speakWithDonKumao(text);
-}
 
   // ドンくまお音声を同時再生
   speakWithDonKumao(text);
@@ -350,10 +300,10 @@ function startTimerLoop(phaseMaxSec){
       transitionLock = true;
 
       if(phase === "focus"){
-        goToBreakPhase();
+        startBreakPhase();
       }else{
         totalSetIndex++;
-        goToFocusPhase();
+        startFocusPhase();
       }
 
       transitionLock = false;
@@ -364,7 +314,7 @@ function startTimerLoop(phaseMaxSec){
 // ======================
 // フェーズ
 // ======================
-function goToFocusPhase(){
+function startFocusPhase(){
   phase = "focus";
   currentTime = FOCUS_SEC;
 
@@ -388,7 +338,7 @@ function goToFocusPhase(){
   playSpringStartVoice(currentMode);
 }
 
-function goToBreakPhase(){
+function startBreakPhase(){
   phase = "break";
   currentTime = BREAK_SEC;
 
@@ -409,14 +359,6 @@ function goToBreakPhase(){
 
   // 休憩開始時ボイスも同時に流す
   playSpringBreakVoice();
-}
-
-function startFocusPhase(){
-  goToFocusPhase();
-}
-
-function startBreakPhase(){
-  goToBreakPhase();
 }
 
 // ======================
@@ -466,12 +408,6 @@ function showFocusUI(){
 }
 
 function showBreakUI(){
-  elModeTitle.classList.remove("hidden");
-  elQuote.classList.remove("hidden");
-  elRingWrap.classList.remove("hidden");
-  elLap.classList.remove("hidden");
-  elBears.classList.remove("hidden");
-
   elModeTitle.textContent = "休憩TIME";
   elQuote.textContent = "";
 
@@ -489,16 +425,11 @@ function startStudy(mode){
   stopTimer();
   stopDonKumaoVoice();
   stopAmbient();
-  goToFocusPhase();
+  startFocusPhase();
 }
-
-
 
 // ======================
 // 初期化
 // ======================
 showHomeUI();
 window.startStudy = startStudy;
-stopDonKumaoVoice();
-stopAmbient();
-stopTimer();
