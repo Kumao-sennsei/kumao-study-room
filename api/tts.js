@@ -9,22 +9,30 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Text is required" });
   }
 
-  if (!process.env.ELEVEN_API_KEY) {
+  const apiKey = process.env.ELEVEN_API_KEY;
+  const voiceId = process.env.ELEVEN_VOICE_ID;
+
+  console.log("ELEVEN_API_KEY exists:", !!apiKey);
+  console.log("ELEVEN_API_KEY prefix:", apiKey ? apiKey.slice(0, 3) : null);
+  console.log("ELEVEN_API_KEY length:", apiKey ? apiKey.length : 0);
+  console.log("ELEVEN_VOICE_ID:", voiceId);
+
+  if (!apiKey) {
     return res.status(500).json({ error: "ELEVEN_API_KEY is missing" });
   }
 
-  if (!process.env.ELEVEN_VOICE_ID) {
+  if (!voiceId) {
     return res.status(500).json({ error: "ELEVEN_VOICE_ID is missing" });
   }
 
   try {
     const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${process.env.ELEVEN_VOICE_ID}`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "xi-api-key": process.env.ELEVEN_API_KEY,
+          "xi-api-key": apiKey,
           "Accept": "audio/mpeg"
         },
         body: JSON.stringify({
@@ -36,7 +44,8 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("ElevenLabs error:", errText);
+      console.error("ElevenLabs status:", response.status);
+      console.error("ElevenLabs error body:", errText);
       return res.status(response.status).json({
         error: "ElevenLabs request failed",
         details: errText
