@@ -75,6 +75,24 @@ function pickRandom(arr){
 // ======================
 let currentVoiceAudio = null;
 let voiceRequestToken = 0;
+let audioUnlocked = false;
+
+async function unlockAudio(){
+  if(audioUnlocked) return;
+
+  try{
+    const a = new Audio();
+    a.playsInline = true;
+    a.muted = true;
+    a.src = "data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAFAAAGkQCA" ;
+    await a.play().catch(() => {});
+    a.pause();
+    a.removeAttribute("src");
+    a.load();
+  }catch(e){}
+
+  audioUnlocked = true;
+}
 
 function stopDonKumaoVoice(){
   voiceRequestToken++;
@@ -122,10 +140,13 @@ async function speakWithDonKumao(text, onEnded){
     }
 
     const audioUrl = URL.createObjectURL(blob);
-    const audio = new Audio(audioUrl);
+    const audio = new Audio();
+    audio.src = audioUrl;
     audio.dataset.objectUrl = audioUrl;
     audio.volume = 1;
     audio.currentTime = 0;
+    audio.preload = "auto";
+    audio.playsInline = true;
 
     currentVoiceAudio = audio;
 
@@ -184,6 +205,10 @@ function playSpringBreakVoice(){
 
   stopDonKumaoVoice();
   stopAmbient();
+
+  // ドンくまお音声を同時再生
+  speakWithDonKumao(text);
+}
 
   // ドンくまお音声を同時再生
   speakWithDonKumao(text);
@@ -432,18 +457,19 @@ function showBreakUI(){
 // ======================
 // 入口
 // ======================
-function startStudy(mode){
+async function startStudy(mode){
+  await unlockAudio();
   currentMode = mode;
   totalSetIndex = 1;
-  transitionLock = false;
-  stopTimer();
-  stopDonKumaoVoice();
-  stopAmbient();
-  goToFocusPhase();
+  startFocusPhase();
 }
+
 
 // ======================
 // 初期化
 // ======================
 showHomeUI();
 window.startStudy = startStudy;
+stopDonKumaoVoice();
+stopAmbient();
+stopTimer();
