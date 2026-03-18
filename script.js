@@ -87,7 +87,7 @@ function setCharacterImage(mode, setInRound) {
 const SPRING_START_QUOTES = [
   {
     display: "立て。春は始まりだ。\nお前もまだ始まったばかりだろ？",
-    speech: "たて…。春は、はじまりだ。\nお前もまだ、はじまったばかりだろ？"
+    speech: "たて…。はるわ、はじまりだ。\nお前もまだ、はじまったばかりだろ？"
   },
   {
     display: "桜は散ってもな、お前はまだ咲ける。\n25分、いけるだろ？",
