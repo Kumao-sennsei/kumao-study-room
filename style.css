@@ -2,17 +2,23 @@
    Base
 ====================== */
 *{ box-sizing:border-box; }
+
 html, body{
   height:100%;
   margin:0;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
 }
-body{ background:#111; }
-.hidden{ display:none !important; }
+
+body{
+  background:#111;
+}
+
+.hidden{
+  display:none !important;
+}
 
 /* ======================
-   Global scale (自動収縮の核)
-   - vmin基準で全体が狭いほど縮む
+   Global scale
 ====================== */
 :root{
   --pad: clamp(10px, 1.6vmin, 18px);
@@ -23,17 +29,18 @@ body{ background:#111; }
   --modeTitle: clamp(18px, 2.2vmin, 32px);
   --quote: clamp(12px, 1.55vmin, 18px);
 
-  /* リングは「上下2分割」でも収まるよう vmin 寄りに */
   --ring: clamp(160px, 22vmin, 260px);
   --time: clamp(28px, 5.2vmin, 60px);
 
-  /* 🐻も自動収縮 */
   --bear: clamp(18px, 3.0vmin, 26px);
 
-  /* ボタン（A案）：一定サイズで止める（伸びすぎ禁止） */
   --btnH: clamp(56px, 7.2vmin, 84px);
   --btnFS: clamp(14px, 1.7vmin, 18px);
   --btnPX: clamp(12px, 2.0vmin, 16px);
+
+  --rareBtnFS: clamp(13px, 1.55vmin, 17px);
+  --rareBtnPX: clamp(14px, 2vmin, 18px);
+  --rareBtnPY: clamp(10px, 1.4vmin, 13px);
 }
 
 /* ======================
@@ -48,7 +55,6 @@ body{ background:#111; }
   padding: var(--pad);
 }
 
-/* 左右共通：縮められるように */
 #left, #right{
   width:50%;
   border-radius:10px;
@@ -56,11 +62,12 @@ body{ background:#111; }
   min-height:0;
 }
 
-#right{ overflow:hidden; }
+#right{
+  overflow:hidden;
+}
 
-/* 左：中身は基本「収縮して収める」。最後の保険だけスクロール */
 #left{
-  overflow:auto;                   /* 保険：極端な端末だけスクロール */
+  overflow:auto;
   -webkit-overflow-scrolling: touch;
 
   background:#4b88cc;
@@ -69,9 +76,6 @@ body{ background:#111; }
   display:flex;
   flex-direction:column;
   align-items:center;
-
-  /* ここがポイント：center固定だと“伸びる要素”が暴れるので、
-     上下に余白を残しつつ、詰まったら縮む/折り返す方向へ */
   justify-content:center;
 
   text-align:center;
@@ -107,6 +111,67 @@ body{ background:#111; }
   line-height:1.7;
   margin: 0 0 clamp(6px, 1.0vmin, 12px);
   opacity:.95;
+  max-width: min(92%, 760px);
+}
+
+/* ======================
+   Rare Button
+====================== */
+#rareBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-top: clamp(8px, 1.2vmin, 14px);
+  margin-bottom: clamp(4px, 0.8vmin, 10px);
+  padding: var(--rareBtnPY) var(--rareBtnPX);
+  border:none;
+  border-radius:16px;
+  background: rgba(34, 34, 34, 0.95);
+  color:#fff;
+  font-weight:700;
+  font-size: var(--rareBtnFS);
+  line-height:1.6;
+  text-align:center;
+  cursor:pointer;
+  max-width:min(92%, 760px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.16);
+  transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
+}
+
+#rareBtn:hover{
+  transform: translateY(-1px);
+}
+
+#rareBtn:active{
+  transform: translateY(1px);
+}
+
+#rareBtn:disabled{
+  opacity:.72;
+  cursor:default;
+}
+
+/* ゴールドのやわらかい発光 */
+@keyframes rareGoldGlow{
+  0%{
+    box-shadow:
+      0 0 6px rgba(255, 215, 0, 0.18),
+      0 0 0 rgba(255, 215, 0, 0);
+  }
+  50%{
+    box-shadow:
+      0 0 18px rgba(255, 215, 0, 0.55),
+      0 0 32px rgba(255, 215, 0, 0.18);
+  }
+  100%{
+    box-shadow:
+      0 0 6px rgba(255, 215, 0, 0.18),
+      0 0 0 rgba(255, 215, 0, 0);
+  }
+}
+
+.rare-glow{
+  animation: rareGoldGlow 1.8s infinite ease-in-out;
 }
 
 /* ======================
@@ -124,11 +189,13 @@ body{ background:#111; }
   height:100%;
   transform: rotate(-90deg);
 }
+
 .ring-bg{
   fill:none;
   stroke: rgba(255,255,255,.25);
   stroke-width:10;
 }
+
 .ring-fg{
   fill:none;
   stroke: #f2c14e;
@@ -157,7 +224,7 @@ body{ background:#111; }
 }
 
 /* ======================
-   Bears（自動収縮 + 折り返し）
+   Bears
 ====================== */
 #bears{
   margin-top: clamp(6px, 1.0vmin, 10px);
@@ -165,7 +232,7 @@ body{ background:#111; }
   gap: clamp(8px, 1.2vmin, 14px);
   align-items:center;
   justify-content:center;
-  flex-wrap: wrap; /* これで横が狭くても詰まって崩れない */
+  flex-wrap: wrap;
 }
 
 .bear{
@@ -174,14 +241,14 @@ body{ background:#111; }
   opacity:.35;
   transition: .2s ease;
 }
+
 .bear.on{
   filter: grayscale(0);
   opacity:1;
 }
 
 /* ======================
-   Menu（A案：伸びすぎ禁止）
-   - ここが「ボタンがデカい」根本原因を潰す
+   Menu
 ====================== */
 #startMenu{
   margin-top: clamp(10px, 1.6vmin, 18px);
@@ -189,8 +256,6 @@ body{ background:#111; }
   display:flex;
   flex-direction:column;
   gap: clamp(10px, 1.8vmin, 22px);
-
-  /* ★重要：余った高さを吸わない（ボタンが伸びない） */
   flex: 0 0 auto;
   min-height: 0;
 }
@@ -199,38 +264,34 @@ body{ background:#111; }
   width:100%;
   border:none;
   border-radius:10px;
-
-  /* ★重要：flex:1 をやめる（伸びすぎ防止） */
   flex: 0 0 auto;
-
-  height: var(--btnH);            /* A案：一定のほどよい高さ */
-  padding: 0 var(--btnPX);        /* 高さはheightで制御する */
+  height: var(--btnH);
+  padding: 0 var(--btnPX);
   font-size: var(--btnFS);
   font-weight:700;
-
   cursor:pointer;
   background:#f4f4f4;
+  color:#111;
   box-shadow: 0 8px 18px rgba(0,0,0,.12);
-
   white-space: nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-
   display:flex;
   align-items:center;
   justify-content:center;
 }
 
-.modeBtn:active{ transform: translateY(1px); }
+.modeBtn:active{
+  transform: translateY(1px);
+}
 
 /* ======================
-   Right (video + images)
+   Right (images)
 ====================== */
 #right{
   background:#000;
   position:relative;
 }
-
 
 #character{
   position:absolute;
@@ -270,21 +331,22 @@ body{ background:#111; }
 }
 
 /* ======================
-   Responsive（分割は現状のまま）
+   Responsive
 ====================== */
-
-/* ▼ 縦画面：上下2分割 */
 @media (orientation: portrait){
-  #app{ flex-direction:column; }
+  #app{
+    flex-direction:column;
+  }
   #left, #right{
     width:100%;
     flex:1;
   }
 }
 
-/* ▼ 横画面：左右2分割 */
 @media (orientation: landscape){
-  #app{ flex-direction:row; }
+  #app{
+    flex-direction:row;
+  }
   #left, #right{
     width:50%;
     flex:1;
@@ -292,7 +354,7 @@ body{ background:#111; }
 }
 
 /* ======================
-   超低い横（スマホ横など）でさらに詰まる時だけ、リングを少し縮める
+   超低い横画面
 ====================== */
 @media (max-height: 420px){
   :root{
@@ -300,32 +362,34 @@ body{ background:#111; }
     --time: clamp(24px, 4.8vmin, 52px);
     --btnH: clamp(52px, 7.0vmin, 76px);
   }
+
+  #rareBtn{
+    margin-top: 8px;
+    padding: 9px 14px;
+  }
 }
+
 /* ======================
    PCで左が小さく見える問題の対策
-   - 左パネルの "上限" を引き上げる
 ====================== */
 @media (min-width: 1100px) and (min-height: 650px){
   :root{
-    /* タイトル類をもう少し大きく */
     --title: clamp(22px, 3.2vmin, 72px);
     --sub: clamp(14px, 1.8vmin, 24px);
     --modeTitle: clamp(20px, 2.4vmin, 40px);
     --quote: clamp(12px, 1.55vmin, 20px);
 
-    /* リングと時間をPCでは大きめに（ここが体感で一番効く） */
     --ring: clamp(200px, 26vmin, 340px);
     --time: clamp(34px, 5.6vmin, 72px);
 
-    /* 🐻も少しだけ */
     --bear: clamp(18px, 2.4vmin, 30px);
   }
 }
+
 /* ======================
    PCだけ：左が小さく見える＆中央寄りすぎ対策
 ====================== */
 @media (min-width: 1100px){
-
   :root{
     --title: clamp(40px, 4.5vmin, 110px);
     --sub: clamp(18px, 2.2vmin, 30px);
@@ -339,29 +403,33 @@ body{ background:#111; }
 
     --btnH: clamp(70px, 6.5vmin, 96px);
     --btnFS: clamp(18px, 1.8vmin, 22px);
+    --rareBtnFS: clamp(15px, 1.35vmin, 18px);
   }
 
-  /* 左を少しだけ上寄せ */
   #left{
     justify-content:flex-start;
     padding-top: clamp(40px, 5vmin, 80px);
-    background:#4b88cc;  /* ← 明るい集中ブルー */
+    background:#4b88cc;
   }
 
-  /* タイトル ↔ サブタイトル */
   #productName{
     margin-bottom: 32px;
   }
 
-  /* サブタイトル ↔ ボタン群 */
   #subTitle{
     margin-bottom: 40px;
   }
 
-  /* ボタン幅 */
   #startMenu{
     width:min(900px, 100%);
-    gap: 32px;   /* ← ここが gap */
+    gap: 32px;
   }
 
+  #rareBtn{
+    max-width:min(900px, 100%);
+  }
+
+  #quote{
+    max-width:min(900px, 100%);
+  }
 }
