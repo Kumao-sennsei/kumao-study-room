@@ -54,20 +54,43 @@ function stopAmbient() {
   currentAudioMode = "";
 }
 
-async function startAmbient(mode) {
+// iPad / iPhone 向け：最初のユーザー操作時に環境音を準備
+async function primeAmbient(mode) {
   if (!mode) return;
-  if (currentAudioMode === mode && currentAudio) return;
-
-  stopAmbient();
-
-  currentAudioMode = mode;
-  currentAudio = new Audio(`${mode}.mp3`);
-  currentAudio.loop = true;
-  currentAudio.volume = 0.5;
-  currentAudio.currentTime = 0;
-  currentAudio.playsInline = true;
 
   try {
+    if (!currentAudio || currentAudioMode !== mode) {
+      currentAudioMode = mode;
+      currentAudio = new Audio(`${mode}.mp3`);
+      currentAudio.loop = true;
+      currentAudio.volume = 0.5;
+      currentAudio.currentTime = 0;
+      currentAudio.playsInline = true;
+      currentAudio.preload = "auto";
+    }
+
+    // ここでは再生せず、ロードだけしておく
+    currentAudio.load();
+  } catch (e) {
+    console.error("環境音の準備失敗:", e);
+  }
+}
+
+async function startAmbient(mode) {
+  if (!mode) return;
+
+  try {
+    if (!currentAudio || currentAudioMode !== mode) {
+      currentAudioMode = mode;
+      currentAudio = new Audio(`${mode}.mp3`);
+      currentAudio.loop = true;
+      currentAudio.volume = 0.5;
+      currentAudio.currentTime = 0;
+      currentAudio.playsInline = true;
+      currentAudio.preload = "auto";
+    }
+
+    currentAudio.volume = 0.5;
     await currentAudio.play();
   } catch (e) {
     console.error("環境音再生エラー:", e);
@@ -87,7 +110,7 @@ function setCharacterImage(mode, setInRound) {
 const SPRING_START_QUOTES = [
   {
     display: "立て。春は始まりだ。\nお前もまだ始まったばかりだろ？",
-    speech: "たて…。はるわ、はじまりだ。\nお前もまだ、はじまったばかりだろ？"
+    speech: "たて…。はるは、はじまりだ。\nお前もまだ、はじまったばかりだろ？"
   },
   {
     display: "桜は散ってもな、お前はまだ咲ける。\n25分、いけるだろ？",
@@ -99,11 +122,11 @@ const SPRING_START_QUOTES = [
   },
   {
     display: "甘える時間は終わりだ。\nだがな、お前はもう走れる状態だ。行くぞ。",
-    speech: "あまえる時間は、おわりだ…\nだがな…\nお前はもう、走れる状態だ。\nいくぞ。"
+    speech: "あまえる時間は、おわりだ…\nだがな…\nお前はもう、走れるじょうたいだ。\nいくぞ。"
   },
   {
     display: "桜の花が舞ってる。だが、お前は散る側じゃねぇ。\n今日も咲きにいけ。",
-    speech: "さくらの花が舞ってる…\nだが、お前は、ちるがわじゃねぇ。\n今日も、さきにいけ。"
+    speech: "さくらの花が、舞ってる…\nだが、お前は、ちるがわじゃねぇ。\n今日も、さきにいけ。"
   }
 ];
 
@@ -129,7 +152,6 @@ const SPRING_BREAK_QUOTES = [
     speech: "今日ちょっと、重かったな…\nそれでもやった。\nそこが、頑張りだ。\nとりあえず5分、かたの力を抜け。"
   }
 ];
-
 
 function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -171,7 +193,7 @@ async function speakWithDonKumao(text, onEnded) {
     source.start(0);
   } catch (err) {
     console.error("TTS再生エラー:", err);
-    if (onEnded) onEnded(); // エラー時もタイマーが止まらないよう実行
+    if (onEnded) onEnded();
   }
 }
 
@@ -216,8 +238,13 @@ function setTimerText(sec) {
   elTimer.textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-function getRound() { return Math.floor((totalSetIndex - 1) / SETS_PER_ROUND) + 1; }
-function getSetInRound() { return ((totalSetIndex - 1) % SETS_PER_ROUND) + 1; }
+function getRound() {
+  return Math.floor((totalSetIndex - 1) / SETS_PER_ROUND) + 1;
+}
+
+function getSetInRound() {
+  return ((totalSetIndex - 1) % SETS_PER_ROUND) + 1;
+}
 
 function updateBears() {
   const setInRound = getSetInRound();
@@ -233,7 +260,10 @@ function updateRing(sec, maxSec) {
 }
 
 function stopTimer() {
-  if (intervalId) { clearInterval(intervalId); intervalId = null; }
+  if (intervalId) {
+    clearInterval(intervalId);
+    intervalId = null;
+  }
 }
 
 function startTimerLoop(phaseMaxSec) {
@@ -293,23 +323,20 @@ function prepareBreakUI() {
 }
 
 // ======================
-// フェーズ遷移ロジック（ここがメインの修正箇所）
+// フェーズ遷移ロジック
 // ======================
 async function goToPhase(nextPhase) {
   if (transitionLock) return;
   transitionLock = true;
 
-  // 1. 全て停止
   stopTimer();
   stopVoice();
-  stopAmbient();
 
   if (nextPhase === "focus") {
     prepareFocusUI();
     const quote = pickRandom(SPRING_START_QUOTES);
     elQuote.textContent = quote.display;
 
-    // 2. 音声再生。終わってからタイマーと環境音を開始。
     speakWithDonKumao(quote.speech, async () => {
       if (phase !== "focus") {
         transitionLock = false;
@@ -320,13 +347,12 @@ async function goToPhase(nextPhase) {
       startTimerLoop(FOCUS_SEC);
       transitionLock = false;
     });
-
   } else {
+    stopAmbient();
     prepareBreakUI();
     const quote = pickRandom(SPRING_BREAK_QUOTES);
     elQuote.textContent = quote.display;
 
-    // 2. 音声再生。終わってから休憩タイマーを開始。
     speakWithDonKumao(quote.speech, () => {
       if (phase !== "break") {
         transitionLock = false;
@@ -341,6 +367,7 @@ async function goToPhase(nextPhase) {
 
 function handlePhaseEnd() {
   if (transitionLock) return;
+
   if (phase === "focus") {
     goToPhase("break");
   } else {
@@ -349,11 +376,14 @@ function handlePhaseEnd() {
   }
 }
 
-function startStudy(mode) {
+async function startStudy(mode) {
   currentMode = mode;
   totalSetIndex = 1;
   transitionLock = false;
-  unlockAudioSystem().then(() => goToPhase("focus"));
+
+  await unlockAudioSystem();
+  await primeAmbient(mode);
+  goToPhase("focus");
 }
 
 // 初期化
