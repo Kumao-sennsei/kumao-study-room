@@ -306,28 +306,34 @@ async function goToPhase(nextPhase) {
 
   if (nextPhase === "focus") {
     prepareFocusUI();
-    const text = pickRandom(SPRING_START_QUOTES);
-    elQuote.textContent = text;
+    const quote = pickRandom(SPRING_START_QUOTES);
+    elQuote.textContent = quote.display;
 
     // 2. 音声再生。終わってからタイマーと環境音を開始。
-    speakWithDonKumao(text, async () => {
-      if (phase !== "focus") { transitionLock = false; return; }
-      
-      await startAmbient(currentMode); // 環境音開始
-      startTimerLoop(FOCUS_SEC);      // タイマー開始
+    speakWithDonKumao(quote.speech, async () => {
+      if (phase !== "focus") {
+        transitionLock = false;
+        return;
+      }
+
+      await startAmbient(currentMode);
+      startTimerLoop(FOCUS_SEC);
       transitionLock = false;
     });
 
   } else {
     prepareBreakUI();
-    const text = pickRandom(SPRING_BREAK_QUOTES);
-    elQuote.textContent = text;
+    const quote = pickRandom(SPRING_BREAK_QUOTES);
+    elQuote.textContent = quote.display;
 
     // 2. 音声再生。終わってから休憩タイマーを開始。
-    speakWithDonKumao(text, () => {
-      if (phase !== "break") { transitionLock = false; return; }
-      
-      startTimerLoop(BREAK_SEC);      // タイマー開始
+    speakWithDonKumao(quote.speech, () => {
+      if (phase !== "break") {
+        transitionLock = false;
+        return;
+      }
+
+      startTimerLoop(BREAK_SEC);
       transitionLock = false;
     });
   }
