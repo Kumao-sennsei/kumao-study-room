@@ -687,3 +687,37 @@ async function startStudy(mode) {
 // 初期化
 showHomeUI();
 window.startStudy = startStudy;
+
+let roomUsers = [];
+let isInRoom = false;
+
+function renderRoom() {
+  const list = document.getElementById("roomList");
+  const count = document.getElementById("roomCount");
+
+  list.innerHTML = "";
+  roomUsers.forEach(name => {
+    const li = document.createElement("li");
+    li.textContent = name;
+    list.appendChild(li);
+  });
+
+  count.textContent = roomUsers.length;
+}
+
+function joinRoom() {
+  if (isInRoom) return;
+
+  isInRoom = true;
+  roomUsers.push("あなた");
+  renderRoom();
+}
+
+function leaveRoom() {
+  if (!isInRoom) return;
+
+  isInRoom = false;
+  roomUsers = roomUsers.filter(name => name !== "あなた");
+  renderRoom();
+}
+
