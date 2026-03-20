@@ -46,11 +46,12 @@ async function primeAmbient(mode) {
 
   try {
     if (!currentAudio || currentAudioMode !== mode) {
-      currentAudio = new Audio(`${mode}.wav`);
+      currentAudio = new Audio(`${mode}.mp3`);
       currentAudioMode = mode;
-
+      
       currentAudio.loop = true;
       currentAudio.volume = 0.5;
+      currentAudio.currentTime = 0;
       currentAudio.playsInline = true;
       currentAudio.preload = "auto";
     }
@@ -66,15 +67,17 @@ async function startAmbient(mode) {
 
   try {
     if (!currentAudio || currentAudioMode !== mode) {
-      currentAudio = new Audio(`${mode}.wav`);
+      currentAudio = new Audio(`${mode}.mp3`);
       currentAudioMode = mode;
-
+      
       currentAudio.loop = true;
       currentAudio.volume = 0.5;
+      currentAudio.currentTime = 0;
       currentAudio.playsInline = true;
       currentAudio.preload = "auto";
     }
 
+    currentAudio.volume = 0.5;
     await currentAudio.play();
   } catch (e) {
     console.error("環境音再生エラー:", e);
@@ -147,8 +150,23 @@ let currentTime = FOCUS_SEC;
 let intervalId = null;
 let transitionLock = false;
 
-const elTimer = document.getElementById("timer");
+// DOM
+const elProductName = document.getElementById("productName");
+const elSubTitle = document.getElementById("subTitle");
+const elModeTitle = document.getElementById("modeTitle");
+const elQuote = document.getElementById("quote");
+const elRingWrap = document.getElementById("ringWrap");
+const elLap = document.getElementById("lap");
+const elBears = document.getElementById("bears");
+const elBearSpans = Array.from(document.querySelectorAll(".bear"));
+const elStartMenu = document.getElementById("startMenu");
 const elCharacter = document.getElementById("character");
+const elBrandBox = document.getElementById("brandBox");
+const elRareBtn = document.getElementById("rareBtn");
+const ringFg = document.querySelector(".ring-fg");
+
+const RADIUS = 52;
+const CIRC = 2 * Math.PI * RADIUS;
 
 function setTimerText(sec) {
   const m = Math.floor(sec / 60);
