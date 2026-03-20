@@ -77,7 +77,7 @@ async function startAmbient(mode) {
     if (!currentAudio || currentAudioMode !== mode) {
       currentAudioMode = mode;
       currentAudio = new Audio(`${mode}.wav`);
-      currentAudio.loop = true;
+      currentAudio.loop = false;
       currentAudio.volume = 0.5;
       currentAudio.currentTime = 0;
       currentAudio.playsInline = true;
