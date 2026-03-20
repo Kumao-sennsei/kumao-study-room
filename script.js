@@ -720,4 +720,6 @@ function leaveRoom() {
   roomUsers = roomUsers.filter(name => name !== "あなた");
   renderRoom();
 }
-
+window.addEventListener("DOMContentLoaded", () => {
+  renderRoom();
+});
