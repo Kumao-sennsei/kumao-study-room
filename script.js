@@ -51,12 +51,16 @@ async function primeAmbient(mode) {
   try {
     if (!currentAudio || currentAudioMode !== mode) {
       currentAudioMode = mode;
-      currentAudio = new Audio(`${mode}.mp3`);
-      currentAudio.loop = true;
+      currentAudio = new Audio(`${mode}.wav`);
+      currentAudio.loop = false;
       currentAudio.volume = 0.5;
       currentAudio.currentTime = 0;
       currentAudio.playsInline = true;
       currentAudio.preload = "auto";
+     currentAudio.addEventListener("ended", () => {
+   currentAudio.currentTime = 0;
+    currentAudio.play();
+  });
     }
 
     // 再生はしない。準備だけ
@@ -72,7 +76,7 @@ async function startAmbient(mode) {
   try {
     if (!currentAudio || currentAudioMode !== mode) {
       currentAudioMode = mode;
-      currentAudio = new Audio(`${mode}.mp3`);
+      currentAudio = new Audio(`${mode}.wav`);
       currentAudio.loop = true;
       currentAudio.volume = 0.5;
       currentAudio.currentTime = 0;
