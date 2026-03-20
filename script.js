@@ -729,25 +729,35 @@ const fakeNames = [
   "silent_study", "東大志望", "夜型戦士", "コツコツ勢"
 ];
 
-// 偽物ユーザー生成
+// 偽物ユーザー（滞在時間つき）
+let fakeUsers = [];
+
 function updateFakeUsers() {
   if (!isInRoom) return;
 
-  // 自分以外の人数（0〜3人くらい）
-  const fakeCount = Math.floor(Math.random() * 4);
+  const now = Date.now();
 
-  // 自分以外だけ一旦消す
-  roomUsers = roomUsers.filter(name => name === "あなた");
+  // ⏳ 期限切れユーザーを削除
+  fakeUsers = fakeUsers.filter(user => user.leaveAt > now);
 
-  // ランダム追加
-  for (let i = 0; i < fakeCount; i++) {
+  // ➕ たまに新しい人が入る（30%）
+  if (Math.random() < 0.3 && fakeUsers.length < 5) {
     const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
-    roomUsers.push(name);
+
+    // 1時間〜2時間滞在
+    const stayTime = (60 + Math.random() * 60) * 60 * 1000;
+
+    fakeUsers.push({
+      name: name,
+      leaveAt: now + stayTime
+    });
   }
+
+  // 👤 表示更新（あなた＋偽物）
+  roomUsers = ["あなた", ...fakeUsers.map(u => u.name)];
 
   renderRoom();
 }
 
-// 3秒ごとに変化
-setInterval(updateFakeUsers, 3000);
-
+// 10秒ごとに更新（自然に）
+setInterval(updateFakeUsers, 10000);
