@@ -723,3 +723,31 @@ function leaveRoom() {
 window.addEventListener("DOMContentLoaded", () => {
   renderRoom();
 });
+
+const fakeNames = [
+  "たろう", "勉強マン", "集中神", "user123", "がんばる君",
+  "silent_study", "東大志望", "夜型戦士", "コツコツ勢"
+];
+
+// 偽物ユーザー生成
+function updateFakeUsers() {
+  if (!isInRoom) return;
+
+  // 自分以外の人数（0〜3人くらい）
+  const fakeCount = Math.floor(Math.random() * 4);
+
+  // 自分以外だけ一旦消す
+  roomUsers = roomUsers.filter(name => name === "あなた");
+
+  // ランダム追加
+  for (let i = 0; i < fakeCount; i++) {
+    const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+    roomUsers.push(name);
+  }
+
+  renderRoom();
+}
+
+// 3秒ごとに変化
+setInterval(updateFakeUsers, 3000);
+
