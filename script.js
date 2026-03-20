@@ -1,11 +1,10 @@
 // ======================
-// 環境音（完全シームレス版）
+// 🔥 環境音（安定版ループ）
 // ======================
 let ambientCtx = null;
 let ambientBuffer = null;
-let ambientSource1 = null;
-let ambientSource2 = null;
-let ambientLoopTimer = null;
+let ambientSource = null;
+let nextTimer = null;
 let loadedMode = null;
 
 async function startAmbient(mode) {
@@ -15,7 +14,6 @@ async function startAmbient(mode) {
     ambientCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
 
-  // 初回 or モード変更時のみロード
   if (!ambientBuffer || loadedMode !== mode) {
     const res = await fetch(`${mode}.wav`);
     const arrayBuffer = await res.arrayBuffer();
@@ -23,44 +21,37 @@ async function startAmbient(mode) {
     loadedMode = mode;
   }
 
-  const now = ambientCtx.currentTime;
   const duration = ambientBuffer.duration;
-  const overlap = 0.3;
+  const overlap = 0.15;
+  const now = ambientCtx.currentTime;
 
-  ambientSource1 = ambientCtx.createBufferSource();
-  ambientSource2 = ambientCtx.createBufferSource();
+  const source = ambientCtx.createBufferSource();
+  source.buffer = ambientBuffer;
+  source.connect(ambientCtx.destination);
+  source.start(now);
 
-  ambientSource1.buffer = ambientBuffer;
-  ambientSource2.buffer = ambientBuffer;
+  ambientSource = source;
 
-  ambientSource1.connect(ambientCtx.destination);
-  ambientSource2.connect(ambientCtx.destination);
+  if (nextTimer) clearTimeout(nextTimer);
 
-  ambientSource1.start(now);
-  ambientSource2.start(now + duration - overlap);
-
-  // 既存ループ防止
-  if (ambientLoopTimer) clearTimeout(ambientLoopTimer);
-
-  ambientLoopTimer = setTimeout(() => {
+  nextTimer = setTimeout(() => {
     startAmbient(mode);
   }, (duration - overlap) * 1000);
 }
 
 function stopAmbient() {
   try {
-    ambientSource1?.stop();
-    ambientSource2?.stop();
+    ambientSource?.stop();
   } catch (e) {}
 
-  if (ambientLoopTimer) {
-    clearTimeout(ambientLoopTimer);
-    ambientLoopTimer = null;
+  if (nextTimer) {
+    clearTimeout(nextTimer);
+    nextTimer = null;
   }
 }
 
 // ======================
-// 画像管理
+// 画像＆音管理
 // ======================
 const bgImages = {
   fire: ["fire_round1.png", "fire_round2.png", "fire_round3.png", "fire_round4.png"],
@@ -76,7 +67,7 @@ const usedVoiceIndexes = {};
 let isStarting = false;
 
 // ======================
-// ボイス
+// 音声ユーティリティ
 // ======================
 function stopVoice() {
   if (currentVoiceAudio) {
@@ -98,7 +89,7 @@ function playVoiceAudio(src, onEnded) {
   currentVoiceAudio = audio;
   currentVoiceEndedOnce = false;
 
-  const safeEnd = () => {
+  const safeOnEnded = () => {
     if (currentVoiceEndedOnce) return;
     currentVoiceEndedOnce = true;
 
@@ -106,13 +97,15 @@ function playVoiceAudio(src, onEnded) {
       currentVoiceAudio = null;
     }
 
-    if (onEnded) onEnded();
+    if (typeof onEnded === "function") {
+      onEnded();
+    }
   };
 
-  audio.onended = safeEnd;
-  audio.onerror = safeEnd;
+  audio.onended = safeOnEnded;
+  audio.onerror = safeOnEnded;
 
-  audio.play().catch(safeEnd);
+  audio.play().catch(safeOnEnded);
 }
 
 // ======================
@@ -155,9 +148,9 @@ function stopTimer() {
   }
 }
 
-function startTimerLoop(maxSec) {
+function startTimerLoop(phaseMaxSec) {
   stopTimer();
-  phaseEndTime = Date.now() + maxSec * 1000;
+  phaseEndTime = Date.now() + phaseMaxSec * 1000;
 
   intervalId = setInterval(() => {
     const remaining = Math.max(0, Math.ceil((phaseEndTime - Date.now()) / 1000));
