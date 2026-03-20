@@ -60,7 +60,7 @@ async function primeAmbient(mode) {
     }
 
     // 再生はしない。準備だけ
-    currentAudio.load();
+    
   } catch (e) {
     console.error("環境音の準備失敗:", e);
   }
