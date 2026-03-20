@@ -1,56 +1,4 @@
 // ======================
-// 🔥 環境音（安定版ループ）
-// ======================
-let ambientCtx = null;
-let ambientBuffer = null;
-let ambientSource = null;
-let nextTimer = null;
-let loadedMode = null;
-
-async function startAmbient(mode) {
-  if (!mode) return;
-
-  if (!ambientCtx) {
-    ambientCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-
-  if (!ambientBuffer || loadedMode !== mode) {
-    const res = await fetch(`${mode}.wav`);
-    const arrayBuffer = await res.arrayBuffer();
-    ambientBuffer = await ambientCtx.decodeAudioData(arrayBuffer);
-    loadedMode = mode;
-  }
-
-  const duration = ambientBuffer.duration;
-  const overlap = 0.15;
-  const now = ambientCtx.currentTime;
-
-  const source = ambientCtx.createBufferSource();
-  source.buffer = ambientBuffer;
-  source.connect(ambientCtx.destination);
-  source.start(now);
-
-  ambientSource = source;
-
-  if (nextTimer) clearTimeout(nextTimer);
-
-  nextTimer = setTimeout(() => {
-    startAmbient(mode);
-  }, (duration - overlap) * 1000);
-}
-
-function stopAmbient() {
-  try {
-    ambientSource?.stop();
-  } catch (e) {}
-
-  if (nextTimer) {
-    clearTimeout(nextTimer);
-    nextTimer = null;
-  }
-}
-
-// ======================
 // 画像＆音管理
 // ======================
 const bgImages = {
@@ -59,6 +7,8 @@ const bgImages = {
   sea: ["sea_round1.png", "sea_round2.png", "sea_round3.png", "sea_round4.png"]
 };
 
+let currentAudio = null;
+let currentAudioMode = "";
 let currentVoiceAudio = null;
 let currentVoiceEndedOnce = false;
 let phaseEndTime = null;
@@ -80,32 +30,97 @@ function stopVoice() {
   currentVoiceEndedOnce = false;
 }
 
+function stopAmbient() {
+  if (currentAudio) {
+    try {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    } catch (e) {}
+    currentAudio = null;
+  }
+  currentAudioMode = "";
+}
+
+async function primeAmbient(mode) {
+  if (!mode) return;
+
+  try {
+    if (!currentAudio || currentAudioMode !== mode) {
+      currentAudio = new Audio(`${mode}.wav`);
+      currentAudioMode = mode;
+
+      currentAudio.loop = true;
+      currentAudio.volume = 0.5;
+      currentAudio.playsInline = true;
+      currentAudio.preload = "auto";
+    }
+
+    currentAudio.load();
+  } catch (e) {
+    console.error("環境音の準備失敗:", e);
+  }
+}
+
+async function startAmbient(mode) {
+  if (!mode) return;
+
+  try {
+    if (!currentAudio || currentAudioMode !== mode) {
+      currentAudio = new Audio(`${mode}.wav`);
+      currentAudioMode = mode;
+
+      currentAudio.loop = true;
+      currentAudio.volume = 0.5;
+      currentAudio.playsInline = true;
+      currentAudio.preload = "auto";
+    }
+
+    await currentAudio.play();
+  } catch (e) {
+    console.error("環境音再生エラー:", e);
+  }
+}
+
 function playVoiceAudio(src, onEnded) {
   stopVoice();
 
-  const audio = new Audio(src);
-  audio.preload = "auto";
-  audio.playsInline = true;
-  currentVoiceAudio = audio;
-  currentVoiceEndedOnce = false;
+  try {
+    const audio = new Audio(src);
+    audio.preload = "auto";
+    audio.playsInline = true;
+    currentVoiceAudio = audio;
+    currentVoiceEndedOnce = false;
 
-  const safeOnEnded = () => {
-    if (currentVoiceEndedOnce) return;
-    currentVoiceEndedOnce = true;
+    const safeOnEnded = () => {
+      if (currentVoiceEndedOnce) return;
+      currentVoiceEndedOnce = true;
 
-    if (currentVoiceAudio === audio) {
-      currentVoiceAudio = null;
-    }
+      if (currentVoiceAudio === audio) {
+        currentVoiceAudio = null;
+      }
 
+      if (typeof onEnded === "function") {
+        onEnded();
+      }
+    };
+
+    audio.onended = safeOnEnded;
+
+    audio.onerror = (e) => {
+      console.error("ボイス再生エラー:", e, src);
+      safeOnEnded();
+    };
+
+    audio.play().catch((e) => {
+      console.error("ボイス再生失敗:", e, src);
+      safeOnEnded();
+    });
+  } catch (e) {
+    console.error("ボイス生成失敗:", e, src);
     if (typeof onEnded === "function") {
       onEnded();
     }
-  };
-
-  audio.onended = safeOnEnded;
-  audio.onerror = safeOnEnded;
-
-  audio.play().catch(safeOnEnded);
+  }
 }
 
 // ======================
@@ -214,6 +229,7 @@ async function startStudy(mode) {
   currentMode = mode;
   totalSetIndex = 1;
 
+  await primeAmbient(mode);
   await goToPhase("focus");
 
   isStarting = false;
