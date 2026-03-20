@@ -51,7 +51,7 @@ async function primeAmbient(mode) {
   try {
     if (!currentAudio || currentAudioMode !== mode) {
       currentAudioMode = mode;
-      currentAudio = new Audio(`${mode}.mp3`);
+      currentAudio = new Audio(`${mode}.wav`);
       currentAudio.loop = true;
       currentAudio.volume = 0.5;
       currentAudio.currentTime = 0;
@@ -72,7 +72,7 @@ async function startAmbient(mode) {
   try {
     if (!currentAudio || currentAudioMode !== mode) {
       currentAudioMode = mode;
-      currentAudio = new Audio(`${mode}.mp3`);
+      currentAudio = new Audio(`${mode}.wav`);
       currentAudio.loop = true;
       currentAudio.volume = 0.5;
       currentAudio.currentTime = 0;
