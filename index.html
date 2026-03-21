@@ -111,37 +111,47 @@ style="display:none; position:fixed; inset:0; background:#111; color:#fff; z-ind
    
  <div id="studyRoomContent" style="display:flex; gap:30px; align-items:flex-start; margin-top:20px;">
 
-  <div id="roomDetail" style="flex:0 0 420px;"></div>
+  <!-- 左：席 -->
+  <div style="flex:0 0 420px;">
+    <div id="roomDetail"></div>
+  </div>
 
-</div>
-    <h3>📘 みんなの学習ノート</h3>
+  <!-- 右：お知らせ＋ノート -->
+  <div style="flex:1;">
+    <div id="noticeBox" style="background:#1a1a1a; border:1px solid #333; border-radius:10px; padding:12px; margin-bottom:20px;">
+      <div style="font-weight:bold; margin-bottom:8px;">📢 お知らせ</div>
+      <div>たかちゃん、自習室へようこそ！</div>
+      <div style="margin-top:6px;">✨ ポモドーロ学習で集中力アップを目指そう</div>
+      <div style="margin-top:6px;">🏆 Kumaoさん、学習時間4時間突破！</div>
+    </div>
 
-    <div id="noteGrid" style="
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap:10px;
-      margin-top:10px;
-    ">
-      
-      <!-- ダミー投稿 -->
-      <div class="noteCard">英語 30分やった🔥<br>👍 3</div>
-      <div class="noteCard">数学むずい😇<br>👍 5</div>
-      <div class="noteCard">集中できた！<br>👍 2</div>
-      <div class="noteCard">眠いけど頑張る<br>👍 4</div>
+    <div id="noteArea">
+      <h3>📘 みんなの学習ノート</h3>
 
-      <div class="noteCard">理科復習OK<br>👍 1</div>
-      <div class="noteCard">今日は神日🔥<br>👍 6</div>
-      <div class="noteCard">英単語50個<br>👍 2</div>
-      <div class="noteCard">やる気ゼロ→復活<br>👍 3</div>
+      <div id="noteGrid" style="
+        display:grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap:10px;
+        margin-top:10px;
+      ">
+        <div class="noteCard">英語 30分やった🔥<br>👍 3</div>
+        <div class="noteCard">数学むずい😇<br>👍 5</div>
+        <div class="noteCard">集中できた！<br>👍 2</div>
+        <div class="noteCard">眠いけど頑張る<br>👍 4</div>
 
-      <div class="noteCard">継続が命<br>👍 7</div>
-      <div class="noteCard">疲れたけど勝ち<br>👍 2</div>
-      <div class="noteCard">今日も1歩前進<br>👍 4</div>
-      <div class="noteCard">コツコツ最強<br>👍 5</div>
+        <div class="noteCard">理科復習OK<br>👍 1</div>
+        <div class="noteCard">今日は神日🔥<br>👍 6</div>
+        <div class="noteCard">英単語50個<br>👍 2</div>
+        <div class="noteCard">やる気ゼロ→復活<br>👍 3</div>
+
+        <div class="noteCard">継続が命<br>👍 7</div>
+        <div class="noteCard">疲れたけど勝ち<br>👍 2</div>
+        <div class="noteCard">今日も1歩前進<br>👍 4</div>
+        <div class="noteCard">コツコツ最強<br>👍 5</div>
+      </div>
     </div>
   </div>
 
-</div>
 </div>
   
 </body>
