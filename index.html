@@ -68,7 +68,33 @@
   <ul id="roomList"></ul>
   <button onclick="joinRoom()">入室</button>
   <button onclick="leaveRoom()">退出</button>
-</div>
 
+  
+</div>
+<button id="goStudyRoomBtn" 
+style="position:fixed; left:20px; top:20px; z-index:9999;">
+  自習室へ
+</button>
+
+<button id="backMainBtn" 
+style="position:fixed; left:20px; top:60px; z-index:9999; display:none;">
+  戻る
+</button>
+
+  <div id="studyRoomView" 
+style="display:none; position:fixed; inset:0; background:#111; color:#fff; z-index:5000; padding:20px;">
+
+  <h2>オンライン自習室</h2>
+
+  <div id="roomButtons">
+    <button onclick="enterRoom('Room1')">Room1（3人）</button>
+    <button onclick="enterRoom('Room2')">Room2（5人）</button>
+    <button onclick="enterRoom('Room3')">Room3（1人）</button>
+  </div>
+
+  <div id="roomDetail" style="margin-top:20px;"></div>
+
+</div>
+  
 </body>
 </html>
