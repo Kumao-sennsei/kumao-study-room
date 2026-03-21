@@ -84,24 +84,33 @@ style="position:fixed; left:20px; top:60px; z-index:9999; display:none;">
  <div id="studyRoomView" 
 style="display:none; position:fixed; inset:0; background:#111; color:#fff; z-index:20000; padding:20px;">
   <button id="closeStudyRoomViewBtn" style="margin-bottom:20px;">← 元の画面に戻る</button>
-  <h2>オンライン自習室</h2>
+ <div style="display:flex; justify-content:space-between; align-items:flex-start;">
 
-  <div id="roomButtons">
-    <button onclick="enterRoom('Room1')">Room1（3人）</button>
-    <button onclick="enterRoom('Room2')">Room2（5人）</button>
-    <button onclick="enterRoom('Room3')">Room3（1人）</button>
+  <!-- 左 -->
+  <div>
+    <h2>オンライン自習室</h2>
+
+    <div id="roomButtons">
+      <button onclick="enterRoom('Room1')">Room1（3人）</button>
+      <button onclick="enterRoom('Room2')">Room2（5人）</button>
+      <button onclick="enterRoom('Room3')">Room3（1人）</button>
+    </div>
+  </div>
+
+   <!-- 右（お知らせ） -->
+  <div style="width:50%; margin-left:20px;">
+    <div id="noticeBox" style="background:#1a1a1a; border:1px solid #333; border-radius:10px; padding:12px;">
+      <div style="font-weight:bold; margin-bottom:8px;">📢 お知らせ</div>
+      <div>たかちゃん、自習室へようこそ！</div>
+      <div style="margin-top:6px;">✨ ポモドーロ学習で集中力アップを目指そう</div>
+      <div style="margin-top:6px;">🏆 Kumaoさん、学習時間4時間突破！</div>
+    </div>
   </div>
 
  <div id="studyRoomContent" style="display:flex; gap:30px; align-items:flex-start; margin-top:20px;">
 
   <div id="roomDetail" style="flex:0 0 420px;"></div>
 
-  <div id="noteArea" style="flex:1;">
-    <div id="noticeBox" style="background:#1a1a1a; border:1px solid #333; border-radius:10px; padding:12px; margin-bottom:20px;">
-  <div style="font-weight:bold; margin-bottom:8px;">📢 お知らせ</div>
-  <div>たかちゃん、自習室へようこそ！</div>
-  <div style="margin-top:6px;">✨ ポモドーロ学習で集中力アップを目指そう</div>
-  <div style="margin-top:6px;">🏆 Kumaoさん、学習時間4時間突破！</div>
 </div>
     <h3>📘 みんなの学習ノート</h3>
 
