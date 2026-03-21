@@ -117,47 +117,79 @@ style="display:none; position:fixed; inset:0; background:#111; color:#fff; z-ind
       <h3>📘 みんなの学習ノート</h3>
 
       <!-- ここから追加：投稿フォーム -->
-<div id="noteComposer" style="
-  background:#1a1a1a;
-  border:1px solid #333;
-  border-radius:12px;
-  padding:12px;
-  margin-bottom:14px;
-">
-  <div style="font-weight:bold; margin-bottom:8px;">✍️ ノートを投稿する</div>
+<!-- ここから追加：投稿フォーム -->
+<div id="noteComposerWrap" style="margin-bottom:14px;">
+  <button
+    id="toggleNoteComposerBtn"
+    type="button"
+    style="
+      padding:10px 16px;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      background:#ffd54f;
+      color:#111;
+      font-weight:bold;
+      font-size:16px;
+    "
+  >
+    投稿する📒
+  </button>
 
-  <div style="display:grid; gap:8px;">
-    <input
-      id="noteSubjectInput"
-      type="text"
-      placeholder="教科（例：英語 / 数学 / 理科）"
-      style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff;"
-    />
+  <div
+    id="noteComposer"
+    style="
+      display:none;
+      background:#1a1a1a;
+      border:1px solid #333;
+      border-radius:12px;
+      padding:12px;
+      margin-top:12px;
+    "
+  >
+    <div style="font-weight:bold; margin-bottom:8px;">✍️ ノートを投稿する</div>
 
-    <textarea
-      id="noteTextInput"
-      rows="3"
-      placeholder="今日の学習メモを書こう！（例：英単語30個やった🔥）"
-      style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff; resize:vertical;"
-    ></textarea>
+    <div style="display:grid; gap:8px;">
+      <input
+        id="noteSubjectInput"
+        type="text"
+        placeholder="教科（例：英語 / 数学 / 理科）"
+        style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff;"
+      />
 
-    <input
-      id="noteImageInput"
-      type="text"
-      placeholder="画像URL（任意・空欄OK）"
-      style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff;"
-    />
+      <textarea
+        id="noteTextInput"
+        rows="3"
+        placeholder="今日の学習メモを書こう！（例：英単語30個やった🔥）"
+        style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff; resize:vertical;"
+      ></textarea>
 
-    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-      <button
-        id="addNoteBtn"
-        type="button"
-        style="padding:10px 14px; border:none; border-radius:8px; cursor:pointer; background:#ffd54f; color:#111; font-weight:bold;"
-      >
-        投稿する
-      </button>
+      <input
+        id="noteImageInput"
+        type="text"
+        placeholder="画像URL（任意・空欄OK）"
+        style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff;"
+      />
 
-      <span id="noteFormMessage" style="font-size:12px; color:#bbb;"></span>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button
+          id="addNoteBtn"
+          type="button"
+          style="padding:10px 14px; border:none; border-radius:8px; cursor:pointer; background:#ffd54f; color:#111; font-weight:bold;"
+        >
+          投稿する
+        </button>
+
+        <button
+          id="closeNoteComposerBtn"
+          type="button"
+          style="padding:10px 14px; border:none; border-radius:8px; cursor:pointer; background:#444; color:#fff; font-weight:bold;"
+        >
+          閉じる
+        </button>
+
+        <span id="noteFormMessage" style="font-size:12px; color:#bbb;"></span>
+      </div>
     </div>
   </div>
 </div>
@@ -294,6 +326,16 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     }, 2500);
   }
 
+    function setComposerOpen(isOpen) {
+    const composer = document.getElementById("noteComposer");
+    const toggleBtn = document.getElementById("toggleNoteComposerBtn");
+    if (!composer || !toggleBtn) return;
+
+    composer.style.display = isOpen ? "block" : "none";
+    toggleBtn.textContent = isOpen ? "投稿フォームを閉じる" : "投稿する📒";
+  }
+  
+
   function renderNotes() {
     const noteGrid = getNoteGrid();
     if (!noteGrid) return;
@@ -383,11 +425,12 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     saveNotes(notes);
     renderNotes();
 
-    subjectEl.value = "";
+       subjectEl.value = "";
     textEl.value = "";
     imageEl.value = "";
 
     showMessage("投稿できたよ！");
+    setComposerOpen(false);
   }
 
   function editNote(noteId) {
@@ -434,10 +477,32 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     showMessage("削除したよ！");
   }
 
-  function bindEvents() {
+   function bindEvents() {
     const addBtn = document.getElementById("addNoteBtn");
     const noteGrid = getNoteGrid();
     const textEl = document.getElementById("noteTextInput");
+    const toggleBtn = document.getElementById("toggleNoteComposerBtn");
+    const closeBtn = document.getElementById("closeNoteComposerBtn");
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", () => {
+        const composer = document.getElementById("noteComposer");
+        if (!composer) return;
+        const isOpen = composer.style.display === "block";
+        setComposerOpen(!isOpen);
+
+        if (!isOpen) {
+          const subjectEl = document.getElementById("noteSubjectInput");
+          if (subjectEl) subjectEl.focus();
+        }
+      });
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        setComposerOpen(false);
+      });
+    }
 
     if (addBtn) {
       addBtn.addEventListener("click", addNote);
@@ -468,11 +533,12 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     }
   }
 
-  function initNotesFeature() {
+    function initNotesFeature() {
     if (!getNoteGrid()) return;
     getNotes();
     renderNotes();
     bindEvents();
+    setComposerOpen(false);
   }
 
   if (document.readyState === "loading") {
