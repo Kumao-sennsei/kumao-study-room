@@ -92,34 +92,38 @@ style="display:none; position:fixed; inset:0; background:#111; color:#fff; z-ind
     <button onclick="enterRoom('Room3')">Room3（1人）</button>
   </div>
 
-  <div id="roomDetail" style="margin-top:20px;"></div>
-<div id="noteArea" style="margin-top:40px;">
-  <h3>📘 みんなの学習ノート</h3>
+ <div id="studyRoomContent" style="display:flex; gap:30px; align-items:flex-start; margin-top:20px;">
 
-  <div id="noteGrid" style="
-    display:grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap:10px;
-    margin-top:10px;
-  ">
-    
-    <!-- ダミー投稿 -->
-    <div class="noteCard">英語 30分やった🔥<br>👍 3</div>
-    <div class="noteCard">数学むずい😇<br>👍 5</div>
-    <div class="noteCard">集中できた！<br>👍 2</div>
-    <div class="noteCard">眠いけど頑張る<br>👍 4</div>
+  <div id="roomDetail" style="flex:0 0 420px;"></div>
 
-    <div class="noteCard">理科復習OK<br>👍 1</div>
-    <div class="noteCard">今日は神日🔥<br>👍 6</div>
-    <div class="noteCard">英単語50個<br>👍 2</div>
-    <div class="noteCard">やる気ゼロ→復活<br>👍 3</div>
+  <div id="noteArea" style="flex:1;">
+    <h3>📘 みんなの学習ノート</h3>
 
-    <div class="noteCard">継続が命<br>👍 7</div>
-    <div class="noteCard">疲れたけど勝ち<br>👍 2</div>
-    <div class="noteCard">今日も1歩前進<br>👍 4</div>
-    <div class="noteCard">コツコツ最強<br>👍 5</div>
+    <div id="noteGrid" style="
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+      margin-top:10px;
+    ">
+      
+      <!-- ダミー投稿 -->
+      <div class="noteCard">英語 30分やった🔥<br>👍 3</div>
+      <div class="noteCard">数学むずい😇<br>👍 5</div>
+      <div class="noteCard">集中できた！<br>👍 2</div>
+      <div class="noteCard">眠いけど頑張る<br>👍 4</div>
 
+      <div class="noteCard">理科復習OK<br>👍 1</div>
+      <div class="noteCard">今日は神日🔥<br>👍 6</div>
+      <div class="noteCard">英単語50個<br>👍 2</div>
+      <div class="noteCard">やる気ゼロ→復活<br>👍 3</div>
+
+      <div class="noteCard">継続が命<br>👍 7</div>
+      <div class="noteCard">疲れたけど勝ち<br>👍 2</div>
+      <div class="noteCard">今日も1歩前進<br>👍 4</div>
+      <div class="noteCard">コツコツ最強<br>👍 5</div>
+    </div>
   </div>
+
 </div>
 </div>
   
