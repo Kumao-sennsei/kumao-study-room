@@ -761,3 +761,37 @@ function updateFakeUsers() {
 
 // 10秒ごとに更新（自然に）
 setInterval(updateFakeUsers, 10000);
+
+const studyRoomView = document.getElementById("studyRoomView");
+const goBtn = document.getElementById("goStudyRoomBtn");
+const backBtn = document.getElementById("backMainBtn");
+
+// 👉 画面切替
+goBtn.onclick = () => {
+  studyRoomView.style.display = "block";
+  backBtn.style.display = "block";
+  goBtn.style.display = "none";
+};
+
+backBtn.onclick = () => {
+  studyRoomView.style.display = "none";
+  backBtn.style.display = "none";
+  goBtn.style.display = "block";
+};
+
+// 👉 部屋に入る（仮）
+function enterRoom(roomName) {
+  const detail = document.getElementById("roomDetail");
+
+  detail.innerHTML = `
+    <h3>${roomName}</h3>
+    <div style="display:grid; grid-template-columns: repeat(5, 60px); gap:10px;">
+      ${Array.from({ length: 20 }).map(() => `
+        <div style="width:60px; height:60px; background:#333; display:flex; align-items:center; justify-content:center;">
+          ○
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
