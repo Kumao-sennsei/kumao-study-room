@@ -116,6 +116,54 @@ style="display:none; position:fixed; inset:0; background:#111; color:#fff; z-ind
     <div id="noteArea">
       <h3>📘 みんなの学習ノート</h3>
 
+      <!-- ここから追加：投稿フォーム -->
+<div id="noteComposer" style="
+  background:#1a1a1a;
+  border:1px solid #333;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:14px;
+">
+  <div style="font-weight:bold; margin-bottom:8px;">✍️ ノートを投稿する</div>
+
+  <div style="display:grid; gap:8px;">
+    <input
+      id="noteSubjectInput"
+      type="text"
+      placeholder="教科（例：英語 / 数学 / 理科）"
+      style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff;"
+    />
+
+    <textarea
+      id="noteTextInput"
+      rows="3"
+      placeholder="今日の学習メモを書こう！（例：英単語30個やった🔥）"
+      style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff; resize:vertical;"
+    ></textarea>
+
+    <input
+      id="noteImageInput"
+      type="text"
+      placeholder="画像URL（任意・空欄OK）"
+      style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff;"
+    />
+
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <button
+        id="addNoteBtn"
+        type="button"
+        style="padding:10px 14px; border:none; border-radius:8px; cursor:pointer; background:#ffd54f; color:#111; font-weight:bold;"
+      >
+        投稿する
+      </button>
+
+      <span id="noteFormMessage" style="font-size:12px; color:#bbb;"></span>
+    </div>
+  </div>
+</div>
+<!-- ここまで追加 -->
+      
+
       <div id="noteGrid" style="
         display:grid;
         grid-template-columns: repeat(4, 1fr);
@@ -146,6 +194,294 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   </div>
 
 </div>
-  
+  <script>
+(() => {
+  const STORAGE_KEY = "kumaoStudyRoomNotes_v1";
+
+  function escapeHtml(str) {
+    return String(str ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function makeId() {
+    return "note_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+  }
+
+  function formatDate(isoString) {
+    if (!isoString) return "";
+    const d = new Date(isoString);
+    if (Number.isNaN(d.getTime())) return "";
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const h = String(d.getHours()).padStart(2, "0");
+    const min = String(d.getMinutes()).padStart(2, "0");
+    return `${y}/${m}/${day} ${h}:${min}`;
+  }
+
+  function getNoteGrid() {
+    return document.getElementById("noteGrid");
+  }
+
+  function loadNotes() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : null;
+    } catch (e) {
+      console.error("ノート読込エラー", e);
+      return null;
+    }
+  }
+
+  function saveNotes(notes) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+  }
+
+  function extractSeedNotesFromHtml() {
+    const noteGrid = getNoteGrid();
+    if (!noteGrid) return [];
+
+    const cards = [...noteGrid.querySelectorAll(".noteCard")];
+
+    return cards.map((card, index) => {
+      const img = card.querySelector("img");
+      const rawText = card.innerText.replace(/\s+/g, " ").trim();
+
+      let likes = 0;
+      const likeMatch = rawText.match(/👍\s*(\d+)/);
+      if (likeMatch) likes = Number(likeMatch[1]) || 0;
+
+      let text = rawText.replace(/👍\s*\d+/, "").trim();
+      text = text.replace(/\n/g, " ").trim();
+
+      return {
+        id: "seed_" + index,
+        author: "みんな",
+        subject: "",
+        text: text || "学習ノート",
+        image: img ? img.getAttribute("src") || "" : "",
+        likes,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        points: likes,
+        isMine: false
+      };
+    });
+  }
+
+  function getNotes() {
+    const saved = loadNotes();
+    if (saved && saved.length) return saved;
+
+    const seed = extractSeedNotesFromHtml();
+    saveNotes(seed);
+    return seed;
+  }
+
+  function showMessage(msg, isError = false) {
+    const el = document.getElementById("noteFormMessage");
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = isError ? "#ff8a80" : "#bbb";
+    setTimeout(() => {
+      if (el.textContent === msg) el.textContent = "";
+    }, 2500);
+  }
+
+  function renderNotes() {
+    const noteGrid = getNoteGrid();
+    if (!noteGrid) return;
+
+    const notes = getNotes();
+
+    noteGrid.innerHTML = notes.map(note => {
+      const imageHtml = note.image
+        ? `<img src="${escapeHtml(note.image)}" alt="ノート画像"
+            style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bottom:8px;">`
+        : "";
+
+      const subjectHtml = note.subject
+        ? `<div style="font-size:12px; color:#ffd54f; margin-bottom:4px;">${escapeHtml(note.subject)}</div>`
+        : "";
+
+      const actionHtml = note.isMine
+        ? `
+          <div style="display:flex; gap:6px; margin-top:10px;">
+            <button type="button" class="note-edit-btn" data-note-id="${escapeHtml(note.id)}"
+              style="padding:6px 10px; border:none; border-radius:6px; cursor:pointer; background:#64b5f6; color:#111; font-weight:bold;">
+              編集
+            </button>
+            <button type="button" class="note-delete-btn" data-note-id="${escapeHtml(note.id)}"
+              style="padding:6px 10px; border:none; border-radius:6px; cursor:pointer; background:#ef5350; color:#fff; font-weight:bold;">
+              削除
+            </button>
+          </div>
+        `
+        : "";
+
+      return `
+        <div class="noteCard" data-note-id="${escapeHtml(note.id)}" style="
+          background:#1a1a1a;
+          border:1px solid #333;
+          border-radius:10px;
+          padding:10px;
+          min-height:140px;
+          box-sizing:border-box;
+        ">
+          ${imageHtml}
+          ${subjectHtml}
+          <div style="white-space:pre-wrap; word-break:break-word; line-height:1.5;">${escapeHtml(note.text)}</div>
+          <div style="margin-top:8px; font-size:12px; color:#aaa;">
+            ${escapeHtml(note.author)} ・ ${escapeHtml(formatDate(note.createdAt))}
+          </div>
+          <div style="margin-top:6px;">👍 ${Number(note.likes) || 0}</div>
+          ${actionHtml}
+        </div>
+      `;
+    }).join("");
+  }
+
+  function addNote() {
+    const subjectEl = document.getElementById("noteSubjectInput");
+    const textEl = document.getElementById("noteTextInput");
+    const imageEl = document.getElementById("noteImageInput");
+
+    if (!subjectEl || !textEl || !imageEl) return;
+
+    const subject = subjectEl.value.trim();
+    const text = textEl.value.trim();
+    const image = imageEl.value.trim();
+
+    if (!text) {
+      showMessage("学習メモを書いてね！", true);
+      textEl.focus();
+      return;
+    }
+
+    const notes = getNotes();
+
+    const newNote = {
+      id: makeId(),
+      author: "たかちゃん",
+      subject,
+      text,
+      image,
+      likes: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      points: 0,
+      isMine: true
+    };
+
+    notes.unshift(newNote);
+    saveNotes(notes);
+    renderNotes();
+
+    subjectEl.value = "";
+    textEl.value = "";
+    imageEl.value = "";
+
+    showMessage("投稿できたよ！");
+  }
+
+  function editNote(noteId) {
+    const notes = getNotes();
+    const target = notes.find(note => note.id === noteId);
+    if (!target || !target.isMine) return;
+
+    const newSubject = prompt("教科を編集してね", target.subject || "");
+    if (newSubject === null) return;
+
+    const newText = prompt("ノート本文を編集してね", target.text || "");
+    if (newText === null) return;
+
+    const newImage = prompt("画像URLを編集してね（空欄OK）", target.image || "");
+    if (newImage === null) return;
+
+    const trimmedText = newText.trim();
+    if (!trimmedText) {
+      alert("本文は空にできないよ！");
+      return;
+    }
+
+    target.subject = newSubject.trim();
+    target.text = trimmedText;
+    target.image = newImage.trim();
+    target.updatedAt = new Date().toISOString();
+
+    saveNotes(notes);
+    renderNotes();
+    showMessage("編集したよ！");
+  }
+
+  function deleteNote(noteId) {
+    const notes = getNotes();
+    const target = notes.find(note => note.id === noteId);
+    if (!target || !target.isMine) return;
+
+    const ok = confirm("このノートを削除する？");
+    if (!ok) return;
+
+    const nextNotes = notes.filter(note => note.id !== noteId);
+    saveNotes(nextNotes);
+    renderNotes();
+    showMessage("削除したよ！");
+  }
+
+  function bindEvents() {
+    const addBtn = document.getElementById("addNoteBtn");
+    const noteGrid = getNoteGrid();
+    const textEl = document.getElementById("noteTextInput");
+
+    if (addBtn) {
+      addBtn.addEventListener("click", addNote);
+    }
+
+    if (textEl) {
+      textEl.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+          addNote();
+        }
+      });
+    }
+
+    if (noteGrid) {
+      noteGrid.addEventListener("click", (e) => {
+        const editBtn = e.target.closest(".note-edit-btn");
+        const deleteBtn = e.target.closest(".note-delete-btn");
+
+        if (editBtn) {
+          editNote(editBtn.dataset.noteId);
+          return;
+        }
+
+        if (deleteBtn) {
+          deleteNote(deleteBtn.dataset.noteId);
+        }
+      });
+    }
+  }
+
+  function initNotesFeature() {
+    if (!getNoteGrid()) return;
+    getNotes();
+    renderNotes();
+    bindEvents();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initNotesFeature);
+  } else {
+    initNotesFeature();
+  }
+})();
+</script>
+   
 </body>
 </html>
