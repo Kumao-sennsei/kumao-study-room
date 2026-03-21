@@ -164,12 +164,22 @@ style="display:none; position:fixed; inset:0; background:#111; color:#fff; z-ind
         style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff; resize:vertical;"
       ></textarea>
 
-      <input
-        id="noteImageInput"
-        type="text"
-        placeholder="画像URL（任意・空欄OK）"
-        style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff;"
-      />
+       <div>
+  <input
+    id="noteImageInput"
+    type="file"
+    accept="image/*"
+    style="padding:10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff; width:100%; box-sizing:border-box;"
+  />
+  <div id="noteImagePreviewWrap" style="display:none; margin-top:10px;">
+    <img
+      id="noteImagePreview"
+      src=""
+      alt="画像プレビュー"
+      style="width:100%; max-height:180px; object-fit:cover; border-radius:8px; border:1px solid #333;"
+    />
+  </div>
+</div>
 
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
         <button
@@ -327,6 +337,29 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     }, 2500);
   }
 
+  function previewSelectedImage() {
+  const fileInput = document.getElementById("noteImageInput");
+  const previewWrap = document.getElementById("noteImagePreviewWrap");
+  const previewImg = document.getElementById("noteImagePreview");
+
+  if (!fileInput || !previewWrap || !previewImg) return;
+
+  const file = fileInput.files && fileInput.files[0];
+  if (!file) {
+    previewWrap.style.display = "none";
+    previewImg.src = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    previewImg.src = event.target.result;
+    previewWrap.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+}
+  
+
     function setComposerOpen(isOpen) {
     const composer = document.getElementById("noteComposer");
     const toggleBtn = document.getElementById("toggleNoteComposerBtn");
@@ -415,7 +448,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
 
     const subject = subjectEl.value.trim();
     const text = textEl.value.trim();
-    const image = imageEl.value.trim();
+   const file = imageEl.files && imageEl.files[0];
 
     if (!text) {
       showMessage("学習メモを書いてね！", true);
@@ -430,7 +463,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
       author: "たかちゃん",
       subject,
       text,
-      image,
+      image: "",
       likes: 0,
       liked: false,
       createdAt: new Date().toISOString(),
@@ -438,6 +471,32 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
       points: 0,
       isMine: true
     };
+
+    if (file) {
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    newNote.image = event.target.result;
+
+    notes.unshift(newNote);
+    saveNotes(notes);
+    renderNotes();
+
+    subjectEl.value = "";
+    textEl.value = "";
+    imageEl.value = "";
+
+    const previewWrap = document.getElementById("noteImagePreviewWrap");
+    const previewImg = document.getElementById("noteImagePreview");
+    if (previewWrap) previewWrap.style.display = "none";
+    if (previewImg) previewImg.src = "";
+
+    showMessage("投稿できたよ！");
+    setComposerOpen(false);
+  };
+  reader.readAsDataURL(file);
+  return;
+}
+    
 
     notes.unshift(newNote);
     saveNotes(notes);
@@ -509,68 +568,74 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   renderNotes();
 }
   
-   function bindEvents() {
-    const addBtn = document.getElementById("addNoteBtn");
-    const noteGrid = getNoteGrid();
-    const textEl = document.getElementById("noteTextInput");
-    const toggleBtn = document.getElementById("toggleNoteComposerBtn");
-    const closeBtn = document.getElementById("closeNoteComposerBtn");
+  function bindEvents() {
+  const addBtn = document.getElementById("addNoteBtn");
+  const noteGrid = getNoteGrid();
+  const textEl = document.getElementById("noteTextInput");
+  const imageInput = document.getElementById("noteImageInput");
+  const toggleBtn = document.getElementById("toggleNoteComposerBtn");
+  const closeBtn = document.getElementById("closeNoteComposerBtn");
 
-    if (toggleBtn) {
-      toggleBtn.addEventListener("click", () => {
-        const composer = document.getElementById("noteComposer");
-        if (!composer) return;
-        const isOpen = composer.style.display === "block";
-        setComposerOpen(!isOpen);
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", () => {
+      const composer = document.getElementById("noteComposer");
+      if (!composer) return;
+      const isOpen = composer.style.display === "block";
+      setComposerOpen(!isOpen);
 
-        if (!isOpen) {
-          const subjectEl = document.getElementById("noteSubjectInput");
-          if (subjectEl) subjectEl.focus();
-        }
-      });
-    }
-
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        setComposerOpen(false);
-      });
-    }
-
-    if (addBtn) {
-      addBtn.addEventListener("click", addNote);
-    }
-
-    if (textEl) {
-      textEl.addEventListener("keydown", (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-          addNote();
-        }
-      });
-    }
-
-    if (noteGrid) {
-      noteGrid.addEventListener("click", (e) => {
-        const editBtn = e.target.closest(".note-edit-btn");
-        const deleteBtn = e.target.closest(".note-delete-btn");
-　　　　 const likeBtn = e.target.closest(".like-btn");
-        
-       if (editBtn) {
-  editNote(editBtn.dataset.noteId);
-  return;
-}
-
-if (deleteBtn) {
-  deleteNote(deleteBtn.dataset.noteId);
-  return;
-}
-
-if (likeBtn) {
-  likeNote(likeBtn.dataset.noteId);
-  return;
-}
-      });
-    }
+      if (!isOpen) {
+        const subjectEl = document.getElementById("noteSubjectInput");
+        if (subjectEl) subjectEl.focus();
+      }
+    });
   }
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      setComposerOpen(false);
+    });
+  }
+
+  if (imageInput) {
+    imageInput.addEventListener("change", previewSelectedImage);
+  }
+
+  if (addBtn) {
+    addBtn.addEventListener("click", addNote);
+  }
+
+  if (textEl) {
+    textEl.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        addNote();
+      }
+    });
+  }
+
+  if (noteGrid) {
+    noteGrid.addEventListener("click", (e) => {
+      const editBtn = e.target.closest(".note-edit-btn");
+      const deleteBtn = e.target.closest(".note-delete-btn");
+      const likeBtn = e.target.closest(".like-btn");
+
+      if (editBtn) {
+        editNote(editBtn.dataset.noteId);
+        return;
+      }
+
+      if (deleteBtn) {
+        deleteNote(deleteBtn.dataset.noteId);
+        return;
+      }
+
+      if (likeBtn) {
+        likeNote(likeBtn.dataset.noteId);
+        return;
+      }
+    });
+  }
+}
+  
 
     function initNotesFeature() {
     if (!getNoteGrid()) return;
