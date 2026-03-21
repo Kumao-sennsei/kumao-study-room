@@ -299,6 +299,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
         text: text || "学習ノート",
         image: img ? img.getAttribute("src") || "" : "",
         likes,
+        liked: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         points: likes,
@@ -431,6 +432,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
       text,
       image,
       likes: 0,
+      liked: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       points: 0,
@@ -493,6 +495,20 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     showMessage("削除したよ！");
   }
 
+  function likeNote(noteId) {
+  const notes = getNotes();
+  const target = notes.find(note => note.id === noteId);
+  if (!target) return;
+
+  if (target.liked) return; // すでに押してる
+
+  target.likes += 1;
+  target.liked = true;
+
+  saveNotes(notes);
+  renderNotes();
+}
+  
    function bindEvents() {
     const addBtn = document.getElementById("addNoteBtn");
     const noteGrid = getNoteGrid();
@@ -536,15 +552,22 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
       noteGrid.addEventListener("click", (e) => {
         const editBtn = e.target.closest(".note-edit-btn");
         const deleteBtn = e.target.closest(".note-delete-btn");
+　　　　 const likeBtn = e.target.closest(".like-btn");
+        
+       if (editBtn) {
+  editNote(editBtn.dataset.noteId);
+  return;
+}
 
-        if (editBtn) {
-          editNote(editBtn.dataset.noteId);
-          return;
-        }
+if (deleteBtn) {
+  deleteNote(deleteBtn.dataset.noteId);
+  return;
+}
 
-        if (deleteBtn) {
-          deleteNote(deleteBtn.dataset.noteId);
-        }
+if (likeBtn) {
+  likeNote(likeBtn.dataset.noteId);
+  return;
+}
       });
     }
   }
