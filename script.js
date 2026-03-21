@@ -766,6 +766,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const studyRoomView = document.getElementById("studyRoomView");
   const goBtn = document.getElementById("goStudyRoomBtn");
   const backBtn = document.getElementById("backMainBtn");
+    const closeStudyRoomViewBtn = document.getElementById("closeStudyRoomViewBtn");
 
   // 画面切替
   goBtn.onclick = () => {
@@ -775,6 +776,11 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   backBtn.onclick = () => {
+    studyRoomView.style.display = "none";
+    backBtn.style.display = "none";
+    goBtn.style.display = "block";
+  };
+    closeStudyRoomViewBtn.onclick = () => {
     studyRoomView.style.display = "none";
     backBtn.style.display = "none";
     goBtn.style.display = "block";
