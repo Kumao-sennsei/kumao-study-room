@@ -762,22 +762,24 @@ function updateFakeUsers() {
 // 10秒ごとに更新（自然に）
 setInterval(updateFakeUsers, 10000);
 
-const studyRoomView = document.getElementById("studyRoomView");
-const goBtn = document.getElementById("goStudyRoomBtn");
-const backBtn = document.getElementById("backMainBtn");
+window.addEventListener("DOMContentLoaded", () => {
+  const studyRoomView = document.getElementById("studyRoomView");
+  const goBtn = document.getElementById("goStudyRoomBtn");
+  const backBtn = document.getElementById("backMainBtn");
 
-// 👉 画面切替
-goBtn.onclick = () => {
-  studyRoomView.style.display = "block";
-  backBtn.style.display = "block";
-  goBtn.style.display = "none";
-};
+  // 画面切替
+  goBtn.onclick = () => {
+    studyRoomView.style.display = "block";
+    backBtn.style.display = "block";
+    goBtn.style.display = "none";
+  };
 
-backBtn.onclick = () => {
-  studyRoomView.style.display = "none";
-  backBtn.style.display = "none";
-  goBtn.style.display = "block";
-};
+  backBtn.onclick = () => {
+    studyRoomView.style.display = "none";
+    backBtn.style.display = "none";
+    goBtn.style.display = "block";
+  };
+});
 
 // 👉 部屋に入る（仮）
 function enterRoom(roomName) {
