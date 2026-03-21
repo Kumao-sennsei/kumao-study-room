@@ -433,3 +433,18 @@ body{
     max-width:min(900px, 100%);
   }
 }
+
+.noteCard {
+  background: #222;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.noteCard:hover {
+  background: #333;
+  transform: scale(1.03);
+}
