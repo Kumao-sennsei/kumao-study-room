@@ -821,3 +821,52 @@ body{
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ===== 風景画像をスマホでもちゃんと表示する ===== */
+#app {
+  min-height: 100vh;
+}
+
+#left {
+  width: 50%;
+  box-sizing: border-box;
+}
+
+#right {
+  width: 50%;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+#character {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  #app {
+    display: block !important;
+    min-height: auto;
+  }
+
+  #left {
+    width: 100% !important;
+  }
+
+  #right {
+    width: 100% !important;
+    height: 42vh !important;
+    min-height: 320px;
+    margin-top: 12px;
+  }
+
+  #character {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
