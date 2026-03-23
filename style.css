@@ -754,6 +754,68 @@ body{
   }
 }
 
+/* ===== 風景画像の上に自習室UIを重ねる ===== */
+#right {
+  position: relative;
+  overflow: hidden;
+}
+
+#goStudyRoomBtn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 30;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#studyRoom {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 30;
+  background: rgba(34, 34, 34, 0.96);
+  color: #fff;
+  padding: 12px;
+  border-radius: 14px;
+  min-width: 150px;
+  box-sizing: border-box;
+}
+
+#studyRoom ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+
+.studyRoomButtons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 520px) {
+  #goStudyRoomBtn {
+    top: 12px;
+    left: 12px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  #studyRoom {
+    top: 12px;
+    right: 12px;
+    min-width: 120px;
+    padding: 10px;
+    font-size: 13px;
+  }
+}
+
 @media (max-width: 520px) {
   #noteGrid {
     grid-template-columns: 1fr !important;
