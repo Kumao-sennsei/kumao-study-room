@@ -776,9 +776,9 @@ body{
 
 #studyRoom {
   position: absolute;
-  top: 60px;
+  top: 72px;
   left: 16px;
-  z-index: 30;
+  z-index: 20;
   background: rgba(34, 34, 34, 0.96);
   color: #fff;
   padding: 12px;
