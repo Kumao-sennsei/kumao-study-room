@@ -481,3 +481,206 @@ body{
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ===== メイン画面：風景画像の上にボタン配置 ===== */
+#right {
+  position: relative;
+}
+
+#goStudyRoomBtn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 20;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#studyRoom {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 20;
+  background: rgba(34, 34, 34, 0.96);
+  color: #fff;
+  padding: 12px;
+  border-radius: 14px;
+  min-width: 150px;
+  box-sizing: border-box;
+}
+
+#studyRoom ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+
+.studyRoomButtons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ===== 自習室内部：PCでは横並び ===== */
+#studyRoomLayout {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+#studyRoomContent {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+
+/* ===== ノートカードの基本 ===== */
+#noteGrid .noteCard {
+  min-width: 0;
+}
+
+/* ===== スマホ縦画面対応 ===== */
+@media (max-width: 768px) {
+  /* メイン画面 */
+  #app {
+    display: block;
+  }
+
+  #left,
+  #right {
+    width: 100%;
+  }
+
+  #right {
+    margin-top: 12px;
+  }
+
+  #goStudyRoomBtn {
+    top: 12px;
+    left: 12px;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  #studyRoom {
+    top: 12px;
+    right: 12px;
+    min-width: 132px;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .studyRoomButtons {
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .studyRoomButtons button {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+
+  /* 自習室全体 */
+  #studyRoomView {
+    padding: 12px !important;
+    overflow-x: hidden;
+  }
+
+  #studyRoomLayout {
+    display: block;
+  }
+
+  /* Roomボタンを横並びに */
+  #roomButtons {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-top: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 4px;
+  }
+
+  #roomButtons button {
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+
+  /* 席を上、右側コンテンツを下へ */
+  #studyRoomContent {
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-top: 12px !important;
+  }
+
+  #studyRoomContent > div:first-child {
+    flex: none !important;
+    width: 100% !important;
+  }
+
+  #studyRoomContent > div:last-child {
+    flex: none !important;
+    width: 100% !important;
+  }
+
+  /* 席の横幅をスマホに合わせる */
+  #roomDetail {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  /* お知らせ */
+  #noticeBox {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 16px !important;
+  }
+
+  /* 投稿ボタン */
+  #toggleNoteComposerBtn {
+    width: 100%;
+    max-width: 220px;
+  }
+
+  /* ノート一覧 */
+  #noteGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  #noteGrid .noteCard {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  #noteGrid .noteCard img {
+    height: 110px !important;
+  }
+}
+
+/* さらに小さいスマホ */
+@media (max-width: 520px) {
+  #noteGrid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #goStudyRoomBtn {
+    font-size: 13px;
+    padding: 7px 10px;
+  }
+
+  #studyRoom {
+    font-size: 13px;
+    min-width: 120px;
+  }
+
+  #studyRoomContent {
+    gap: 14px !important;
+  }
+}
