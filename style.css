@@ -684,3 +684,78 @@ body{
     gap: 14px !important;
   }
 }
+
+/* ===== スマホ縦：自習室を見やすくする ===== */
+@media (max-width: 768px) {
+  #studyRoomView {
+    padding: 12px !important;
+    overflow-x: hidden;
+  }
+
+  #studyRoomLayout {
+    display: block;
+  }
+
+  #roomButtons {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin: 12px 0 16px;
+    padding-bottom: 4px;
+  }
+
+  #roomButtons button {
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+
+  #studyRoomContent {
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-top: 12px !important;
+  }
+
+  .studyRoomSeats,
+  .studyRoomSide {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  #roomDetail {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  #noticeBox {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 16px !important;
+  }
+
+  #noteGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  #noteGrid .noteCard {
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+  }
+
+  #noteGrid .noteCard img {
+    height: 110px !important;
+    object-fit: cover;
+  }
+
+  #toggleNoteComposerBtn {
+    width: 100%;
+    max-width: 220px;
+  }
+}
+
+@media (max-width: 520px) {
+  #noteGrid {
+    grid-template-columns: 1fr !important;
+  }
+}
