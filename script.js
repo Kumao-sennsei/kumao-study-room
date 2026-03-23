@@ -82,6 +82,13 @@ async function startAmbient(mode) {
       currentAudio.currentTime = 0;
       currentAudio.playsInline = true;
       currentAudio.preload = "auto";
+
+      currentAudio.addEventListener("ended", () => {
+        currentAudio.currentTime = 0;
+        currentAudio.play().catch((e) => {
+          console.error("環境音ループ再生エラー:", e);
+        });
+      });
     }
 
     currentAudio.volume = 0.5;
@@ -90,6 +97,7 @@ async function startAmbient(mode) {
     console.error("環境音再生エラー:", e);
   }
 }
+
 
 function playVoiceAudio(src, onEnded) {
   stopVoice();
