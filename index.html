@@ -49,32 +49,31 @@
     </div>
 
     <!-- 右 -->
-    <div id="right">
-      <!-- ドンくまお（開始・休憩で表示） -->
-      <img id="character" src="don_space.png" alt="don kumao" />
+<div id="right">
+  <!-- ドンくまお（開始・休憩で表示） -->
+  <img id="character" src="don_space.png" alt="don kumao" />
 
-      <!-- 右下クレジット（開始画面だけ表示） -->
-      <div id="brandBox">
-        <img id="goodayLogo" src="gooday.png" alt="Gooday logo" />
-        <div id="poweredBy">Powered by Kumao Labo</div>
-      </div>
+  <!-- 風景画像の左上・右上に重ねる -->
+  <button id="goStudyRoomBtn">自習室へ</button>
+
+  <div id="studyRoom">
+    <div>🟢 自習室（<span id="roomCount">0</span>人）</div>
+    <ul id="roomList"></ul>
+    <div class="studyRoomButtons">
+      <button onclick="joinRoom()">入室</button>
+      <button onclick="leaveRoom()">退出</button>
     </div>
   </div>
 
-  <script src="script.js"></script>
-
-<div id="studyRoom" style="position:fixed; right:10px; top:20px; z-index:9999; background:#222; color:#fff; padding:10px; border-radius:10px;">
-  <div>🟢 自習室（<span id="roomCount">0</span>人）</div>
-  <ul id="roomList"></ul>
-  <button onclick="joinRoom()">入室</button>
-  <button onclick="leaveRoom()">退出</button>
-
-  
+  <!-- 右下クレジット（開始画面だけ表示） -->
+  <div id="brandBox">
+    <img id="goodayLogo" src="gooday.png" alt="Gooday logo" />
+    <div id="poweredBy">Powered by Kumao Labo</div>
+  </div>
 </div>
-<button id="goStudyRoomBtn" 
-style="position:fixed; left:20px; top:20px; z-index:9999;">
-  自習室へ
-</button>
+  </div>
+
+  <script src="script.js"></script>
 
 <button id="backMainBtn" 
 style="position:fixed; left:20px; top:60px; z-index:9999; display:none;">
@@ -84,8 +83,7 @@ style="position:fixed; left:20px; top:60px; z-index:9999; display:none;">
  <div id="studyRoomView" 
 style="display:none; position:fixed; inset:0; background:#111; color:#fff; z-index:20000; padding:20px; overflow-y:auto;">
   <button id="closeStudyRoomViewBtn" style="margin-bottom:20px;">← 元の画面に戻る</button>
- <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-
+<div id="studyRoomLayout">
   <!-- 左 -->
   <div>
     <h2>オンライン自習室</h2>
