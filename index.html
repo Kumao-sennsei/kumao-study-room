@@ -48,20 +48,30 @@
       </div>
     </div>
 
-   <!-- 右 -->
-<div id="right">
-  <!-- ドンくまお（開始・休憩で表示） -->
-  <img id="character" src="don_space.png" alt="don kumao" />
+    <!-- 右 -->
+    <div id="right">
+      <!-- ドンくまお（開始・休憩で表示） -->
+      <img id="character" src="don_space.png" alt="don kumao" />
 
-  </div>
+      <!-- 風景画像の左上に配置 -->
+      <button id="goStudyRoomBtn" type="button">自習室へ</button>
 
-  <!-- 右下クレジット（開始画面だけ表示） -->
-  <div id="brandBox">
-    <img id="goodayLogo" src="gooday.png" alt="Gooday logo" />
-    <div id="poweredBy">Powered by Kumao Labo</div>
-  </div>
-</div>
- 
+      <!-- 風景画像の右上に配置 -->
+      <div id="studyRoom">
+        <div>🟢 自習室（<span id="roomCount">0</span>人）</div>
+        <ul id="roomList"></ul>
+        <div class="studyRoomButtons">
+          <button type="button" onclick="joinRoom()">入室</button>
+          <button type="button" onclick="leaveRoom()">退出</button>
+        </div>
+      </div>
+
+      <!-- 右下クレジット（開始画面だけ表示） -->
+      <div id="brandBox">
+        <img id="goodayLogo" src="gooday.png" alt="Gooday logo" />
+        <div id="poweredBy">Powered by Kumao Labo</div>
+      </div>
+    </div>
 
   <script src="script.js"></script>
 
