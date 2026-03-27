@@ -430,6 +430,42 @@ function getCurrentMonth() {
   return Number(monthText);
 }
 
+function pickByWeight(items) {
+  const total = items.reduce((sum, item) => sum + item.weight, 0);
+  let r = Math.random() * total;
+
+  for (const item of items) {
+    r -= item.weight;
+    if (r < 0) return item.value;
+  }
+
+  return items[items.length - 1].value;
+}
+
+function getRareCategoryByWeight(monthPool) {
+  const hasNormal = monthPool.some((quote) => quote.category === "normal");
+  const hasFunny = monthPool.some((quote) => quote.category === "funny");
+  const hasUltra = monthPool.some((quote) => quote.category === "ultra");
+
+  const weights = [];
+
+  if (hasNormal) weights.push({ value: "normal", weight: 80 });
+  if (hasFunny) weights.push({ value: "funny", weight: 18 });
+  if (hasUltra) weights.push({ value: "ultra", weight: 2 });
+
+  if (weights.length === 0) {
+    return null;
+  }
+
+  return pickByWeight(weights);
+}
+
+function getRarePoolForCurrentMonth() {
+  const month = getCurrentMonth();
+  return RARE_QUOTES_BY_MONTH[month] || FALLBACK_RARE_QUOTES;
+}
+
+
 function getStartQuote() {
   return pickRandomNoRepeat("start_quotes", START_QUOTES) || START_QUOTES[0];
 }
