@@ -477,8 +477,26 @@ function getBreakQuoteForCurrentMonth() {
 }
 
 function getRareQuote() {
-  return pickRandomNoRepeat("rare_quotes", RARE_QUOTES) || RARE_QUOTES[0];
+  const month = getCurrentMonth();
+  const pool = getRarePoolForCurrentMonth();
+  const selectedCategory = getRareCategoryByWeight(pool);
+
+  if (!selectedCategory) {
+    return pickRandomNoRepeat(`rare_month_${month}_all`, pool) || pool[0];
+  }
+
+  const categoryPool = pool.filter((quote) => quote.category === selectedCategory);
+
+  if (categoryPool.length > 0) {
+    return (
+      pickRandomNoRepeat(`rare_month_${month}_${selectedCategory}`, categoryPool) ||
+      categoryPool[0]
+    );
+  }
+
+  return pickRandomNoRepeat(`rare_month_${month}_all`, pool) || pool[0];
 }
+
 
 // ======================
 // 設定・状態管理
