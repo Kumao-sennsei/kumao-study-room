@@ -188,18 +188,54 @@ const START_QUOTES = [
   { display: "お前には、まだ伸びしろがある。\nしかも、かなりデカい。", audio: "audio/start/start_30.mp3" }
 ];
 
-const RARE_QUOTES = [
-  { display: "Ayo! You built different. I’m proud of that grind.", audio: "audio/rare/rare_01.mp3" },
-  { display: "I see that hustle. You not regular. You elite with it.", audio: "audio/rare/rare_02.mp3" },
-  { display: "That focus? That’s dangerous energy. Keep that.", audio: "audio/rare/rare_03.mp3" },
-  { display: "You really locked in. Not many built like that.", audio: "audio/rare/rare_04.mp3" },
-  { display: "I don’t gas people up. But you? You earned that respect.", audio: "audio/rare/rare_05.mp3" },
-  { display: "Ayo, wake up. You next up. Move like it.", audio: "audio/rare/rare_06.mp3" },
-  { display: "Stop playin’ small. You bigger than that.", audio: "audio/rare/rare_07.mp3" },
-  { display: "Pressure? Good. That’s growth season.", audio: "audio/rare/rare_08.mp3" },
-  { display: "Don’t fold. We don’t quit around here.", audio: "audio/rare/rare_09.mp3" },
-  { display: "Big dog energy. Act like you know.", audio: "audio/rare/rare_10.mp3" }
+const RARE_QUOTES_BY_MONTH = {
+  4: [
+    {
+      category: "ultra",
+      display: "Ayo, you really built different.\nNo cap, that grind is loud.\n【訳】お前、マジでモノが違う。\nガチでその努力、存在感えぐい。",
+      audio: "audio/rare/04/month04_rare_ultra_01.mp3"
+    },
+    {
+      category: "ultra",
+      display: "Sheesh... you locked in for real.\nThat’s big dog energy.\n【訳】うわ、完全に本気モード入ってるな。\nそれは主役級の強さだ。",
+      audio: "audio/rare/04/month04_rare_ultra_02.mp3"
+    },
+    {
+      category: "funny",
+      display: "お前の努力、今ちょうどタケノコみたいに伸びてる。\nしかも雨上がりのやつだ。\nにょきにょき通り越して、もはや竹林予備軍だ。",
+      audio: "audio/rare/04/month04_rare_funny_01.mp3"
+    },
+    {
+      category: "funny",
+      display: "今のお前、春風に乗ったやる気の妖精みたいな動きしてるぞ。\n落ち着いてるようで、内側だけ異様に強い。\nなんかもう、静かな暴走機関車だ。",
+      audio: "audio/rare/04/month04_rare_funny_02.mp3"
+    }
+  ]
+};
+
+const FALLBACK_RARE_QUOTES = [
+  {
+    category: "normal",
+    display: "Ayo! You built different. I’m proud of that grind.",
+    audio: "audio/rare/rare_01.mp3"
+  },
+  {
+    category: "normal",
+    display: "I see that hustle. You not regular. You elite with it.",
+    audio: "audio/rare/rare_02.mp3"
+  },
+  {
+    category: "normal",
+    display: "That focus? That’s dangerous energy. Keep that.",
+    audio: "audio/rare/rare_03.mp3"
+  },
+  {
+    category: "normal",
+    display: "You really locked in. Not many built like that.",
+    audio: "audio/rare/rare_04.mp3"
+  }
 ];
+
 
 const BREAK_QUOTES_BY_MONTH = {
   1: [
@@ -385,7 +421,13 @@ function pickRandomNoRepeat(key, arr) {
 }
 
 function getCurrentMonth() {
-  return new Date().getMonth() + 1;
+  const now = new Date();
+  const monthText = new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    month: "numeric"
+  }).format(now);
+
+  return Number(monthText);
 }
 
 function getStartQuote() {
