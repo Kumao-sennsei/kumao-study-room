@@ -453,22 +453,23 @@ function pickByWeight(items) {
 }
 
 function getRareCategoryByWeight(monthPool) {
-  const hasNormal = monthPool.some((quote) => quote.category === "normal");
-  const hasFunny = monthPool.some((quote) => quote.category === "funny");
-  const hasUltra = monthPool.some((quote) => quote.category === "ultra");
+  const availableCategories = [];
 
-  const weights = [];
+  if (monthPool.some((quote) => quote.category === "funny")) {
+    availableCategories.push("funny");
+  }
 
-  if (hasNormal) weights.push({ value: "normal", weight: 80 });
-  if (hasFunny) weights.push({ value: "funny", weight: 18 });
-  if (hasUltra) weights.push({ value: "ultra", weight: 2 });
+  if (monthPool.some((quote) => quote.category === "ultra")) {
+    availableCategories.push("ultra");
+  }
 
-  if (weights.length === 0) {
+  if (availableCategories.length === 0) {
     return null;
   }
 
-  return pickByWeight(weights);
+  return pickRandom(availableCategories);
 }
+
 
 function getRarePoolForCurrentMonth() {
   const month = getCurrentMonth();
