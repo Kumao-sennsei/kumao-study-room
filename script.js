@@ -536,6 +536,10 @@ function saveStoryFragment(fragmentId) {
 
   console.log("[story] 保存済み欠片:", saved);
 }
+function getSavedStoryFragments() {
+  const STORAGE_KEY = "kumao_story_fragments";
+  return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+}
 
 // ======================
 // 設定・状態管理
