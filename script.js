@@ -668,6 +668,7 @@ function showRareButton(onClickHandler) {
   elRareBtn.textContent = "レアボイス当選！おめでとう🎉 押してみてね🐻✨";
   elRareBtn.disabled = false;
   elRareBtn.classList.remove("hidden");
+  elStoryBtn.classList.remove("hidden");
   elRareBtn.classList.add("rare-glow");
   elRareBtn.onclick = onClickHandler;
 }
