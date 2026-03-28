@@ -540,6 +540,10 @@ function getSavedStoryFragments() {
   const STORAGE_KEY = "kumao_story_fragments";
   return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 }
+function hasStoryFragment(fragmentId) {
+  const saved = getSavedStoryFragments();
+  return saved.includes(fragmentId);
+}
 
 // ======================
 // 設定・状態管理
