@@ -494,9 +494,15 @@ function getStartQuote() {
 
 function getBreakQuoteForCurrentMonth() {
   const month = getCurrentMonth();
-  const arr = BREAK_QUOTES_BY_MONTH[month] || FALLBACK_BREAK_QUOTES;
+  const arr = BREAK_QUOTES_BY_MONTH[month];
+
+  if (!Array.isArray(arr) || arr.length === 0) {
+    throw new Error(`休憩音声データがありません。month=${month}`);
+  }
+
   return pickRandomNoRepeat(`break_month_${month}`, arr) || arr[0];
 }
+
 
 function getRareQuote() {
   const month = getCurrentMonth();
