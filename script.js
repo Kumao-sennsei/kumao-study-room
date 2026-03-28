@@ -986,7 +986,7 @@ function renderStoryList() {
 
     const item = document.createElement("div");
 item.className = "story-item";
-item.textContent = isOwned ? "✅" : "❌";
+item.textContent = `${i}月\n${isOwned ? "✅" : "❌"}`;
 
 container.appendChild(item);
   }
