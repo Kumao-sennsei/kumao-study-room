@@ -573,6 +573,7 @@ const elStartMenu = document.getElementById("startMenu");
 const elCharacter = document.getElementById("character");
 const elBrandBox = document.getElementById("brandBox");
 const elRareBtn = document.getElementById("rareBtn");
+const elStoryBtn = document.getElementById("storyBtn");
 const ringFg = document.querySelector(".ring-fg");
 
 const RADIUS = 52;
