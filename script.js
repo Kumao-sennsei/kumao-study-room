@@ -447,7 +447,7 @@ function getCurrentMonth() {
     timeZone: "Asia/Tokyo",
     month: "numeric"
   }).format(now);
-
+console.log("[month] monthText =", monthText, "Number(monthText) =", Number(monthText));
   return Number(monthText);
 }
 
