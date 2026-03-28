@@ -575,6 +575,7 @@ const elBrandBox = document.getElementById("brandBox");
 const elRareBtn = document.getElementById("rareBtn");
 const elStoryBtn = document.getElementById("storyBtn");
 const storyBookBtn = document.getElementById("storyBookBtn");
+const storyBookModal = document.getElementById("storyBookModal");
 
 storyBookBtn.onclick = () => {
   console.log("図鑑ボタン押された！");
