@@ -579,6 +579,7 @@ const storyBookModal = document.getElementById("storyBookModal");
 
 storyBookBtn.onclick = () => {
   console.log("図鑑ボタン押された！");
+  storyBookModal.classList.remove("hidden");
 };
 
 const ringFg = document.querySelector(".ring-fg");
