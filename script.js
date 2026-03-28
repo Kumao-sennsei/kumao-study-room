@@ -103,6 +103,7 @@ function playVoiceAudio(src, onEnded) {
   stopVoice();
 
   try {
+    console.log("[voice] 再生しようとしている音声:", src);
     const audio = new Audio(src);
     audio.preload = "auto";
     audio.playsInline = true;
