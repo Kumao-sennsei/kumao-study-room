@@ -985,6 +985,9 @@ function renderStoryList() {
     const isOwned = saved.includes(id);
 
     const item = document.createElement("div");
+    item.onclick = () => {
+  alert(`${i}月のストーリー！`); // ← 仮表示
+};
 item.className = "story-item";
 item.textContent = `${i}月\n${isOwned ? "✅" : "❌"}`;
 
