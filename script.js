@@ -973,3 +973,20 @@ function enterRoom(roomName) {
   `;
 }
 
+function renderStoryList() {
+  const container = document.getElementById("storyList");
+  const saved = getSavedStoryFragments();
+
+  container.innerHTML = "";
+
+  for (let i = 1; i <= 12; i++) {
+    const id = `story_${i.toString().padStart(2, "0")}`;
+    const isOwned = saved.includes(id);
+
+    const div = document.createElement("div");
+    div.textContent = `${i}月：${isOwned ? "✅ 取得済み" : "❌ ???"}`;
+
+    container.appendChild(div);
+  }
+}
+
