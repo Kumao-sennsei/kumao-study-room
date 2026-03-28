@@ -986,7 +986,11 @@ function renderStoryList() {
 
     const item = document.createElement("div");
     item.onclick = () => {
-  alert(`${i}月のストーリー！`); // ← 仮表示
+  if (!isOwned) {
+    alert("まだ解放されてないよ！");
+    return;
+  }
+  alert(`${i}月のストーリー！`);
 };
 item.className = "story-item";
 item.textContent = `${i}月\n${isOwned ? "✅" : "❌"}`;
