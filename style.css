@@ -900,5 +900,11 @@ body{
 left: 50%;
 transform: translate(-50%, -50%);
   }
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
 
 
