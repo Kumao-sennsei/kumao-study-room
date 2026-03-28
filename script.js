@@ -673,6 +673,7 @@ function showRareButton(onClickHandler) {
   elRareBtn.onclick = onClickHandler;
   elStoryBtn.onclick = () => {
   saveStoryFragment(`story_${getCurrentMonth().toString().padStart(2, "0")}`);
+    elStoryBtn.classList.add("hidden");
 };
 }
 
