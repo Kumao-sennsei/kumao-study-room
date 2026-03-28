@@ -885,6 +885,10 @@ body{
   background: rgba(0,0,0,0.7);
 }
 
+#leftPanel {
+  position: relative;
+}
+
 .modal-content {
   background: white;
   padding: 20px;
