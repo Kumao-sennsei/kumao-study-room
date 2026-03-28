@@ -525,6 +525,17 @@ function getRareQuote() {
   return pickRandomNoRepeat(`rare_month_${month}_all`, pool) || pool[0];
 }
 
+function saveStoryFragment(fragmentId) {
+  const STORAGE_KEY = "kumao_story_fragments";
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+  if (!saved.includes(fragmentId)) {
+    saved.push(fragmentId);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+  }
+
+  console.log("[story] 保存済み欠片:", saved);
+}
 
 // ======================
 // 設定・状態管理
