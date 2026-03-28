@@ -668,11 +668,15 @@ function showRareButton(onClickHandler) {
   elRareBtn.textContent = "レアボイス当選！おめでとう🎉 押してみてね🐻✨";
   elRareBtn.disabled = false;
   elRareBtn.classList.remove("hidden");
+  const fragmentId = `story_${getCurrentMonth().toString().padStart(2, "0")}`;
+
+if (!hasStoryFragment(fragmentId)) {
   elStoryBtn.classList.remove("hidden");
+}
   elRareBtn.classList.add("rare-glow");
   elRareBtn.onclick = onClickHandler;
   elStoryBtn.onclick = () => {
-  saveStoryFragment(`story_${getCurrentMonth().toString().padStart(2, "0")}`);
+  saveStoryFragment(fragmentId);
     elStoryBtn.classList.add("hidden");
 };
 }
