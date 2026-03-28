@@ -582,6 +582,11 @@ storyBookBtn.onclick = () => {
   storyBookModal.classList.remove("hidden");
 };
 
+function closeStoryBook() {
+  storyBookModal.classList.add("hidden");
+}
+
+
 const ringFg = document.querySelector(".ring-fg");
 
 const RADIUS = 52;
