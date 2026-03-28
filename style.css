@@ -888,9 +888,13 @@ body{
 .modal-content {
   background: white;
   padding: 20px;
-  margin: 50px auto;
   width: 300px;
   border-radius: 10px;
-  position: relative;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
+
 
