@@ -984,10 +984,11 @@ function renderStoryList() {
     const id = `story_${i.toString().padStart(2, "0")}`;
     const isOwned = saved.includes(id);
 
-    const div = document.createElement("div");
-    div.textContent = `${i}月：${isOwned ? "✅ 取得済み" : "❌ ???"}`;
+    const item = document.createElement("div");
+item.className = "story-item";
+item.textContent = isOwned ? "✅" : "❌";
 
-    container.appendChild(div);
+container.appendChild(item);
   }
 }
 
