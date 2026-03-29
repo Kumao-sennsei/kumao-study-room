@@ -1093,11 +1093,38 @@ function playStoryAudio(month) {
 
 function playStoryAudio(month) {
   const monthStr = String(month).padStart(2, "0");
-
   const src = `audio/rare/${monthStr}/month${monthStr}_rare_ultra_04.mp3`;
 
+  // いったん全行の再生中表示を消す
+  document.querySelectorAll(".story-line.playing").forEach((el) => {
+    el.classList.remove("playing");
+  });
+
+  // 今クリックした月の行を探して光らせる
+  const currentLine = document.querySelector(`.story-line[data-month="${month}"]`);
+  if (currentLine) {
+    currentLine.classList.add("playing");
+  }
+
   const audio = new Audio(src);
+
+  audio.addEventListener("ended", () => {
+    if (currentLine) {
+      currentLine.classList.remove("playing");
+    }
+  });
+
+  audio.addEventListener("error", () => {
+    if (currentLine) {
+      currentLine.classList.remove("playing");
+    }
+  });
+
   audio.play().catch((error) => {
+    if (currentLine) {
+      currentLine.classList.remove("playing");
+    }
     console.error("音声再生エラー:", error, src);
   });
 }
+
