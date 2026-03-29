@@ -1076,5 +1076,12 @@ function playStoryAudio(month) {
 }
 
 function playStoryAudio(month) {
-  alert(month + "月クリックされたよ！");
+  const monthStr = String(month).padStart(2, "0");
+
+  const src = `audio/rare/${monthStr}/month${monthStr}_rare_ultra_04.mp3`;
+
+  const audio = new Audio(src);
+  audio.play().catch((error) => {
+    console.error("音声再生エラー:", error, src);
+  });
 }
