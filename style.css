@@ -994,3 +994,6 @@ transform: translate(-50%, -50%);
     text-align: left;
   }
 }
+.story-row .story-line:not(:has(🔒)) {
+  background: #fffbe6;
+}
