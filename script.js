@@ -1035,7 +1035,7 @@ function renderStoryBook() {
     html += `
       <div class="story-row">
         <div class="story-month">${month}月</div>
-        <div class="story-line" ${isUnlocked ? `onclick="playStoryAudio(${month})"` : ""}>${text}</div>
+        <div class="story-line" data-month="${month}" ${isUnlocked ? `onclick="playStoryAudio(${month})"` : ""}>${text}</div>
       </div>
     `;
   });
