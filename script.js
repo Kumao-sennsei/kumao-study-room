@@ -1091,20 +1091,58 @@ function playStoryAudio(month) {
   audio.play();
 }
 
-function playStoryAudio(month) {
-  const monthStr = String(month).padStart(2, "0");
-  const src = `audio/rare/${monthStr}/month${monthStr}_rare_ultra_04.mp3`;
+function playStoryAudio(startMonth) {
+  const unlocked = UNLOCKED_STORIES.sort((a, b) => a - b);
 
-  // いったん全行の再生中表示を消す
-  document.querySelectorAll(".story-line.playing").forEach((el) => {
-    el.classList.remove("playing");
-  });
+  let currentIndex = unlocked.indexOf(startMonth);
+  if (currentIndex === -1) return;
 
-  // 今クリックした月の行を探して光らせる
-  const currentLine = document.querySelector(`.story-line[data-month="${month}"]`);
-  if (currentLine) {
-    currentLine.classList.add("playing");
+  function playNext() {
+    if (currentIndex >= unlocked.length) return;
+
+    const month = unlocked[currentIndex];
+    const monthStr = String(month).padStart(2, "0");
+    const src = `audio/rare/${monthStr}/month${monthStr}_rare_ultra_04.mp3`;
+
+    // ハイライト更新
+    document.querySelectorAll(".story-line.playing").forEach((el) => {
+      el.classList.remove("playing");
+    });
+
+    const currentLine = document.querySelector(`.story-line[data-month="${month}"]`);
+    if (currentLine) {
+      currentLine.classList.add("playing");
+    }
+
+    const audio = new Audio(src);
+
+    audio.addEventListener("ended", () => {
+      if (currentLine) {
+        currentLine.classList.remove("playing");
+      }
+      currentIndex++;
+      playNext(); // 次へ
+    });
+
+    audio.addEventListener("error", () => {
+      if (currentLine) {
+        currentLine.classList.remove("playing");
+      }
+      currentIndex++;
+      playNext(); // エラーでも次へ
+    });
+
+    audio.play().catch(() => {
+      if (currentLine) {
+        currentLine.classList.remove("playing");
+      }
+      currentIndex++;
+      playNext();
+    });
   }
+
+  playNext();
+}
 
   const audio = new Audio(src);
 
