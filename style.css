@@ -997,3 +997,85 @@ transform: translate(-50%, -50%);
 .story-row .story-line:not(:has(🔒)) {
   background: #fffbe6;
 }
+/* ===== ストーリー図鑑：左寄せ・左画面内に収める調整 ===== */
+
+#storyBookModal {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1000;
+}
+
+#storyBookModal .modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(94%, 760px);
+  max-width: 760px;
+  max-height: 84vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+#storyList.story-grid {
+  display: block;
+  margin-top: 8px;
+}
+
+.story-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.story-month {
+  background: #ececec;
+  color: #111;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 8px;
+  padding: 10px 8px;
+  box-sizing: border-box;
+}
+
+.story-line {
+  background: #fffbe6;
+  color: #111;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  line-height: 1.7;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* 左右2分割レイアウトの左側に収まりやすくする */
+#left {
+  position: relative;
+  overflow: auto;
+}
+
+@media (max-width: 768px) {
+  #storyBookModal .modal-content {
+    width: min(96%, 96vw);
+    max-height: 82vh;
+    padding: 12px;
+  }
+
+  .story-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .story-month {
+    text-align: left;
+  }
+}
