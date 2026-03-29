@@ -577,11 +577,6 @@ const elStoryBtn = document.getElementById("storyBtn");
 const storyBookBtn = document.getElementById("storyBookBtn");
 const storyBookModal = document.getElementById("storyBookModal");
 
-storyBookBtn.onclick = () => {
-  console.log("図鑑ボタン押された！");
-  renderStoryList(); // ←これ追加🔥
-  storyBookModal.classList.remove("hidden");
-};
 
 function closeStoryBook() {
   storyBookModal.classList.add("hidden");
