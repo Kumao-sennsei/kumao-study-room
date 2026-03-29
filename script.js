@@ -993,4 +993,84 @@ item.textContent = `${i}月\n${isOwned ? "✅" : "❌"}`;
 container.appendChild(item);
   }
 }
+/* =========================
+   ストーリー図鑑
+========================= */
+
+const STORY_TEXTS = {
+  3: `3月の物語本文サンプルです。
+
+くまお先生は、静かな夜の学びの部屋でこう言った。
+「焦らなくていい。前に進んでいれば、それで勝ちだ。」
+
+積み上げた時間は、ちゃんと君の力になる。
+今日の一歩は小さく見えても、未来では大きな差になる。`
+};
+
+const UNLOCKED_STORIES = [3];
+
+function renderStoryBook() {
+  const storyList = document.getElementById("storyList");
+  if (!storyList) return;
+
+  let html = "";
+
+  for (let month = 1; month <= 12; month++) {
+    const isUnlocked = UNLOCKED_STORIES.includes(month);
+
+    html += `
+      <button
+        type="button"
+        class="story-item ${isUnlocked ? "unlocked" : "locked"}"
+        ${isUnlocked ? `onclick="showStory(${month})"` : "disabled"}
+      >
+        <div>${month}月</div>
+        <div style="margin-top:8px; font-size:16px;">
+          ${isUnlocked ? "✅" : "🔒"}
+        </div>
+      </button>
+    `;
+  }
+
+  storyList.innerHTML = html;
+}
+
+function openStoryBook() {
+  const modal = document.getElementById("storyBookModal");
+  if (!modal) return;
+
+  renderStoryBook();
+  modal.classList.remove("hidden");
+}
+
+function closeStoryBook() {
+  const modal = document.getElementById("storyBookModal");
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+}
+
+function showStory(month) {
+  if (!UNLOCKED_STORIES.includes(month)) return;
+
+  const text = STORY_TEXTS[month];
+  if (!text) return;
+
+  const modal = document.getElementById("storyViewerModal");
+  const title = document.getElementById("storyViewerTitle");
+  const body = document.getElementById("storyViewerBody");
+
+  if (!modal || !title || !body) return;
+
+  title.textContent = `${month}月の物語`;
+  body.textContent = text;
+  modal.classList.remove("hidden");
+}
+
+function closeStoryViewer() {
+  const modal = document.getElementById("storyViewerModal");
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+}
 
