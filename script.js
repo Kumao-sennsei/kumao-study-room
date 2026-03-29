@@ -1002,30 +1002,31 @@ function getUnlockedStories() {
 }
 
 function renderStoryBook() {
-  const el = document.getElementById("storyList");
-  if (!el) return;
+  const storyList = document.getElementById("storyList");
+  if (!storyList) return;
 
-  const unlocked = getUnlockedStories();
-  const order = getStoryOrder();
+  const unlockedMonths = getUnlockedStories();
+  const order = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3];
 
   let html = "";
 
-  order.forEach(month => {
-    const ok = unlocked.includes(month);
+  order.forEach((month) => {
+    const isUnlocked = unlockedMonths.includes(month);
+    const text = isUnlocked
+      ? (STORY_TEXTS[month] || `${month}月の本文は未登録です。`)
+      : "🔒 まだ未解放";
 
     html += `
-      <button
-        class="story-item ${ok ? "unlocked" : "locked"}"
-        ${ok ? `onclick="showStory(${month})"` : "disabled"}
-      >
-        <div>${month}月</div>
-        <div>${ok ? "✅" : "🔒"}</div>
-      </button>
+      <div class="story-row">
+        <div class="story-month">${month}月</div>
+        <div class="story-line">${text}</div>
+      </div>
     `;
   });
 
-  el.innerHTML = html;
+  storyList.innerHTML = html;
 }
+
 
 function openStoryBook() {
   const modal = document.getElementById("storyBookModal");
