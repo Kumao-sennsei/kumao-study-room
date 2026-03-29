@@ -917,4 +917,28 @@ transform: translate(-50%, -50%);
 
     color: #000;
 }
+/* ストーリー縦一覧 */
+.story-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+  align-items: start;
+}
 
+.story-month {
+  font-weight: bold;
+  text-align: center;
+  background: #f0f0f0;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.story-line {
+  background: #ffffff;
+  color: #111;
+  padding: 10px;
+  border-radius: 8px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
