@@ -1079,3 +1079,9 @@ transform: translate(-50%, -50%);
     text-align: left;
   }
 }
+
+.story-line.playing {
+  background: #ffe58f;
+  box-shadow: 0 0 0 2px rgba(255, 214, 10, 0.35);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
