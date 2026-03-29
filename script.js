@@ -969,32 +969,8 @@ function enterRoom(roomName) {
   `;
 }
 
-function renderStoryList() {
-  const container = document.getElementById("storyList");
-  const saved = getSavedStoryFragments();
-
-  container.innerHTML = "";
-
-  for (let i = 1; i <= 12; i++) {
-    const id = `story_${i.toString().padStart(2, "0")}`;
-    const isOwned = saved.includes(id);
-
-    const item = document.createElement("div");
-    item.onclick = () => {
-  if (!isOwned) {
-    alert("まだ解放されてないよ！");
-    return;
-  }
-  alert(`${i}月のストーリー！`);
-};
-item.className = "story-item";
-item.textContent = `${i}月\n${isOwned ? "✅" : "❌"}`;
-
-container.appendChild(item);
-  }
-}
 /* =========================
-   ストーリー図鑑
+   ストーリー図鑑（新）
 ========================= */
 
 const STORY_TEXTS = {
@@ -1007,32 +983,48 @@ const STORY_TEXTS = {
 今日の一歩は小さく見えても、未来では大きな差になる。`
 };
 
-const UNLOCKED_STORIES = [3];
+function getStoryOrder() {
+  return [4,5,6,7,8,9,10,11,12,1,2,3];
+}
+
+function getUnlockedStories() {
+  const saved = getSavedStoryFragments();
+  const unlocked = [];
+
+  saved.forEach(id => {
+    const m = id.match(/^story_(\d{2})$/);
+    if (m) unlocked.push(parseInt(m[1]));
+  });
+
+  if (!unlocked.includes(3)) unlocked.push(3);
+
+  return unlocked;
+}
 
 function renderStoryBook() {
-  const storyList = document.getElementById("storyList");
-  if (!storyList) return;
+  const el = document.getElementById("storyList");
+  if (!el) return;
+
+  const unlocked = getUnlockedStories();
+  const order = getStoryOrder();
 
   let html = "";
 
-  for (let month = 1; month <= 12; month++) {
-    const isUnlocked = UNLOCKED_STORIES.includes(month);
+  order.forEach(month => {
+    const ok = unlocked.includes(month);
 
     html += `
       <button
-        type="button"
-        class="story-item ${isUnlocked ? "unlocked" : "locked"}"
-        ${isUnlocked ? `onclick="showStory(${month})"` : "disabled"}
+        class="story-item ${ok ? "unlocked" : "locked"}"
+        ${ok ? `onclick="showStory(${month})"` : "disabled"}
       >
         <div>${month}月</div>
-        <div style="margin-top:8px; font-size:16px;">
-          ${isUnlocked ? "✅" : "🔒"}
-        </div>
+        <div>${ok ? "✅" : "🔒"}</div>
       </button>
     `;
-  }
+  });
 
-  storyList.innerHTML = html;
+  el.innerHTML = html;
 }
 
 function openStoryBook() {
@@ -1051,10 +1043,10 @@ function closeStoryBook() {
 }
 
 function showStory(month) {
-  if (!UNLOCKED_STORIES.includes(month)) return;
+  const unlocked = getUnlockedStories();
+  if (!unlocked.includes(month)) return;
 
-  const text = STORY_TEXTS[month];
-  if (!text) return;
+  const text = STORY_TEXTS[month] || `${month}月の本文は未登録`;
 
   const modal = document.getElementById("storyViewerModal");
   const title = document.getElementById("storyViewerTitle");
@@ -1073,4 +1065,5 @@ function closeStoryViewer() {
 
   modal.classList.add("hidden");
 }
+
 
