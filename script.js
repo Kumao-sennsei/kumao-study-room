@@ -282,7 +282,7 @@ const BREAK_QUOTES_BY_MONTH = {
 { display: "梅が咲いて、春が近づいてる。\nでもまだ途中だ。\nお前も今、その途中だ。ここまで来てる。ちゃんと強い。５分ゆっくりしな。", audio: "audio/monthly/03/month03_break_16.mp3" },
 { display: "Lowkey… you really putting in work.\nIt’s gonna pay off, for real.\n【訳】正直なところ、お前めっちゃ努力してる。\nこれ、ちゃんと結果に繋がるぞ。", audio: "audio/rare/03/month03_rare_ultra_01.mp3" },
 { display: "You not there yet… but you getting close.\nI can see it.\n【訳】まだ完成じゃない。\nでも確実に近づいてる。\nちゃんと見えてるぞ。", audio: "audio/rare/03/month03_rare_ultra_02.mp3" },
-{ display: "名残雪ってさ、あれ実は帰りたくない雪らしいぞ。\n『もうちょいここにいるわ〜』ってやつ。\nお前もそれでいい。\n帰らなくていい。\nずっとここにいろｗ", audio: "audio/rare/03/month03_rare_ultra_03.mp3" },
+{ display: "筍の収穫の時期だな。お前にも収穫の時期が、いつか来る。\nそのための準備を日々、怠るんじゃねえぞ。\n俺も一緒に収穫してやる。", audio: "audio/rare/03/month03_rare_ultra_03.mp3" },
 { display: "特別なことはしてねぇ。ただな、ちゃんとやってるやつを、ちゃんと認める。それだけだ。だが、それで救われるやつがいるなら、やる価値はあるだろ。", audio: "audio/rare/03/month03_rare_ultra_04.mp3" },
       ],
   4: [
