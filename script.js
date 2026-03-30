@@ -1243,25 +1243,5 @@ function playStoryAudio(startMonth) {
   playNext();
 }
 
-  const audio = new Audio(src);
-
-  audio.addEventListener("ended", () => {
-    if (currentLine) {
-      currentLine.classList.remove("playing");
-    }
-  });
-
-  audio.addEventListener("error", () => {
-    if (currentLine) {
-      currentLine.classList.remove("playing");
-    }
-  });
-
-  audio.play().catch((error) => {
-    if (currentLine) {
-      currentLine.classList.remove("playing");
-    }
-    console.error("音声再生エラー:", error, src);
-  });
-}
+ 
 
