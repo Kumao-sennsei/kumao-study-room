@@ -982,6 +982,85 @@ function groupPostsByUser(posts) {
   return grouped;
 }
 
+function getLatestPost(posts) {
+  if (!posts || posts.length === 0) return null;
+  return posts[posts.length - 1];
+}
+
+function getPostCount(posts) {
+  if (!posts) return 0;
+  return posts.length;
+}
+
+function buildUserPostSummary(userName, posts) {
+  const latestPost = getLatestPost(posts);
+  const postCount = getPostCount(posts);
+
+  return {
+    userName,
+    postCount,
+    latestPost
+  };
+}
+
+function buildGroupedPostSummaries(posts) {
+  const grouped = groupPostsByUser(posts);
+  const summaries = [];
+
+  Object.keys(grouped).forEach((userName) => {
+    summaries.push(buildUserPostSummary(userName, grouped[userName]));
+  });
+
+  return summaries;
+}
+
+function renderGroupedPostCard(summary) {
+  const latestImage = summary.latestPost?.image || "";
+  const latestComment = summary.latestPost?.comment || "";
+  const safeUserName = summary.userName || "unknown";
+
+  return `
+    <div class="noteCard">
+      <div style="font-weight:700; margin-bottom:8px;">
+        ${safeUserName}
+      </div>
+
+      <div style="font-size:12px; opacity:0.85; margin-bottom:8px;">
+        今日の投稿：${summary.postCount}枚
+      </div>
+
+      ${
+        latestImage
+          ? `<img src="${latestImage}" alt="${safeUserName}の最新投稿" style="width:100%; border-radius:8px; margin-bottom:8px; object-fit:cover;" />`
+          : ""
+      }
+
+      <div style="font-size:12px; line-height:1.5;">
+        ${latestComment}
+      </div>
+    </div>
+  `;
+}
+
+function renderGroupedPosts(posts) {
+  const noteGrid = document.getElementById("noteGrid");
+  if (!noteGrid) return;
+
+  const summaries = buildGroupedPostSummaries(posts);
+
+  noteGrid.innerHTML = summaries
+    .map((summary) => renderGroupedPostCard(summary))
+    .join("");
+}
+
+function refreshStudyRoomView(posts) {
+  renderRoom();
+  renderGroupedPosts(posts || []);
+}
+
+
+
+
 function renderRoom() {
   const list = document.getElementById("roomList");
   const count = document.getElementById("roomCount");
