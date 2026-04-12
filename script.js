@@ -1090,8 +1090,28 @@ function leaveRoom() {
   roomUsers = roomUsers.filter(name => name !== "あなた");
   renderRoom();
 }
+
+const samplePosts = [
+  {
+    user: "Aさん",
+    image: "gooday.png",
+    comment: "英語30分やった🔥"
+  },
+  {
+    user: "Aさん",
+    image: "gooday.png",
+    comment: "英単語50個やった！"
+  },
+  {
+    user: "Bさん",
+    image: "",
+    comment: "数学むずい😇"
+  }
+];
+
+
 window.addEventListener("DOMContentLoaded", () => {
-  renderRoom();
+  refreshStudyRoomView([]);
 });
 
 const fakeNames = [
