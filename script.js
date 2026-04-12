@@ -1021,9 +1021,10 @@ function renderGroupedPostCard(summary) {
 
   return `
     <div class="noteCard">
-      <div style="font-weight:700; margin-bottom:8px;">
-        ${safeUserName}
-      </div>
+      <div style="font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+  <img src="kumao_baby.png" style="width:24px; height:24px; border-radius:50%;" />
+  <span>${safeUserName}</span>
+</div>
 
       <div style="font-size:12px; opacity:0.85; margin-bottom:8px;">
         今日の投稿：${summary.postCount}枚
