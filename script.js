@@ -909,8 +909,9 @@ async function goToPhase(nextPhase) {
       startTimerLoop(FOCUS_SEC);
       transitionLock = false;
     });
-  } else {
+    } else {
     stopAmbient();
+    stopVoice();
     prepareBreakUI();
 
     const quote = getBreakQuoteForCurrentMonth();
