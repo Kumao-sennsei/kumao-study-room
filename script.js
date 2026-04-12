@@ -1121,8 +1121,6 @@ function getUnlockedStories() {
     if (m) unlocked.push(parseInt(m[1]));
   });
 
-  if (!unlocked.includes(3)) unlocked.push(3);
-
   return unlocked;
 }
 
