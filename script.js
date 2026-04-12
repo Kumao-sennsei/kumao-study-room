@@ -1029,6 +1029,7 @@ function renderGroupedPostCard(summary) {
   return `
     <div class="noteCard">
 <div style="font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:12px;">
+  <img src="${avatarSrc}" style="width:80px; height:80px; border-radius:50%; object-fit:cover;" />
   <span>${safeUserName}</span>
 </div>
 
