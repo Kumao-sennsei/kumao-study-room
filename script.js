@@ -28,8 +28,9 @@ function stopVoice() {
       currentVoiceAudio.pause();
       currentVoiceAudio.currentTime = 0;
     } catch (e) {}
-    currentVoiceAudio = null;
   }
+
+  currentVoiceAudio = null;
   currentVoiceEndedOnce = false;
 }
 
