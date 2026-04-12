@@ -74,18 +74,11 @@ async function startAmbient(mode) {
     if (!currentAudio || currentAudioMode !== mode) {
       currentAudioMode = mode;
       currentAudio = new Audio(`${mode}.wav`);
-      currentAudio.loop = false;
-      currentAudio.volume = 0.5;
-      currentAudio.currentTime = 0;
-      currentAudio.playsInline = true;
-      currentAudio.preload = "auto";
-
-      currentAudio.addEventListener("ended", () => {
-        currentAudio.currentTime = 0;
-        currentAudio.play().catch((e) => {
-          console.error("環境音ループ再生エラー:", e);
-        });
-      });
+      currentAudio.loop = true;
+currentAudio.volume = 0.5;
+currentAudio.currentTime = 0;
+currentAudio.playsInline = true;
+currentAudio.preload = "auto";
     }
 
     currentAudio.volume = 0.5;
