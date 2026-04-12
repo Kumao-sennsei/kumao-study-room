@@ -917,15 +917,18 @@ async function goToPhase(nextPhase) {
     const quote = getBreakQuoteForCurrentMonth();
     elQuote.textContent = quote.display;
 
-    playVoiceAudio(quote.audio, () => {
-      if (phase !== "break") {
-        transitionLock = false;
-        return;
-      }
+       setTimeout(() => {
+      playVoiceAudio(quote.audio, () => {
+        if (phase !== "break") {
+          transitionLock = false;
+          return;
+        }
 
-      startTimerLoop(BREAK_SEC);
-      transitionLock = false;
-    });
+        startTimerLoop(BREAK_SEC);
+        transitionLock = false;
+      });
+    }, 180);
+    
   }
 }
 
