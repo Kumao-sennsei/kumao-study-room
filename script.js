@@ -1028,9 +1028,10 @@ function renderGroupedPostCard(summary) {
 　const avatarSrc = getAvatarByPostCount(summary.postCount);
   return `
     <div class="noteCard">
-<div style="font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:12px;">
-  <img src="${avatarSrc}" style="width:80px; height:80px; border-radius:50%; object-fit:cover;" />
-  <span>${safeUserName}</span>
+
+<div style="text-align:center; margin-bottom:8px;">
+  <img src="${avatarSrc}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; display:block; margin:0 auto;" />
+  <div style="margin-top:6px; font-weight:700;">${safeUserName}</div>
 </div>
 
       <div style="font-size:12px; opacity:0.85; margin-bottom:8px;">
