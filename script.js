@@ -966,6 +966,22 @@ window.startStudy = startStudy;
 let roomUsers = [];
 let isInRoom = false;
 
+function groupPostsByUser(posts) {
+  const grouped = {};
+
+  posts.forEach(post => {
+    const user = post.user || "unknown";
+
+    if (!grouped[user]) {
+      grouped[user] = [];
+    }
+
+    grouped[user].push(post);
+  });
+
+  return grouped;
+}
+
 function renderRoom() {
   const list = document.getElementById("roomList");
   const count = document.getElementById("roomCount");
