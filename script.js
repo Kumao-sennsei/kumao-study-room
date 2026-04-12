@@ -1025,11 +1025,11 @@ function renderGroupedPostCard(summary) {
   const latestImage = summary.latestPost?.image || "";
   const latestComment = summary.latestPost?.comment || "";
   const safeUserName = summary.userName || "unknown";
-
+　const avatarSrc = getAvatarByPostCount(summary.postCount);
   return `
     <div class="noteCard">
       <div style="font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
-  <img src="kumao_baby.png" style="width:24px; height:24px; border-radius:50%;" />
+  <img src="${avatarSrc}" style="width:24px; height:24px; border-radius:50%;" />
   <span>${safeUserName}</span>
 </div>
 
