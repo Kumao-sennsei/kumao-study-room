@@ -105,38 +105,54 @@ function playVoiceAudio(src, onEnded) {
 
   try {
     console.log("[voice] 再生しようとしている音声:", src);
+
     const audio = new Audio(src);
     audio.preload = "auto";
     audio.playsInline = true;
     currentVoiceAudio = audio;
     currentVoiceEndedOnce = false;
 
-    const safeOnEnded = () => {
-      if (currentVoiceEndedOnce) return;
-      currentVoiceEndedOnce = true;
-
+    audio.onended = () => {
       if (currentVoiceAudio === audio) {
         currentVoiceAudio = null;
       }
+      currentVoiceEndedOnce = true;
 
       if (typeof onEnded === "function") {
         onEnded();
       }
     };
 
-    audio.onended = safeOnEnded;
-
     audio.onerror = (e) => {
       console.error("ボイス再生エラー:", e, src);
-      safeOnEnded();
+
+      if (currentVoiceAudio === audio) {
+        currentVoiceAudio = null;
+      }
+      currentVoiceEndedOnce = true;
+
+      if (typeof onEnded === "function") {
+        onEnded();
+      }
     };
 
     audio.play().catch((e) => {
       console.error("ボイス再生失敗:", e, src);
-      safeOnEnded();
+
+      if (currentVoiceAudio === audio) {
+        currentVoiceAudio = null;
+      }
+      currentVoiceEndedOnce = true;
+
+      if (typeof onEnded === "function") {
+        onEnded();
+      }
     });
   } catch (e) {
     console.error("ボイス生成失敗:", e, src);
+    currentVoiceAudio = null;
+    currentVoiceEndedOnce = true;
+
     if (typeof onEnded === "function") {
       onEnded();
     }
