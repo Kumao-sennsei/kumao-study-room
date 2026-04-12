@@ -1003,6 +1003,13 @@ function buildUserPostSummary(userName, posts) {
   };
 }
 
+function getAvatarByPostCount(postCount) {
+  if (postCount >= 100) return "kumao_suit.png";
+  if (postCount >= 20) return "kumao_elementary.png";
+  if (postCount >= 5) return "kumao_kindergarten.png";
+  return "kumao_baby.png";
+}
+
 function buildGroupedPostSummaries(posts) {
   const grouped = groupPostsByUser(posts);
   const summaries = [];
