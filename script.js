@@ -1021,17 +1021,29 @@ function buildGroupedPostSummaries(posts) {
   return summaries;
 }
 
+function getStudyLabelByUser(userName) {
+  const studyMap = {
+    "Aさん": "英単語",
+    "Bさん": "数学Ⅱ",
+    "あなた": "公認会計士（簿記）"
+  };
+
+  return studyMap[userName] || "自由に学習中";
+}
+
 function renderGroupedPostCard(summary) {
   const latestImage = summary.latestPost?.image || "";
   const latestComment = summary.latestPost?.comment || "";
   const safeUserName = summary.userName || "unknown";
 　const avatarSrc = getAvatarByPostCount(summary.postCount);
+  const studyLabel = getStudyLabelByUser(safeUserName);
   return `
     <div class="noteCard">
 
 <div style="text-align:center; margin-bottom:8px;">
   <img src="${avatarSrc}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; display:block; margin:0 auto;" />
   <div style="margin-top:6px; font-weight:700;">${safeUserName}</div>
+  <div style="margin-top:4px; font-size:12px; color:#555; background:#f3f4f6; display:inline-block; padding:4px 10px; border-radius:999px;">${studyLabel}</div>
 </div>
 
       <div style="font-size:12px; opacity:0.85; margin-bottom:8px;">
