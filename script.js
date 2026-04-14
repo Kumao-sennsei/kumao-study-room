@@ -1036,7 +1036,7 @@ function renderGroupedPostCard(summary) {
   const latestComment = summary.latestPost?.comment || "";
   const safeUserName = summary.userName || "unknown";
 　const avatarSrc = getAvatarByPostCount(summary.postCount);
-  const studyLabel = getStudyLabelByUser(safeUserName);
+  const studyLabel = summary.latestPost?.studyLabel || "自由に学習中";
   return `
     <div class="noteCard">
 
