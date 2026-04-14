@@ -1113,21 +1113,20 @@ function leaveRoom() {
 }
 
 const samplePosts = [
+{
+  user: "Aさん",
+  image: "gooday.png",
+  comment: "英語30分やった🔥",
+  studyLabel: "英単語"
+},
+  
   {
-    user: "Aさん",
-    image: "gooday.png",
-    comment: "英語30分やった🔥"
-  },
-  {
-    user: "Aさん",
-    image: "gooday.png",
-    comment: "英単語50個やった！"
-  },
-  {
-    user: "Bさん",
-    image: "",
-    comment: "数学むずい😇"
-  }
+  user: "Bさん",
+  image: "",
+  comment: "数学むずい😇",
+  studyLabel: "数学Ⅱ"
+}
+  
 ];
 
 window.addEventListener("DOMContentLoaded", () => {
