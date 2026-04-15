@@ -750,18 +750,13 @@ function getBreakQuoteForCurrentMonth() {
 
 function getRareQuote() {
   const month = getCurrentMonth();
-  const pool = getRarePoolForCurrentMonth();
+  const availablePool = getAvailableRareQuotesForCurrentMonth();
 
-  // 物語欠片をすでに取っているなら、物語音声（_rare_ultra_04）は通常レア抽選から外す
-  const fragmentId = `story_${String(month).padStart(2, "0")}`;
-  const filteredPool = hasStoryFragment(fragmentId)
-    ? pool.filter((quote) => !/_rare_ultra_04\.mp3$/.test(quote.audio))
-    : pool;
+  if (!Array.isArray(availablePool) || availablePool.length === 0) {
+    return null;
+  }
 
-  const targetPool =
-    Array.isArray(filteredPool) && filteredPool.length > 0 ? filteredPool : pool;
-
-  return pickRandomNoRepeat(`rare_month_${month}_all`, targetPool) || targetPool[0];
+  return pickRandomNoRepeat(`rare_month_${month}_all`, availablePool) || availablePool[0];
 }
 
 function saveStoryFragment(fragmentId) {
@@ -782,6 +777,40 @@ function getSavedStoryFragments() {
 function hasStoryFragment(fragmentId) {
   const saved = getSavedStoryFragments();
   return saved.includes(fragmentId);
+}
+
+function getSavedRareAudios() {
+  const STORAGE_KEY = "kumao_saved_rare_audios";
+  return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+}
+
+function hasSavedRareAudio(audio) {
+  const saved = getSavedRareAudios();
+  return saved.includes(audio);
+}
+
+function saveRareAudio(audio) {
+  const STORAGE_KEY = "kumao_saved_rare_audios";
+  const saved = getSavedRareAudios();
+
+  if (!saved.includes(audio)) {
+    saved.push(audio);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+  }
+
+  console.log("[rare] 保存済みレア音声:", saved);
+}
+
+function getAvailableRareQuotesForCurrentMonth() {
+  const month = getCurrentMonth();
+  const pool = getRarePoolForCurrentMonth();
+
+  const fragmentId = `story_${String(month).padStart(2, "0")}`;
+  const filteredPool = hasStoryFragment(fragmentId)
+    ? pool.filter((quote) => !/_rare_ultra_04\.mp3$/.test(quote.audio))
+    : pool;
+
+  return filteredPool.filter((quote) => !hasSavedRareAudio(quote.audio));
 }
 
 // ======================
@@ -887,8 +916,7 @@ function startTimerLoop(phaseMaxSec) {
 
 // ======================
 // レア確率
-// 1周目1セット目: 0%
-// 1周目2〜4セット目: 1%
+// 1周目: 1%
 // 2周目: 3%
 // 3周目: 5%
 // 4周目以降: 10%
@@ -901,6 +929,12 @@ function getRareProbability(round) {
 }
 
 function shouldShowRareButton() {
+  const availableRareQuotes = getAvailableRareQuotesForCurrentMonth();
+
+  if (!Array.isArray(availableRareQuotes) || availableRareQuotes.length === 0) {
+    return false;
+  }
+
   const round = getRound();
   const probability = getRareProbability(round);
   return Math.random() < probability;
@@ -1039,6 +1073,10 @@ async function goToPhase(nextPhase) {
       if (shouldUseStory) {
         saveStoryFragment(fragmentId);
       }
+ 
+      if (!shouldUseStory && selectedQuote) {
+  saveRareAudio(selectedQuote.audio);
+}
 
       elQuote.textContent = selectedQuote.display;
 
