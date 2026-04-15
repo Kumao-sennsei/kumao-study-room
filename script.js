@@ -21,6 +21,44 @@ let isStarting = false;
 let audioUnlocked = false;
 let audioUnlockPromise = null;
 
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    if (!("wakeLock" in navigator)) {
+      console.log("[wakeLock] このブラウザは未対応");
+      return;
+    }
+
+    if (document.visibilityState !== "visible") {
+      console.log("[wakeLock] 画面非表示中なので取得しない");
+      return;
+    }
+
+    wakeLock = await navigator.wakeLock.request("screen");
+    console.log("[wakeLock] 取得成功");
+
+    wakeLock.addEventListener("release", () => {
+      console.log("[wakeLock] 解除されました");
+    });
+  } catch (e) {
+    console.error("[wakeLock] 取得失敗:", e);
+    wakeLock = null;
+  }
+}
+
+async function releaseWakeLock() {
+  try {
+    if (wakeLock) {
+      await wakeLock.release();
+      wakeLock = null;
+      console.log("[wakeLock] 手動解除");
+    }
+  } catch (e) {
+    console.error("[wakeLock] 解除失敗:", e);
+  }
+}
+
 const SILENT_WAV =
   "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=";
 
@@ -1046,6 +1084,7 @@ async function startStudy(mode) {
     transitionLock = false;
 
     await unlockAudioSystem();
+    await requestWakeLock();
     await primeAmbient(mode);
     await goToPhase("focus");
   } finally {
@@ -1056,6 +1095,12 @@ async function startStudy(mode) {
 // 初期化
 showHomeUI();
 window.startStudy = startStudy;
+
+document.addEventListener("visibilitychange", async () => {
+  if (document.visibilityState === "visible") {
+    await requestWakeLock();
+  }
+});
 
 
 
