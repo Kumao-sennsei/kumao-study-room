@@ -1010,35 +1010,55 @@ async function goToPhase(nextPhase) {
 
     const showRare = shouldShowRareButton();
 
-    if (showRare) {
-      elQuote.textContent = "今日は、ちょっと特別だ。";
+   if (showRare) {
+  elQuote.textContent = "今日は、ちょっと特別だ。";
 
-      showRareButton(() => {
-        if (elRareBtn.disabled) return;
+  const month = getCurrentMonth();
+  const fragmentId = `story_${String(month).padStart(2, "0")}`;
+  const monthPool = getRarePoolForCurrentMonth();
 
-        elRareBtn.disabled = true;
-        elRareBtn.classList.add("hidden");
-        elRareBtn.classList.remove("rare-glow");
+  const storyQuote = monthPool.find((quote) =>
+    /_rare_ultra_04\.mp3$/.test(quote.audio)
+  );
 
-        const rareQuote = getRareQuote();
-        elQuote.textContent = rareQuote.display;
+  const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
 
-        playVoiceAudio(rareQuote.audio, async () => {
-          if (phase !== "focus") {
-            transitionLock = false;
-            return;
-          }
+  showRareButton({
+    label: shouldUseStory
+      ? "物語の欠片ゲット！おめでとう🎉 押してみてね😎💣"
+      : "レアボイス当選！おめでとう🎉 押してみてね🐻✨",
 
-          await startAmbient(currentMode);
-          startTimerLoop(FOCUS_SEC);
+    onClickHandler: () => {
+      if (elRareBtn.disabled) return;
+
+      elRareBtn.disabled = true;
+      elRareBtn.classList.add("hidden");
+      elRareBtn.classList.remove("rare-glow");
+
+      const selectedQuote = shouldUseStory ? storyQuote : getRareQuote();
+
+      if (shouldUseStory) {
+        saveStoryFragment(fragmentId);
+      }
+
+      elQuote.textContent = selectedQuote.display;
+
+      playVoiceAudio(selectedQuote.audio, async () => {
+        if (phase !== "focus") {
           transitionLock = false;
-        });
+          return;
+        }
+
+        await startAmbient(currentMode);
+        startTimerLoop(FOCUS_SEC);
+        transitionLock = false;
       });
-
-      transitionLock = false;
-      return;
     }
+  });
 
+  transitionLock = false;
+  return;
+}
 const quote = getStartQuote();
 elQuote.textContent = quote.display;
 
