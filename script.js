@@ -19,18 +19,140 @@ const usedVoiceIndexes = {};
 // 起動・遷移ロック
 let isStarting = false;
 
+// iOS / Android 向けの音声アンロック管理
+let audioUnlocked = false;
+let audioUnlockPromise = null;
+
+// 短い無音 wav（Audio の再生許可を取るために使う）
+const SILENT_WAV =
+  "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=";
+
 // ======================
 // 音声ユーティリティ
 // ======================
+function createManagedAudio(src = "") {
+  const audio = new Audio(src);
+  audio.preload = "auto";
+  audio.playsInline = true;
+
+  // iOS Safari 向けの保険
+  try {
+    audio.setAttribute("playsinline", "true");
+    audio.setAttribute("webkit-playsinline", "true");
+  } catch (e) {}
+
+  return audio;
+}
+
+function ensureAmbientObject(mode) {
+  if (!mode) return null;
+
+  if (!currentAudio) {
+    currentAudio = createManagedAudio(`${mode}.wav`);
+    currentAudio.loop = true;
+    currentAudio.volume = 0.5;
+    currentAudio.currentTime = 0;
+    currentAudioMode = mode;
+    return currentAudio;
+  }
+
+  if (currentAudioMode !== mode) {
+    try {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    } catch (e) {}
+
+    currentAudio.src = `${mode}.wav`;
+    currentAudio.load();
+    currentAudio.loop = true;
+    currentAudio.volume = 0.5;
+    currentAudio.currentTime = 0;
+    currentAudioMode = mode;
+  }
+
+  return currentAudio;
+}
+
+function ensureVoiceObject() {
+  if (!currentVoiceAudio) {
+    currentVoiceAudio = createManagedAudio();
+    currentVoiceAudio.currentTime = 0;
+  }
+
+  return currentVoiceAudio;
+}
+
+async function unlockAudioSystem() {
+  if (audioUnlocked) return true;
+  if (audioUnlockPromise) return audioUnlockPromise;
+
+  audioUnlockPromise = (async () => {
+    try {
+      const silent = createManagedAudio(SILENT_WAV);
+      silent.muted = true;
+
+      try {
+        await silent.play();
+      } catch (e) {}
+
+      try {
+        silent.pause();
+        silent.currentTime = 0;
+      } catch (e) {}
+
+      const ambient = ensureAmbientObject(currentAudioMode || "fire");
+      const voice = ensureVoiceObject();
+
+      if (ambient) {
+        ambient.muted = true;
+        try {
+          await ambient.play();
+        } catch (e) {}
+        try {
+          ambient.pause();
+          ambient.currentTime = 0;
+        } catch (e) {}
+        ambient.muted = false;
+      }
+
+      if (voice) {
+        voice.src = SILENT_WAV;
+        voice.load();
+        voice.muted = true;
+        try {
+          await voice.play();
+        } catch (e) {}
+        try {
+          voice.pause();
+          voice.currentTime = 0;
+        } catch (e) {}
+        voice.muted = false;
+      }
+
+      audioUnlocked = true;
+      console.log("[audio] unlock 成功");
+      return true;
+    } catch (e) {
+      console.error("[audio] unlock 失敗:", e);
+      return false;
+    } finally {
+      audioUnlockPromise = null;
+    }
+  })();
+
+  return audioUnlockPromise;
+}
+
 function stopVoice() {
   if (currentVoiceAudio) {
     try {
       currentVoiceAudio.pause();
       currentVoiceAudio.currentTime = 0;
+      currentVoiceAudio.onended = null;
+      currentVoiceAudio.onerror = null;
     } catch (e) {}
   }
 
-  currentVoiceAudio = null;
   currentVoiceEndedOnce = false;
 }
 
@@ -40,9 +162,7 @@ function stopAmbient() {
       currentAudio.pause();
       currentAudio.currentTime = 0;
     } catch (e) {}
-    currentAudio = null;
   }
-  currentAudioMode = "";
 }
 
 // iPad / iPhone 向け：最初のユーザー操作時に環境音を準備
@@ -50,18 +170,7 @@ async function primeAmbient(mode) {
   if (!mode) return;
 
   try {
-    if (!currentAudio || currentAudioMode !== mode) {
-      currentAudioMode = mode;
-      currentAudio = new Audio(`${mode}.wav`);
-      currentAudio.loop = true;
-currentAudio.volume = 0.5;
-currentAudio.currentTime = 0;
-currentAudio.playsInline = true;
-currentAudio.preload = "auto";
-    }
-
-    // 再生はしない。準備だけ
-    
+    ensureAmbientObject(mode);
   } catch (e) {
     console.error("環境音の準備失敗:", e);
   }
@@ -71,23 +180,21 @@ async function startAmbient(mode) {
   if (!mode) return;
 
   try {
-    if (!currentAudio || currentAudioMode !== mode) {
-      currentAudioMode = mode;
-      currentAudio = new Audio(`${mode}.wav`);
-      currentAudio.loop = true;
-currentAudio.volume = 0.5;
-currentAudio.currentTime = 0;
-currentAudio.playsInline = true;
-currentAudio.preload = "auto";
-    }
+    await unlockAudioSystem();
 
-    currentAudio.volume = 0.5;
-    await currentAudio.play();
+    const audio = ensureAmbientObject(mode);
+    if (!audio) return;
+
+    audio.loop = true;
+    audio.volume = 0.5;
+
+    if (audio.paused) {
+      await audio.play();
+    }
   } catch (e) {
     console.error("環境音再生エラー:", e);
   }
 }
-
 
 function playVoiceAudio(src, onEnded) {
   stopVoice();
@@ -95,16 +202,15 @@ function playVoiceAudio(src, onEnded) {
   try {
     console.log("[voice] 再生しようとしている音声:", src);
 
-    const audio = new Audio(src);
-    audio.preload = "auto";
-    audio.playsInline = true;
-    currentVoiceAudio = audio;
+    const audio = ensureVoiceObject();
     currentVoiceEndedOnce = false;
 
-    audio.onended = () => {
-      if (currentVoiceAudio === audio) {
-        currentVoiceAudio = null;
-      }
+    const safeFinish = () => {
+      try {
+        audio.onended = null;
+        audio.onerror = null;
+      } catch (e) {}
+
       currentVoiceEndedOnce = true;
 
       if (typeof onEnded === "function") {
@@ -112,34 +218,26 @@ function playVoiceAudio(src, onEnded) {
       }
     };
 
+    audio.src = src;
+    audio.load();
+
+    audio.onended = safeFinish;
     audio.onerror = (e) => {
       console.error("ボイス再生エラー:", e, src);
-
-      if (currentVoiceAudio === audio) {
-        currentVoiceAudio = null;
-      }
-      currentVoiceEndedOnce = true;
-
-      if (typeof onEnded === "function") {
-        onEnded();
-      }
+      safeFinish();
     };
 
-    audio.play().catch((e) => {
-      console.error("ボイス再生失敗:", e, src);
-
-      if (currentVoiceAudio === audio) {
-        currentVoiceAudio = null;
-      }
-      currentVoiceEndedOnce = true;
-
-      if (typeof onEnded === "function") {
-        onEnded();
-      }
-    });
+    unlockAudioSystem()
+      .then(() => audio.play())
+      .then(() => {
+        // 再生開始成功
+      })
+      .catch((e) => {
+        console.error("ボイス再生失敗:", e, src);
+        safeFinish();
+      });
   } catch (e) {
     console.error("ボイス生成失敗:", e, src);
-    currentVoiceAudio = null;
     currentVoiceEndedOnce = true;
 
     if (typeof onEnded === "function") {
@@ -154,6 +252,7 @@ function setCharacterImage(mode, setInRound) {
   if (idx < 0 || idx >= bgImages[mode].length) return;
   elCharacter.src = bgImages[mode][idx];
 }
+
 
 // ======================
 // セリフ設定
@@ -861,9 +960,9 @@ async function goToPhase(nextPhase) {
   transitionLock = true;
 
   stopTimer();
-  stopVoice();
 
   if (nextPhase === "focus") {
+    stopVoice();
     prepareFocusUI();
 
     const showRare = shouldShowRareButton();
@@ -893,6 +992,7 @@ async function goToPhase(nextPhase) {
         });
       });
 
+      transitionLock = false;
       return;
     }
 
@@ -909,27 +1009,28 @@ async function goToPhase(nextPhase) {
       startTimerLoop(FOCUS_SEC);
       transitionLock = false;
     });
-    } else {
-    stopAmbient();
-    stopVoice();
-    prepareBreakUI();
 
-    const quote = getBreakQuoteForCurrentMonth();
-    elQuote.textContent = quote.display;
-
-       setTimeout(() => {
-      playVoiceAudio(quote.audio, () => {
-        if (phase !== "break") {
-          transitionLock = false;
-          return;
-        }
-
-        startTimerLoop(BREAK_SEC);
-        transitionLock = false;
-      });
-    }, 180);
-    
+    return;
   }
+
+  stopAmbient();
+  stopVoice();
+  prepareBreakUI();
+
+  const quote = getBreakQuoteForCurrentMonth();
+  elQuote.textContent = quote.display;
+
+  setTimeout(() => {
+    playVoiceAudio(quote.audio, () => {
+      if (phase !== "break") {
+        transitionLock = false;
+        return;
+      }
+
+      startTimerLoop(BREAK_SEC);
+      transitionLock = false;
+    });
+  }, 180);
 }
 
 function handlePhaseEnd() {
@@ -952,6 +1053,7 @@ async function startStudy(mode) {
     totalSetIndex = 1;
     transitionLock = false;
 
+    await unlockAudioSystem();
     await primeAmbient(mode);
     await goToPhase("focus");
   } finally {
@@ -962,6 +1064,22 @@ async function startStudy(mode) {
 // 初期化
 showHomeUI();
 window.startStudy = startStudy;
+
+window.addEventListener(
+  "touchstart",
+  () => {
+    unlockAudioSystem().catch(() => {});
+  },
+  { once: true, passive: true }
+);
+
+window.addEventListener(
+  "click",
+  () => {
+    unlockAudioSystem().catch(() => {});
+  },
+  { once: true, passive: true }
+);
 
 let roomUsers = [];
 let isInRoom = false;
