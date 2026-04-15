@@ -1173,6 +1173,22 @@ async function startStudy(mode) {
 // 初期化
 showHomeUI();
 window.startStudy = startStudy;
+window.addEventListener(
+  "touchstart",
+  () => {
+    unlockAudioSystem().catch(() => {});
+  },
+  { once: true, passive: true }
+);
+
+window.addEventListener(
+  "click",
+  () => {
+    unlockAudioSystem().catch(() => {});
+  },
+  { once: true, passive: true }
+);
+
 
 window.addEventListener(
   "touchstart",
