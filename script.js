@@ -751,22 +751,17 @@ function getBreakQuoteForCurrentMonth() {
 function getRareQuote() {
   const month = getCurrentMonth();
   const pool = getRarePoolForCurrentMonth();
-  const selectedCategory = getRareCategoryByWeight(pool);
 
-  if (!selectedCategory) {
-    return pickRandomNoRepeat(`rare_month_${month}_all`, pool) || pool[0];
-  }
+  // 物語欠片をすでに取っているなら、物語音声（_rare_ultra_04）は通常レア抽選から外す
+  const fragmentId = `story_${String(month).padStart(2, "0")}`;
+  const filteredPool = hasStoryFragment(fragmentId)
+    ? pool.filter((quote) => !/_rare_ultra_04\.mp3$/.test(quote.audio))
+    : pool;
 
-  const categoryPool = pool.filter((quote) => quote.category === selectedCategory);
+  const targetPool =
+    Array.isArray(filteredPool) && filteredPool.length > 0 ? filteredPool : pool;
 
-  if (categoryPool.length > 0) {
-    return (
-      pickRandomNoRepeat(`rare_month_${month}_${selectedCategory}`, categoryPool) ||
-      categoryPool[0]
-    );
-  }
-
-  return pickRandomNoRepeat(`rare_month_${month}_all`, pool) || pool[0];
+  return pickRandomNoRepeat(`rare_month_${month}_all`, targetPool) || targetPool[0];
 }
 
 function saveStoryFragment(fragmentId) {
