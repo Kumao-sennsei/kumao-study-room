@@ -18,6 +18,103 @@ const usedVoiceIndexes = {};
 
 // 起動・遷移ロック
 let isStarting = false;
+let audioUnlocked = false;
+let audioUnlockPromise = null;
+
+const SILENT_WAV =
+  "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=";
+
+function createManagedAudio(src = "") {
+  const audio = new Audio(src);
+  audio.preload = "auto";
+  audio.playsInline = true;
+  audio.setAttribute("playsinline", "true");
+  audio.setAttribute("webkit-playsinline", "true");
+  return audio;
+}
+
+async function unlockAudioSystem() {
+  if (audioUnlocked) return true;
+  if (audioUnlockPromise) return audioUnlockPromise;
+
+  audioUnlockPromise = (async () => {
+    try {
+      const silent = createManagedAudio(SILENT_WAV);
+      silent.muted = true;
+      await silent.play().catch(() => {});
+      silent.pause();
+      silent.currentTime = 0;
+
+      if (!currentAudio) {
+        currentAudio = createManagedAudio(SILENT_WAV);
+        currentAudio.loop = true;
+        currentAudio.volume = 0.5;
+      }
+
+      if (!currentVoiceAudio) {
+        currentVoiceAudio = createManagedAudio(SILENT_WAV);
+      }
+
+      currentAudio.muted = true;
+      currentVoiceAudio.muted = true;
+
+      await currentAudio.play().catch(() => {});
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+
+      await currentVoiceAudio.play().catch(() => {});
+      currentVoiceAudio.pause();
+      currentVoiceAudio.currentTime = 0;
+
+      currentAudio.muted = false;
+      currentVoiceAudio.muted = false;
+
+      audioUnlocked = true;
+      console.log("[audio] unlock 成功");
+      return true;
+    } catch (e) {
+      console.error("[audio] unlock 失敗:", e);
+      return false;
+    } finally {
+      audioUnlockPromise = null;
+    }
+  })();
+
+  return audioUnlockPromise;
+}
+
+function ensureAmbientObject(mode) {
+  if (!mode) return null;
+
+  if (!currentAudio) {
+    currentAudio = createManagedAudio(`${mode}.wav`);
+    currentAudio.loop = true;
+    currentAudio.volume = 0.5;
+    currentAudioMode = mode;
+    return currentAudio;
+  }
+
+  if (currentAudioMode !== mode) {
+    try {
+      currentAudio.pause();
+    } catch (e) {}
+    currentAudio.src = `${mode}.wav`;
+    currentAudio.load();
+    currentAudio.loop = true;
+    currentAudio.volume = 0.5;
+    currentAudio.currentTime = 0;
+    currentAudioMode = mode;
+  }
+
+  return currentAudio;
+}
+
+function ensureVoiceObject() {
+  if (!currentVoiceAudio) {
+    currentVoiceAudio = createManagedAudio();
+  }
+  return currentVoiceAudio;
+}
 
 // iOS / Android 向けの音声アンロック管理
 let audioUnlocked = false;
