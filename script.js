@@ -915,23 +915,26 @@ function hideRareButton() {
   elRareBtn.onclick = null;
 }
 
-function showRareButton(onClickHandler) {
+function showRareButton(config) {
   if (!elRareBtn) return;
 
-  elRareBtn.textContent = "レアボイス当選！おめでとう🎉 押してみてね🐻✨";
+  const isFunctionOnly = typeof config === "function";
+  const onClickHandler = isFunctionOnly ? config : config?.onClickHandler;
+  const label = isFunctionOnly
+    ? "レアボイス当選！おめでとう🎉 押してみてね🐻✨"
+    : (config?.label || "レアボイス当選！おめでとう🎉 押してみてね🐻✨");
+
+  elRareBtn.textContent = label;
   elRareBtn.disabled = false;
   elRareBtn.classList.remove("hidden");
-  const fragmentId = `story_${getCurrentMonth().toString().padStart(2, "0")}`;
-
-if (!hasStoryFragment(fragmentId)) {
-  elStoryBtn.classList.remove("hidden");
-}
   elRareBtn.classList.add("rare-glow");
-  elRareBtn.onclick = onClickHandler;
-  elStoryBtn.onclick = () => {
-  saveStoryFragment(fragmentId);
+  elRareBtn.onclick = onClickHandler || null;
+
+  // 物語欠片ボタンは今後使わないので、ここで必ず隠す
+  if (elStoryBtn) {
     elStoryBtn.classList.add("hidden");
-};
+    elStoryBtn.onclick = null;
+  }
 }
 
 // ======================
