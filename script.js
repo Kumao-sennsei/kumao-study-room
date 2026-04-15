@@ -470,7 +470,7 @@ const BREAK_QUOTES_BY_MONTH = {
 { display: "Ayo, you really built different.\nNo cap, that grind is loud.\n　【訳】お前、マジでモノが違う。\nガチでその努力、存在感えぐい。", audio: "audio/rare/04/month04_rare_ultra_01.mp3" },
 { display: "Sheesh... you locked in for real.\nThat’s big dog energy.\n【訳】うわ、完全に本気モード入ってるな。\nそれは主役級の強さだ。", audio: "audio/rare/04/month04_rare_ultra_02.mp3" },
 { display: "春はタケノコがうまいよな。\nお前もたけのこのように、にょきにょき伸びるんだ。\nそうだ、ニョキニョキだぜ。", audio: "audio/rare/04/month04_rare_ultra_03.mp3" },
-{ display: "春といえばタケノコだよな。\n俺は小さいころ山で家族と生き別れになり、\n飢えをしのぐためにタケノコをよく食べたもんだぜ。\n弟がいたが、名前がおもいだせねぇ。", audio: "audio/rare/04/month04_rare_ultra_04.mp3" },
+{ display: "春といえばタケノコだよな。\n俺は小さいころ山で家族と生き別れになり、\n飢えをしのぐためにタケノコをよく食べたもんだぜ。\n弟がいたが、顔がおもいだせねぇ。", audio: "audio/rare/04/month04_rare_ultra_04.mp3" },
   ],
   5: [
     { display: "新緑ってのはな、静かに伸びてんだ。お前も同じだ。ちゃんと前に進んでる。一回手止めて、少し休め。", audio: "audio/monthly/05/month05_break_01.mp3" },
