@@ -840,6 +840,10 @@ function getRound() {
   return Math.floor((totalSetIndex - 1) / SETS_PER_ROUND) + 1;
 }
 
+function getDisplayRound() {
+  return ((getRound() - 1) % 4) + 1;
+}
+
 function getSetInRound() {
   return ((totalSetIndex - 1) % SETS_PER_ROUND) + 1;
 }
@@ -963,8 +967,8 @@ function prepareFocusUI() {
   hideRareButton();
 
   elModeTitle.textContent = "集中TIME";
-  setCharacterImage(currentMode, getRound());
-  elLap.textContent = `${getRound()}周目`;
+ setCharacterImage(currentMode, getDisplayRound());
+elLap.textContent = `${getDisplayRound()}周目`;
 
   updateBears();
   setTimerText(currentTime);
