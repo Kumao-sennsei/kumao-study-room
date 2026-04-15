@@ -286,7 +286,19 @@ async function startAmbient(mode) {
     audio.volume = 0.5;
 
     if (audio.paused) {
-      await audio.play();
+      try {
+        await audio.play();
+      } catch (e) {
+        console.warn("[audio] 通常再生失敗、再試行します:", e);
+
+        audio.muted = true;
+        await audio.play().catch(() => {});
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = false;
+
+        await audio.play();
+      }
     }
   } catch (e) {
     console.error("環境音再生エラー:", e);
