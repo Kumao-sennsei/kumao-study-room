@@ -71,6 +71,22 @@ function createManagedAudio(src = "") {
   return audio;
 }
 
+async function recoverAudioIfNeeded() {
+  try {
+    if (document.visibilityState !== "visible") return;
+
+    if (phase === "focus") {
+      await startAmbient(currentMode);
+    }
+
+    if (phase === "break") {
+      stopAmbient();
+    }
+  } catch (e) {
+    console.error("[recoverAudioIfNeeded] 復旧失敗:", e);
+  }
+}
+
 async function unlockAudioSystem() {
   if (audioUnlocked) return true;
   if (audioUnlockPromise) return audioUnlockPromise;
@@ -1099,7 +1115,13 @@ window.startStudy = startStudy;
 document.addEventListener("visibilitychange", async () => {
   if (document.visibilityState === "visible") {
     await requestWakeLock();
+    await recoverAudioIfNeeded();
   }
+});
+
+window.addEventListener("focus", async () => {
+  await requestWakeLock();
+  await recoverAudioIfNeeded();
 });
 
 
