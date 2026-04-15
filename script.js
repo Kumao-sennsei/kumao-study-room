@@ -982,22 +982,27 @@ async function goToPhase(nextPhase) {
       return;
     }
 
-    const quote = getStartQuote();
-    elQuote.textContent = quote.display;
+const quote = getStartQuote();
+elQuote.textContent = quote.display;
 
-    playVoiceAudio(quote.audio, async () => {
-      if (phase !== "focus") {
-        transitionLock = false;
-        return;
-      }
+// 先にタイマーを動かす
+startTimerLoop(FOCUS_SEC);
+transitionLock = false;
 
-      await startAmbient(currentMode);
-      startTimerLoop(FOCUS_SEC);
-      transitionLock = false;
-    });
+// 音声は別で流す
+playVoiceAudio(quote.audio, async () => {
+  if (phase !== "focus") return;
+  await startAmbient(currentMode);
+});
 
-    return;
-  }
+// 音声側で詰まってもBGMだけは保険で開始
+setTimeout(async () => {
+  if (phase !== "focus") return;
+  await startAmbient(currentMode);
+}, 600);
+
+return;
+    
 
   stopAmbient();
   stopVoice();
