@@ -1070,6 +1070,65 @@ return;
   stopVoice();
   prepareBreakUI();
 
+  const showRare = shouldShowRareButton();
+
+if (showRare) {
+  elQuote.textContent = "今日は、ちょっと特別だ。";
+
+  const month = getCurrentMonth();
+  const fragmentId = `story_${String(month).padStart(2, "0")}`;
+  const monthPool = getRarePoolForCurrentMonth();
+
+  const storyQuote = monthPool.find((quote) =>
+    /_rare_ultra_04\.mp3$/.test(quote.audio)
+  );
+
+  const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
+
+  showRareButton({
+    label: shouldUseStory
+      ? "物語の欠片ゲット！おめでとう🎉 押してみてね😎💣"
+      : "レアボイス当選！おめでとう🎉 押してみてね🐻✨",
+
+    onClickHandler: () => {
+      if (elRareBtn.disabled) return;
+
+      elRareBtn.disabled = true;
+      elRareBtn.classList.add("hidden");
+      elRareBtn.classList.remove("rare-glow");
+
+      const selectedQuote = shouldUseStory ? storyQuote : getRareQuote();
+      if (!selectedQuote) {
+        transitionLock = false;
+        return;
+      }
+
+      if (shouldUseStory) {
+        saveStoryFragment(fragmentId);
+      }
+
+      if (!shouldUseStory) {
+        saveRareAudio(selectedQuote.audio);
+      }
+
+      elQuote.textContent = selectedQuote.display;
+
+      playVoiceAudio(selectedQuote.audio, () => {
+        if (phase !== "break") {
+          transitionLock = false;
+          return;
+        }
+
+        startTimerLoop(BREAK_SEC);
+        transitionLock = false;
+      });
+    }
+  });
+
+  transitionLock = false;
+  return;
+}
+
   const quote = getBreakQuoteForCurrentMonth();
   elQuote.textContent = quote.display;
 
