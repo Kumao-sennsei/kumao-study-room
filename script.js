@@ -1002,7 +1002,8 @@ setTimeout(async () => {
 }, 600);
 
 return;
-    
+  }
+  
 
   stopAmbient();
   stopVoice();
