@@ -459,7 +459,7 @@ const BREAK_QUOTES_BY_MONTH = {
 { display: "春は始まりの季節だ。\nそしてお前は、ちゃんと始めてる。\n頑張ってる。5分休め。\n次もいくぞ。", audio: "audio/monthly/04/month04_break_06.mp3" },
 { display: "周りは華やかだな。桜も咲いてる。\nだが地味に頑張ってるお前の方が強い。\n5分後、もう一段上行くぞ。", audio: "audio/monthly/04/month04_break_07.mp3" },
 { display: "手応え薄いか？\nそれでも頑張ってるやつを俺は見放したりしねぇ。\n5分だけ、静かに休め。", audio: "audio/monthly/04/month04_break_08.mp3" },
-{ display: "俺は今から花見に行ってくる。\n５分休憩したら、お前は頑張れ。\nいいか？さぼるんじゃねぞ。", audio: "audio/monthly/04/month04_break_09.mp3" },
+{ display: "俺は今から花見に行ってくる。\n５分休憩したら、お前は頑張れ。\nいいか？さぼるんじゃねぇぞ。", audio: "audio/monthly/04/month04_break_09.mp3" },
 { display: "桜は散る。だがな、お前の頑張りは散らねぇ。\nとりあえず5分、ゆっくりしな。", audio: "audio/monthly/04/month04_break_10.mp3" },
 { display: "考えてみろ。桜だってな、一瞬で咲いてるわけじゃねぇ。\n見えねぇところで準備してんだ。お前も同じだ。\nちゃんと積んでる。今はそれでいい。", audio: "audio/monthly/04/month04_break_11.mp3" },
 { display: "新学期ってのはな、やり直しじゃねぇ。\n“上書き”だ。\nここまで来てるお前なら、もう一段上に行ける。\n5分休んで、次の一手いくぞ。", audio: "audio/monthly/04/month04_break_12.mp3" },
