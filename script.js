@@ -1084,14 +1084,15 @@ if (showRare) {
   elQuote.textContent = "今日は、ちょっと特別だ。";
 
   const month = getCurrentMonth();
-  const fragmentId = `story_${String(month).padStart(2, "0")}`;
-  const monthPool = getRarePoolForCurrentMonth();
+const monthStr = String(month).padStart(2, "0");
+const fragmentId = `story_${monthStr}`;
 
-  const storyQuote = monthPool.find((quote) =>
-    /_rare_ultra_04\.mp3$/.test(quote.audio)
-  );
+const monthBreakPool = BREAK_QUOTES_BY_MONTH[month] || [];
+const storyQuote =
+  monthBreakPool.find((quote) => quote.audio === `audio/rare/${monthStr}/month${monthStr}_rare_ultra_04.mp3`) ||
+  null;
 
-  const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
+const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
 
   showRareButton({
     label: shouldUseStory
