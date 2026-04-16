@@ -1089,8 +1089,9 @@ const fragmentId = `story_${monthStr}`;
 
 const monthBreakPool = BREAK_QUOTES_BY_MONTH[month] || [];
 const storyQuote =
-  monthBreakPool.find((quote) => quote.audio === `audio/rare/${monthStr}/month${monthStr}_rare_ultra_04.mp3`) ||
-  null;
+  monthBreakPool.find(
+    (quote) => quote.audio === `audio/rare/${monthStr}/month${monthStr}_rare_ultra_04.mp3`
+  ) || null;
 
 const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
 
