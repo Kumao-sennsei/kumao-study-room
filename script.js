@@ -740,11 +740,19 @@ function getBreakQuoteForCurrentMonth() {
   const month = getCurrentMonth();
   const arr = BREAK_QUOTES_BY_MONTH[month];
 
-  if (!Array.isArray(arr) || arr.length === 0) {
-    throw new Error(`休憩音声データがありません。month=${month}`);
+  const normalBreakQuotes = Array.isArray(arr)
+    ? arr.filter((quote) => typeof quote.audio === "string" && quote.audio.startsWith("audio/monthly/"))
+    : [];
+
+  if (normalBreakQuotes.length > 0) {
+    return pickRandomNoRepeat(`break_month_${month}`, normalBreakQuotes) || normalBreakQuotes[0];
   }
 
-  return pickRandomNoRepeat(`break_month_${month}`, arr) || arr[0];
+  if (Array.isArray(FALLBACK_BREAK_QUOTES) && FALLBACK_BREAK_QUOTES.length > 0) {
+    return pickRandomNoRepeat("fallback_break_quotes", FALLBACK_BREAK_QUOTES) || FALLBACK_BREAK_QUOTES[0];
+  }
+
+  throw new Error(`休憩音声データがありません。month=${month}`);
 }
 
 
