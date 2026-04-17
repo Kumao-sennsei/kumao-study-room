@@ -954,6 +954,7 @@ function hideRareButton() {
   elRareBtn.classList.remove("rare-glow");
   elRareBtn.disabled = true;
   elRareBtn.onclick = null;
+  elRareBtn.ontouchend = null;
 }
 
 function showRareButton(config) {
@@ -969,9 +970,21 @@ function showRareButton(config) {
   elRareBtn.disabled = false;
   elRareBtn.classList.remove("hidden");
   elRareBtn.classList.add("rare-glow");
-  elRareBtn.onclick = onClickHandler || null;
 
-  // 物語欠片ボタンは今後使わないので、ここで必ず隠す
+  let fired = false;
+  const safeHandler = (e) => {
+    if (e) e.preventDefault();
+    if (fired) return;
+    fired = true;
+
+    if (typeof onClickHandler === "function") {
+      onClickHandler(e);
+    }
+  };
+
+  elRareBtn.onclick = safeHandler;
+  elRareBtn.ontouchend = safeHandler;
+
   if (elStoryBtn) {
     elStoryBtn.classList.add("hidden");
     elStoryBtn.onclick = null;
