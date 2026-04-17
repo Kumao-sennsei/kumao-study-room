@@ -973,6 +973,7 @@ function hideRareButton() {
   elRareBtn.classList.remove("rare-glow");
   elRareBtn.disabled = true;
   elRareBtn.onclick = null;
+  elRareBtn.ontouchstart = null;
   elRareBtn.ontouchend = null;
 }
 
@@ -1002,6 +1003,7 @@ function showRareButton(config) {
   };
 
   elRareBtn.onclick = safeHandler;
+  elRareBtn.ontouchstart = safeHandler;
   elRareBtn.ontouchend = safeHandler;
 
   if (elStoryBtn) {
