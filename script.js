@@ -258,6 +258,22 @@ function playVoiceAudio(src, onEnded) {
       }
     };
 
+    const startPlayback = () => {
+      try {
+        const playResult = audio.play();
+
+        if (playResult && typeof playResult.then === "function") {
+          playResult.catch((e) => {
+            console.error("ボイス再生失敗:", e, src);
+            safeFinish();
+          });
+        }
+      } catch (e) {
+        console.error("ボイス再生失敗:", e, src);
+        safeFinish();
+      }
+    };
+
     audio.src = src;
     audio.load();
 
@@ -267,15 +283,21 @@ function playVoiceAudio(src, onEnded) {
       safeFinish();
     };
 
-    unlockAudioSystem()
-      .then(() => audio.play())
-      .then(() => {
-        // 再生開始成功
-      })
-      .catch((e) => {
-        console.error("ボイス再生失敗:", e, src);
-        safeFinish();
-      });
+    if (audioUnlocked) {
+      startPlayback();
+    } else {
+      unlockAudioSystem()
+        .then((ok) => {
+          if (!ok) {
+            throw new Error("audio unlock failed");
+          }
+          startPlayback();
+        })
+        .catch((e) => {
+          console.error("ボイス再生失敗:", e, src);
+          safeFinish();
+        });
+    }
   } catch (e) {
     console.error("ボイス生成失敗:", e, src);
     currentVoiceEndedOnce = true;
