@@ -260,10 +260,9 @@ function playVoiceAudio(src, onEnded) {
 
     const startPlayback = () => {
       try {
-        const playResult = audio.play();
-
-        if (playResult && typeof playResult.then === "function") {
-          playResult.catch((e) => {
+        const result = audio.play();
+        if (result && typeof result.then === "function") {
+          result.catch((e) => {
             console.error("ボイス再生失敗:", e, src);
             safeFinish();
           });
@@ -288,9 +287,7 @@ function playVoiceAudio(src, onEnded) {
     } else {
       unlockAudioSystem()
         .then((ok) => {
-          if (!ok) {
-            throw new Error("audio unlock failed");
-          }
+          if (!ok) throw new Error("audio unlock failed");
           startPlayback();
         })
         .catch((e) => {
