@@ -1003,7 +1003,7 @@ function showRareButton(config) {
   };
 
   elRareBtn.onclick = safeHandler;
-  elRareBtn.ontouchstart = safeHandler;
+  //elRareBtn.ontouchstart = safeHandler;
   elRareBtn.ontouchend = safeHandler;
 
   if (elStoryBtn) {
