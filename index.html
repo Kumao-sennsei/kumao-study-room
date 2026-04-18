@@ -329,7 +329,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
       let text = rawText.replace(/👍\s*\d+/, "").trim();
       text = text.replace(/\n/g, " ").trim();
 
-      return {
+           return {
         id: "seed_" + index,
         author: "みんな",
         subject: "",
@@ -337,6 +337,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
         image: img ? img.getAttribute("src") || "" : "",
         likes,
         liked: false,
+        comments: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         points: likes,
