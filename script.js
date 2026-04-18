@@ -1221,6 +1221,43 @@ async function startStudy(mode) {
 showHomeUI();
 window.startStudy = startStudy;
 
+function bindStartStudyButtonsForIPad() {
+  const startEls = Array.from(document.querySelectorAll("[onclick*='startStudy']"));
+
+  startEls.forEach((el) => {
+    if (el.dataset.startStudyBound === "1") return;
+
+    const attr = el.getAttribute("onclick") || "";
+    const match = attr.match(/startStudy\(['"]?(fire|forest|sea)['"]?\)/);
+    if (!match) return;
+
+    const mode = match[1];
+    let fired = false;
+
+    const handler = async (e) => {
+      if (e) e.stopPropagation();
+      if (fired) return;
+      fired = true;
+
+      try {
+        await startStudy(mode);
+      } finally {
+        setTimeout(() => {
+          fired = false;
+        }, 600);
+      }
+    };
+
+    el.onclick = handler;
+    el.onpointerup = handler;
+    el.ontouchend = handler;
+    el.dataset.startStudyBound = "1";
+  });
+}
+
+bindStartStudyButtonsForIPad();
+document.addEventListener("DOMContentLoaded", bindStartStudyButtonsForIPad);
+
 document.addEventListener("visibilitychange", async () => {
   if (document.visibilityState === "visible") {
     await requestWakeLock();
