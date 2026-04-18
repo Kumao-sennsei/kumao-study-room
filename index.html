@@ -977,6 +977,21 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     try {
       saveUserNameBtn.disabled = true;
 
+            const {
+        data: { session },
+        error: sessionError
+      } = await supabaseClient.auth.getSession();
+
+      if (sessionError) {
+        showMessage(`ログイン確認でエラー: ${sessionError.message}`, true);
+        return;
+      }
+
+      if (!session) {
+        showMessage("先にログインしてから表示名を登録してね！", true);
+        return;
+      }
+
       const { data, error } = await supabaseClient.rpc("create_initial_profile", {
         p_display_name: nextName
       });
