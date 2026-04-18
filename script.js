@@ -1204,26 +1204,25 @@ async function startStudy(mode) {
   isStarting = true;
 
   try {
-    currentMode = mode;
-    totalSetIndex = 1;
-    transitionLock = false;
+  currentMode = mode;
+  totalSetIndex = 1;
+  transitionLock = false;
 
-    // iPadで止まりやすい処理は待たずに先へ進める
-    unlockAudioSystem().catch((e) => {
-      console.error("[startStudy] unlock失敗:", e);
-    });
+  // 音の解禁だけは、タップ直後に必ず待つ
+  await unlockAudioSystem();
 
-    requestWakeLock().catch((e) => {
-      console.error("[startStudy] wakeLock失敗:", e);
-    });
+  // 画面は先に進める
+  await goToPhase("focus");
 
-    primeAmbient(mode).catch((e) => {
-      console.error("[startStudy] primeAmbient失敗:", e);
-    });
+  // ここから先は待たない
+  requestWakeLock().catch((e) => {
+    console.error("[startStudy] wakeLock失敗:", e);
+  });
 
-    // 画面遷移は止めずに先に進める
-    await goToPhase("focus");
-  } finally {
+  primeAmbient(mode).catch((e) => {
+    console.error("[startStudy] primeAmbient失敗:", e);
+  });
+} finally {
     isStarting = false;
   }
 }
