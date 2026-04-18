@@ -493,6 +493,12 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     composer.style.display = isOpen ? "block" : "none";
     toggleBtn.textContent = isOpen ? "投稿フォームを閉じる" : "投稿する📒";
   }
+
+  function getCurrentMemberPlan() {
+    const savedPlan = localStorage.getItem("kumaoMemberPlan");
+    return savedPlan === "free" ? "free" : "paid";
+  }
+  
     function renderNotes() {
     const noteGrid = getNoteGrid();
     if (!noteGrid) return;
@@ -637,7 +643,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     const notes = getNotes();
 
     const currentAuthor = "たかちゃん";
-    const currentMemberPlan = "paid"; // 今は仮固定。あとで free / paid に連動
+    const currentMemberPlan = getCurrentMemberPlan();
     const dailyLimit = currentMemberPlan === "paid" ? 5 : 1;
 
     const todayDateKey = getNoteDateKey(new Date());
