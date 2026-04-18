@@ -716,7 +716,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
 
     const notes = getNotes();
 
-    const currentAuthor = "たかちゃん";
+    const currentAuthor = getCurrentUserName();
     const currentMemberPlan = getCurrentMemberPlan();
     const dailyLimit = currentMemberPlan === "paid" ? 5 : 1;
 
@@ -898,7 +898,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
 
     target.comments.push({
       id: makeId(),
-      author: "たかちゃん",
+      author: getCurrentUserName(),
       text,
       createdAt: new Date().toISOString()
     });
@@ -918,6 +918,9 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   const toggleBtn = document.getElementById("toggleNoteComposerBtn");
   const closeBtn = document.getElementById("closeNoteComposerBtn");
   const memberPlanSelect = document.getElementById("memberPlanSelect");
+  const currentUserNameInput = document.getElementById("currentUserNameInput");
+  const saveUserNameBtn = document.getElementById("saveUserNameBtn");
+    
 
   if (toggleBtn) {
     toggleBtn.addEventListener("click", () => {
