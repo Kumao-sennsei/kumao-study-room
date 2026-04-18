@@ -610,9 +610,27 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
       }
 
       if (data?.display_name) {
-        setCurrentUserName(data.display_name);
-        syncCurrentUserNameUI();
-      }
+  setCurrentUserName(data.display_name);
+  syncCurrentUserNameUI();
+
+  const input = document.getElementById("currentUserNameInput");
+  const saveBtn = document.getElementById("saveUserNameBtn");
+  const status = document.getElementById("currentUserNameStatus");
+
+  if (input) {
+    input.disabled = true;
+  }
+
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = "登録ずみ";
+  }
+
+  if (status) {
+    status.textContent = `現在：${data.display_name}（登録ずみ）`;
+  }
+}
+      
     } catch (e) {
       console.error("syncProfileFromSupabase エラー", e);
     }
