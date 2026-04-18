@@ -1291,7 +1291,7 @@ function getStudyLabelByUser(userName) {
   const studyMap = {
     "Aさん": "英単語",
     "Bさん": "数学Ⅱ",
-    "あなた": "公認会計士（簿記）"
+    [CURRENT_USER_NAME]: "Cさん"
   };
 
   return studyMap[userName] || "自由に学習中";
