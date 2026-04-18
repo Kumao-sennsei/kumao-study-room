@@ -309,6 +309,89 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   function getNoteGrid() {
     return document.getElementById("noteGrid");
   }
+    function getNoteArchiveList() {
+    return document.getElementById("noteArchiveList");
+  }
+
+    function isNoteWithinLastDays(note, days = 7) {
+    if (!note || !note.createdAt) return true;
+
+    const created = new Date(note.createdAt);
+    if (Number.isNaN(created.getTime())) return true;
+
+    const now = new Date();
+    const diffMs = now.getTime() - created.getTime();
+    const limitMs = days * 24 * 60 * 60 * 1000;
+
+    return diffMs < limitMs;
+  }
+
+    function getMonthArchiveKey(note) {
+    if (!note || !note.createdAt) return "不明";
+
+    const created = new Date(note.createdAt);
+    if (Number.isNaN(created.getTime())) return "不明";
+
+    const y = created.getFullYear();
+    const m = String(created.getMonth() + 1).padStart(2, "0");
+    return `${y}年${m}月`;
+  }
+
+  function getNoteDateKey(dateLike = new Date()) {
+    const d = new Date(dateLike);
+    if (Number.isNaN(d.getTime())) return "";
+
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+
+    return `${y}-${m}-${day}`;
+  }
+  
+  function findDailyNoteCard(notes, author, dateKey) {
+    if (!Array.isArray(notes)) return null;
+
+    return notes.find(note => {
+      const noteDateKey = getNoteDateKey(note.createdAt);
+      return note.author === author && noteDateKey === dateKey;
+    }) || null;
+  }
+
+  
+  
+    function renderNoteArchiveList(notes) {
+    const archiveList = getNoteArchiveList();
+    if (!archiveList) return;
+
+    const archiveNotes = notes.filter(note => !isNoteWithinLastDays(note, 7));
+
+    if (archiveNotes.length === 0) {
+      archiveList.innerHTML = "まだアーカイブはありません";
+      return;
+    }
+
+    const grouped = {};
+
+    archiveNotes.forEach(note => {
+      const monthKey = getMonthArchiveKey(note);
+
+      if (!grouped[monthKey]) {
+        grouped[monthKey] = [];
+      }
+
+      grouped[monthKey].push(note);
+    });
+
+    const monthKeys = Object.keys(grouped).sort((a, b) => b.localeCompare(a, "ja"));
+
+    archiveList.innerHTML = monthKeys.map(monthKey => `
+      <div style="padding:10px 0; border-bottom:1px solid #333;">
+        <div style="font-weight:bold; color:#ffd54f; margin-bottom:4px;">${escapeHtml(monthKey)}</div>
+        <div style="font-size:13px; color:#bbb;">${grouped[monthKey].length}件</div>
+      </div>
+    `).join("");
+  }
+  
 
   function loadNotes() {
     try {
@@ -417,8 +500,12 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     if (!noteGrid) return;
 
     const notes = getNotes();
+    renderNoteArchiveList(notes);
 
-    noteGrid.innerHTML = notes.map(note => {
+    const recentNotes = notes.filter(note => isNoteWithinLastDays(note, 7));
+
+    noteGrid.innerHTML = recentNotes.map(note => {
+      
       const imageHtml = note.image
         ? `<img src="${escapeHtml(note.image)}" alt="ノート画像"
             style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bottom:8px;">`
@@ -528,9 +615,15 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
 
     const notes = getNotes();
 
+    const currentAuthor = "たかちゃん";
+    const todayDateKey = getNoteDateKey(new Date());
+    const todayCard = findDailyNoteCard(notes, currentAuthor, todayDateKey);
+    
         const newNote = {
       id: makeId(),
-      author: "たかちゃん",
+      author: currentAuthor,
+      dateKey: todayDateKey,
+      entries: [],
       subject,
       text,
       image: "",
