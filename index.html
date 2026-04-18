@@ -965,13 +965,49 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   }
     
 　  if (saveUserNameBtn) {
-    saveUserNameBtn.addEventListener("click", () => {
-      const nextName = currentUserNameInput?.value?.trim() || "たかちゃん";
+  saveUserNameBtn.addEventListener("click", async () => {
+    const nextName = currentUserNameInput?.value?.trim() || "";
+
+    if (!nextName) {
+      showMessage("表示名を入力してね！", true);
+      currentUserNameInput?.focus();
+      return;
+    }
+
+    try {
+      saveUserNameBtn.disabled = true;
+
+      const { data, error } = await supabaseClient.rpc("create_initial_profile", {
+        p_display_name: nextName
+      });
+
+      if (error) {
+        if (String(error.message || "").includes("profile already exists")) {
+          showMessage("このアカウントはもう表示名登録ずみだよ！", true);
+          return;
+        }
+
+        if (String(error.message || "").includes("duplicate")) {
+          showMessage("その表示名はもう使われているよ！別の名前にしてね。", true);
+          return;
+        }
+
+        showMessage(`保存できなかったよ: ${error.message}`, true);
+        return;
+      }
+
       setCurrentUserName(nextName);
       syncCurrentUserNameUI();
-      showMessage(`表示名を ${nextName} にしたよ！`);
-    });
-  }
+      showMessage(`表示名を ${nextName} で登録したよ！`);
+      console.log("create_initial_profile result:", data);
+    } catch (e) {
+      console.error(e);
+      showMessage("保存中にエラーが起きたよ。", true);
+    } finally {
+      saveUserNameBtn.disabled = false;
+    }
+  });
+}
     
   if (imageInput) {
     imageInput.addEventListener("change", previewSelectedImage);
