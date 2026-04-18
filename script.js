@@ -1285,6 +1285,8 @@ function buildGroupedPostSummaries(posts) {
   return summaries;
 }
 
+const CURRENT_USER_NAME = "たかちゃん";
+
 function getStudyLabelByUser(userName) {
   const studyMap = {
     "Aさん": "英単語",
