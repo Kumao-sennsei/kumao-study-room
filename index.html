@@ -102,7 +102,7 @@
       </div>
     </div>
 
-   <script src="script.js?v=20260418-15"></script>
+   <script src="script.js?v=20260418-16"></script>
 
 <button id="backMainBtn" 
 style="position:fixed; left:20px; top:60px; z-index:9999; display:none;">
@@ -955,6 +955,14 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     });
   }
     
+　  if (saveUserNameBtn) {
+    saveUserNameBtn.addEventListener("click", () => {
+      const nextName = currentUserNameInput?.value?.trim() || "たかちゃん";
+      setCurrentUserName(nextName);
+      syncCurrentUserNameUI();
+      showMessage(`表示名を ${nextName} にしたよ！`);
+    });
+  }
     
   if (imageInput) {
     imageInput.addEventListener("change", previewSelectedImage);
@@ -1008,6 +1016,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     renderNotes();
     bindEvents();
     syncMemberPlanUI();
+    syncCurrentUserNameUI();
     setComposerOpen(false);
   }
 
