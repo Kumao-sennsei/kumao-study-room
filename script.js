@@ -1200,30 +1200,30 @@ function handlePhaseEnd() {
 }
 
 async function startStudy(mode) {
-  document.getElementById("subTitle").textContent = `startStudy入った: ${mode} / v20260418-03`;
-  
   if (isStarting) return;
   isStarting = true;
 
   try {
-  currentMode = mode;
-  totalSetIndex = 1;
-  transitionLock = false;
+    currentMode = mode;
+    totalSetIndex = 1;
+    transitionLock = false;
 
-  document.getElementById("subTitle").textContent = `1 unlock前: ${mode} / v20260418-04`;
-  await unlockAudioSystem();
+    // iPadで止まりやすい処理は待たずに先へ進める
+    unlockAudioSystem().catch((e) => {
+      console.error("[startStudy] unlock失敗:", e);
+    });
 
-  document.getElementById("subTitle").textContent = `2 unlock後 / v20260418-04`;
-  await requestWakeLock();
+    requestWakeLock().catch((e) => {
+      console.error("[startStudy] wakeLock失敗:", e);
+    });
 
-  document.getElementById("subTitle").textContent = `3 wake後 / v20260418-04`;
-  await primeAmbient(mode);
+    primeAmbient(mode).catch((e) => {
+      console.error("[startStudy] primeAmbient失敗:", e);
+    });
 
-  document.getElementById("subTitle").textContent = `4 prime後 / v20260418-04`;
-  await goToPhase("focus");
-
-  document.getElementById("subTitle").textContent = `5 focus後 / v20260418-04`;
-} finally {
+    // 画面遷移は止めずに先に進める
+    await goToPhase("focus");
+  } finally {
     isStarting = false;
   }
 }
