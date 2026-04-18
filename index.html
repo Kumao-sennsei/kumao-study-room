@@ -569,6 +569,41 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   }
 
   function syncCurrentUserNameUI() {
+      async function syncProfileFromSupabase() {
+    try {
+      const {
+        data: { session },
+        error: sessionError
+      } = await supabaseClient.auth.getSession();
+
+      if (sessionError) {
+        console.error("session確認エラー", sessionError);
+        return;
+      }
+
+      if (!session) {
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("display_name")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("profiles取得エラー", error);
+        return;
+      }
+
+      if (data?.display_name) {
+        setCurrentUserName(data.display_name);
+        syncCurrentUserNameUI();
+      }
+    } catch (e) {
+      console.error("syncProfileFromSupabase エラー", e);
+    }
+  }
     const input = document.getElementById("currentUserNameInput");
     const status = document.getElementById("currentUserNameStatus");
     const name = getCurrentUserName();
