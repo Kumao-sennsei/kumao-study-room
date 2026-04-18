@@ -104,6 +104,15 @@
 
    <script src="script.js?v=20260418-16"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = "https://jhsoakmlxbanbxlrhngb.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_veO7IC4DhSERkOMfsBPpMA_57UeYuwO";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+
 <button id="backMainBtn" 
 style="position:fixed; left:20px; top:60px; z-index:9999; display:none;">
   戻る
