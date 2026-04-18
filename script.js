@@ -1087,7 +1087,7 @@ return;
   stopVoice();
   prepareBreakUI();
 
-  const showRare = shouldShowRareButton();
+  const showRare = false;
 
 if (showRare) {
   elQuote.textContent = "今日は、ちょっと特別だ。";
