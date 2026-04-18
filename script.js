@@ -1206,15 +1206,24 @@ async function startStudy(mode) {
   isStarting = true;
 
   try {
-    currentMode = mode;
-    totalSetIndex = 1;
-    transitionLock = false;
+  currentMode = mode;
+  totalSetIndex = 1;
+  transitionLock = false;
 
-    await unlockAudioSystem();
-    await requestWakeLock();
-    await primeAmbient(mode);
-    await goToPhase("focus");
-  } finally {
+  document.getElementById("subTitle").textContent = `1 unlock前: ${mode} / v20260418-04`;
+  await unlockAudioSystem();
+
+  document.getElementById("subTitle").textContent = `2 unlock後 / v20260418-04`;
+  await requestWakeLock();
+
+  document.getElementById("subTitle").textContent = `3 wake後 / v20260418-04`;
+  await primeAmbient(mode);
+
+  document.getElementById("subTitle").textContent = `4 prime後 / v20260418-04`;
+  await goToPhase("focus");
+
+  document.getElementById("subTitle").textContent = `5 focus後 / v20260418-04`;
+} finally {
     isStarting = false;
   }
 }
