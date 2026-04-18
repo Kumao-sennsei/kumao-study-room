@@ -102,7 +102,7 @@
       </div>
     </div>
 
-   <script src="script.js?v=20260418-12"></script>
+   <script src="script.js?v=20260418-13"></script>
 
 <button id="backMainBtn" 
 style="position:fixed; left:20px; top:60px; z-index:9999; display:none;">
@@ -613,67 +613,99 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
       return;
     }
 
-    const notes = getNotes();
+       const notes = getNotes();
 
     const currentAuthor = "たかちゃん";
     const todayDateKey = getNoteDateKey(new Date());
     const todayCard = findDailyNoteCard(notes, currentAuthor, todayDateKey);
-    
+
+    function resetComposer() {
+      subjectEl.value = "";
+      textEl.value = "";
+      imageEl.value = "";
+
+      const previewWrap = document.getElementById("noteImagePreviewWrap");
+      const previewImg = document.getElementById("noteImagePreview");
+      if (previewWrap) previewWrap.style.display = "none";
+      if (previewImg) previewImg.src = "";
+
+      showMessage("投稿できたよ！");
+      setComposerOpen(false);
+    }
+
+    function commitNoteWithImage(imageData = "") {
+      const nowIso = new Date().toISOString();
+
+      const entry = {
+        id: makeId(),
+        subject,
+        text,
+        image: imageData,
+        createdAt: nowIso
+      };
+
+      if (todayCard) {
+        if (!Array.isArray(todayCard.entries)) {
+          todayCard.entries = [];
+        }
+
+        if (
+          todayCard.entries.length === 0 &&
+          (todayCard.subject || todayCard.text || todayCard.image)
+        ) {
+          todayCard.entries.push({
+            id: makeId(),
+            subject: todayCard.subject || "",
+            text: todayCard.text || "",
+            image: todayCard.image || "",
+            createdAt: todayCard.createdAt || nowIso
+          });
+        }
+
+        todayCard.entries.push(entry);
+        todayCard.subject = subject;
+        todayCard.text = text;
+        todayCard.image = imageData;
+        todayCard.dateKey = todayDateKey;
+        todayCard.updatedAt = nowIso;
+      } else {
         const newNote = {
-      id: makeId(),
-      author: currentAuthor,
-      dateKey: todayDateKey,
-      entries: [],
-      subject,
-      text,
-      image: "",
-      likes: 0,
-      liked: false,
-      comments: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      points: 0,
-      isMine: true
-    };
+          id: makeId(),
+          author: currentAuthor,
+          dateKey: todayDateKey,
+          entries: [entry],
+          subject,
+          text,
+          image: imageData,
+          likes: 0,
+          liked: false,
+          comments: [],
+          createdAt: nowIso,
+          updatedAt: nowIso,
+          points: 0,
+          isMine: true
+        };
+
+        notes.unshift(newNote);
+      }
+
+      saveNotes(notes);
+      renderNotes();
+      resetComposer();
+    }
 
     if (file) {
-  const reader = new FileReader();
-  reader.onload = function (event) {
-    newNote.image = event.target.result;
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        commitNoteWithImage(event.target.result);
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
 
-    notes.unshift(newNote);
-    saveNotes(notes);
-    renderNotes();
-
-    subjectEl.value = "";
-    textEl.value = "";
-    imageEl.value = "";
-
-    const previewWrap = document.getElementById("noteImagePreviewWrap");
-    const previewImg = document.getElementById("noteImagePreview");
-    if (previewWrap) previewWrap.style.display = "none";
-    if (previewImg) previewImg.src = "";
-
-    showMessage("投稿できたよ！");
-    setComposerOpen(false);
-  };
-  reader.readAsDataURL(file);
-  return;
-}
+    commitNoteWithImage("");
+    ｝
     
-
-    notes.unshift(newNote);
-    saveNotes(notes);
-    renderNotes();
-
-       subjectEl.value = "";
-    textEl.value = "";
-    imageEl.value = "";
-
-    showMessage("投稿できたよ！");
-    setComposerOpen(false);
-  }
-
   function editNote(noteId) {
     const notes = getNotes();
     const target = notes.find(note => note.id === noteId);
