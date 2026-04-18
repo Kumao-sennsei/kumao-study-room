@@ -1203,29 +1203,37 @@ async function startStudy(mode) {
   if (isStarting) return;
   isStarting = true;
 
-  try {
-    currentMode = mode;
-    totalSetIndex = 1;
-    transitionLock = false;
+ try {
+  currentMode = mode;
+  totalSetIndex = 1;
+  transitionLock = false;
 
-    // 音の解禁は少しだけ待つ
-    await Promise.race([
-      unlockAudioSystem(),
-      new Promise((resolve) => setTimeout(resolve, 250))
-    ]);
+  // iPad向け：開始タップ直後に音声とBGMを明示的に解禁
+  const voice = ensureVoiceObject();
+  voice.src = SILENT_WAV;
+  voice.muted = true;
+  await voice.play().catch(() => {});
+  voice.pause();
+  voice.currentTime = 0;
+  voice.muted = false;
 
-    // 画面遷移は止めない
-    await goToPhase("focus");
+  const ambient = ensureAmbientObject(mode);
+  ambient.muted = true;
+  await ambient.play().catch(() => {});
+  ambient.pause();
+  ambient.currentTime = 0;
+  ambient.muted = false;
 
-    // ここから先は裏でやる
-    requestWakeLock().catch((e) => {
-      console.error("[startStudy] wakeLock失敗:", e);
-    });
+  audioUnlocked = true;
 
-    primeAmbient(mode).catch((e) => {
-      console.error("[startStudy] primeAmbient失敗:", e);
-    });
-  } finally {
+  // 画面はそのまま進める
+  await goToPhase("focus");
+
+  // これは裏でよい
+  requestWakeLock().catch((e) => {
+    console.error("[startStudy] wakeLock失敗:", e);
+  });
+} finally {
     isStarting = false;
   }
 }
