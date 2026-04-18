@@ -1366,7 +1366,7 @@ function joinRoom() {
   if (isInRoom) return;
 
   isInRoom = true;
-  roomUsers.push("あなた");
+  roomUsers.push(CURRENT_USER_NAME);
   renderRoom();
 }
 
@@ -1374,7 +1374,7 @@ function leaveRoom() {
   if (!isInRoom) return;
 
   isInRoom = false;
-  roomUsers = roomUsers.filter(name => name !== "あなた");
+  roomUsers = roomUsers.filter(name => name !== CURRENT_USER_NAME);
   renderRoom();
 }
 
@@ -1429,7 +1429,7 @@ function updateFakeUsers() {
   }
 
   // 👤 表示更新（あなた＋偽物）
-  roomUsers = ["あなた", ...fakeUsers.map(u => u.name)];
+  roomUsers = [CURRENT_USER_NAME, ...fakeUsers.map(u => u.name)];
 
   renderRoom();
 }
