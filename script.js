@@ -993,7 +993,6 @@ function showRareButton(config) {
 
   let fired = false;
   const safeHandler = (e) => {
-    if (e) e.preventDefault();
     if (fired) return;
     fired = true;
 
