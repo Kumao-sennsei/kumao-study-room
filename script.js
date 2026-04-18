@@ -1204,25 +1204,28 @@ async function startStudy(mode) {
   isStarting = true;
 
   try {
-  currentMode = mode;
-  totalSetIndex = 1;
-  transitionLock = false;
+    currentMode = mode;
+    totalSetIndex = 1;
+    transitionLock = false;
 
-  // 音の解禁だけは、タップ直後に必ず待つ
-  await unlockAudioSystem();
+    // 音の解禁は少しだけ待つ
+    await Promise.race([
+      unlockAudioSystem(),
+      new Promise((resolve) => setTimeout(resolve, 250))
+    ]);
 
-  // 画面は先に進める
-  await goToPhase("focus");
+    // 画面遷移は止めない
+    await goToPhase("focus");
 
-  // ここから先は待たない
-  requestWakeLock().catch((e) => {
-    console.error("[startStudy] wakeLock失敗:", e);
-  });
+    // ここから先は裏でやる
+    requestWakeLock().catch((e) => {
+      console.error("[startStudy] wakeLock失敗:", e);
+    });
 
-  primeAmbient(mode).catch((e) => {
-    console.error("[startStudy] primeAmbient失敗:", e);
-  });
-} finally {
+    primeAmbient(mode).catch((e) => {
+      console.error("[startStudy] primeAmbient失敗:", e);
+    });
+  } finally {
     isStarting = false;
   }
 }
