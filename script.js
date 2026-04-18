@@ -1230,7 +1230,6 @@ async function startStudy(mode) {
 
 // 初期化
 showHomeUI();
-document.getElementById("subTitle").textContent = "集中する場所を選びな 😎💣 / v20260418-02";
 window.startStudy = startStudy;
 
 function bindStartStudyButtonsForIPad() {
