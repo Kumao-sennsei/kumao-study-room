@@ -1200,6 +1200,8 @@ function handlePhaseEnd() {
 }
 
 async function startStudy(mode) {
+  document.getElementById("subTitle").textContent = `startStudy入った: ${mode} / v20260418-03`;
+  
   if (isStarting) return;
   isStarting = true;
 
