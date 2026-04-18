@@ -620,6 +620,26 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   if (input) {
     input.disabled = true;
   }
+　      else {
+        const input = document.getElementById("currentUserNameInput");
+        const saveBtn = document.getElementById("saveUserNameBtn");
+        const status = document.getElementById("currentUserNameStatus");
+
+        if (input) {
+          input.disabled = false;
+        }
+
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "保存";
+        }
+
+        if (status) {
+          status.textContent = "現在：未登録";
+        }
+      }
+        
+        
 
   if (saveBtn) {
     saveBtn.disabled = true;
@@ -1067,6 +1087,15 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
 
       setCurrentUserName(nextName);
       syncCurrentUserNameUI();
+            currentUserNameInput.disabled = true;
+      saveUserNameBtn.disabled = true;
+      saveUserNameBtn.textContent = "登録ずみ";
+
+      const currentUserNameStatus = document.getElementById("currentUserNameStatus");
+      if (currentUserNameStatus) {
+        currentUserNameStatus.textContent = `現在：${nextName}（登録ずみ）`;
+      }
+      
       showMessage(`表示名を ${nextName} で登録したよ！`);
       console.log("create_initial_profile result:", data);
     } catch (e) {
