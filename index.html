@@ -495,111 +495,27 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   }
   
 
-  function renderNotes() {
-    const noteGrid = getNoteGrid();
-    if (!noteGrid) return;
+   function addNote() {
+    const subjectEl = document.getElementById("noteSubjectInput");
+    const textEl = document.getElementById("noteTextInput");
+    const imageEl = document.getElementById("noteImageInput");
+
+    if (!subjectEl || !textEl || !imageEl) return;
+
+    const subject = subjectEl.value.trim();
+    const text = textEl.value.trim();
+    const file = imageEl.files && imageEl.files[0];
+
+    if (!text) {
+      showMessage("学習メモを書いてね！", true);
+      textEl.focus();
+      return;
+    }
 
     const notes = getNotes();
-    renderNoteArchiveList(notes);
-
-    const recentNotes = notes.filter(note => isNoteWithinLastDays(note, 7));
-
-    noteGrid.innerHTML = recentNotes.map(note => {
-      
-      const imageHtml = note.image
-        ? `<img src="${escapeHtml(note.image)}" alt="ノート画像"
-            style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bottom:8px;">`
-        : "";
-
-      const subjectHtml = note.subject
-        ? `<div style="font-size:12px; color:#ffd54f; margin-bottom:4px;">${escapeHtml(note.subject)}</div>`
-        : "";
-
-      const actionHtml = note.isMine
-        ? `
-          <div style="display:flex; gap:6px; margin-top:10px;">
-            <button type="button" class="note-edit-btn" data-note-id="${escapeHtml(note.id)}"
-              style="padding:6px 10px; border:none; border-radius:6px; cursor:pointer; background:#64b5f6; color:#111; font-weight:bold;">
-              編集
-            </button>
-            <button type="button" class="note-delete-btn" data-note-id="${escapeHtml(note.id)}"
-              style="padding:6px 10px; border:none; border-radius:6px; cursor:pointer; background:#ef5350; color:#fff; font-weight:bold;">
-              削除
-            </button>
-          </div>
-        `
-        : "";
-
-            const commentsHtml = (note.comments || []).map(comment => `
-        <div style="margin-top:6px; padding:6px 8px; background:#111; border:1px solid #333; border-radius:8px; font-size:12px; line-height:1.5;">
-          <div style="color:#ffd54f; font-weight:bold; margin-bottom:2px;">${escapeHtml(comment.author)}</div>
-          <div style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(comment.text)}</div>
-        </div>
-      `).join("");
-
-      return `
-        <div class="noteCard" data-note-id="${escapeHtml(note.id)}" style="
-          background:#1a1a1a;
-          border:1px solid #333;
-          border-radius:10px;
-          padding:10px;
-          min-height:140px;
-          box-sizing:border-box;
-        ">
-          ${imageHtml}
-          ${subjectHtml}
-          <div style="white-space:pre-wrap; word-break:break-word; line-height:1.5;">${escapeHtml(note.text)}</div>
-          <div style="margin-top:8px; font-size:12px; color:#aaa;">
-            ${escapeHtml(note.author)} ・ ${escapeHtml(formatDate(note.createdAt))}
-          </div>
-          <div style="margin-top:6px;">
-  <button 
-    class="like-btn" 
-    data-note-id="${escapeHtml(note.id)}"
-    style="
-      background:${note.liked ? '#555' : '#ffd54f'};
-      color:${note.liked ? '#aaa' : '#111'};
-      border:none;
-      border-radius:6px;
-      padding:4px 8px;
-      cursor:${note.liked ? 'default' : 'pointer'};
-      font-weight:bold;
-    "
-  >
-    👍 ${Number(note.likes) || 0}
-  </button>
-</div>
-          <div style="margin-top:10px;">
-            <div style="font-size:12px; color:#bbb; margin-bottom:6px;">コメント</div>
-            ${commentsHtml}
-            <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-              <input
-                id="comment-input-${escapeHtml(note.id)}"
-                type="text"
-                placeholder="コメントを書く"
-                style="flex:1; padding:8px; border:1px solid #444; border-radius:6px; background:#111; color:#fff;"
-              />
-              <button
-                type="button"
-                class="note-comment-btn"
-                data-note-id="${escapeHtml(note.id)}"
-                style="padding:8px 10px; border:none; border-radius:6px; cursor:pointer; background:#81c784; color:#111; font-weight:bold;"
-              >
-                送信
-              </button>
-            </div>
-          </div>
-          
-          ${actionHtml}
-        </div>
-      `;
-    }).join("");
-  }
-
-     const notes = getNotes();
 
     const currentAuthor = "たかちゃん";
-    const currentMemberPlan = "paid"; // 今は仮固定。あとで free / paid 連動に置き換える
+    const currentMemberPlan = "paid"; // 今は仮固定。あとで free / paid に連動
     const dailyLimit = currentMemberPlan === "paid" ? 5 : 1;
 
     const todayDateKey = getNoteDateKey(new Date());
@@ -635,7 +551,6 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
           todayCard.entries = [];
         }
 
-        // 旧形式カードを初回だけ entries に退避
         if (
           todayCard.entries.length === 0 &&
           (todayCard.subject || todayCard.text || todayCard.image)
@@ -704,79 +619,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     }
 
     commitNoteWithImage("");
-  
-    function commitNoteWithImage(imageData = "") {
-      const nowIso = new Date().toISOString();
-
-      const entry = {
-        id: makeId(),
-        subject,
-        text,
-        image: imageData,
-        createdAt: nowIso
-      };
-
-      if (todayCard) {
-        if (!Array.isArray(todayCard.entries)) {
-          todayCard.entries = [];
-        }
-
-        if (
-          todayCard.entries.length === 0 &&
-          (todayCard.subject || todayCard.text || todayCard.image)
-        ) {
-          todayCard.entries.push({
-            id: makeId(),
-            subject: todayCard.subject || "",
-            text: todayCard.text || "",
-            image: todayCard.image || "",
-            createdAt: todayCard.createdAt || nowIso
-          });
-        }
-
-        todayCard.entries.push(entry);
-        todayCard.subject = subject;
-        todayCard.text = text;
-        todayCard.image = imageData;
-        todayCard.dateKey = todayDateKey;
-        todayCard.updatedAt = nowIso;
-      } else {
-        const newNote = {
-          id: makeId(),
-          author: currentAuthor,
-          dateKey: todayDateKey,
-          entries: [entry],
-          subject,
-          text,
-          image: imageData,
-          likes: 0,
-          liked: false,
-          comments: [],
-          createdAt: nowIso,
-          updatedAt: nowIso,
-          points: 0,
-          isMine: true
-        };
-
-        notes.unshift(newNote);
-      }
-
-      saveNotes(notes);
-      renderNotes();
-      resetComposer();
-    }
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        commitNoteWithImage(event.target.result);
-      };
-      reader.readAsDataURL(file);
-      return;
-    }
-
-    commitNoteWithImage("");
-    ｝
+  }
     
   function editNote(noteId) {
     const notes = getNotes();
