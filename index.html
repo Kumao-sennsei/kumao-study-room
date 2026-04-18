@@ -624,6 +624,35 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   saveNotes(notes);
   renderNotes();
 }
+
+  function addComment(noteId) {
+    const notes = getNotes();
+    const target = notes.find(note => note.id === noteId);
+    if (!target) return;
+
+    const input = document.getElementById(`comment-input-${noteId}`);
+    if (!input) return;
+
+    const text = input.value.trim();
+    if (!text) return;
+
+    if (!Array.isArray(target.comments)) {
+      target.comments = [];
+    }
+
+    target.comments.push({
+      id: makeId(),
+      author: "たかちゃん",
+      text,
+      createdAt: new Date().toISOString()
+    });
+
+    target.updatedAt = new Date().toISOString();
+
+    saveNotes(notes);
+    renderNotes();
+    showMessage("コメントできたよ！");
+  }
   
   function bindEvents() {
   const addBtn = document.getElementById("addNoteBtn");
@@ -674,6 +703,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
       const editBtn = e.target.closest(".note-edit-btn");
       const deleteBtn = e.target.closest(".note-delete-btn");
       const likeBtn = e.target.closest(".like-btn");
+      const commentBtn = e.target.closest(".note-comment-btn");
 
       if (editBtn) {
         editNote(editBtn.dataset.noteId);
@@ -687,6 +717,10 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
 
       if (likeBtn) {
         likeNote(likeBtn.dataset.noteId);
+        return;
+      }
+            if (commentBtn) {
+        addComment(commentBtn.dataset.noteId);
         return;
       }
     });
