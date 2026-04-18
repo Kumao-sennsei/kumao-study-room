@@ -486,14 +486,15 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
 
     const notes = getNotes();
 
-    const newNote = {
+        const newNote = {
       id: makeId(),
-      author: CURRENT_USER_NAME,
+      author: "たかちゃん",
       subject,
       text,
       image: "",
       likes: 0,
       liked: false,
+      comments: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       points: 0,
