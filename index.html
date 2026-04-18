@@ -596,26 +596,12 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     }).join("");
   }
 
-  function addNote() {
-    const subjectEl = document.getElementById("noteSubjectInput");
-    const textEl = document.getElementById("noteTextInput");
-    const imageEl = document.getElementById("noteImageInput");
-
-    if (!subjectEl || !textEl || !imageEl) return;
-
-    const subject = subjectEl.value.trim();
-    const text = textEl.value.trim();
-   const file = imageEl.files && imageEl.files[0];
-
-    if (!text) {
-      showMessage("学習メモを書いてね！", true);
-      textEl.focus();
-      return;
-    }
-
-       const notes = getNotes();
+     const notes = getNotes();
 
     const currentAuthor = "たかちゃん";
+    const currentMemberPlan = "paid"; // 今は仮固定。あとで free / paid 連動に置き換える
+    const dailyLimit = currentMemberPlan === "paid" ? 5 : 1;
+
     const todayDateKey = getNoteDateKey(new Date());
     const todayCard = findDailyNoteCard(notes, currentAuthor, todayDateKey);
 
@@ -633,6 +619,92 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
       setComposerOpen(false);
     }
 
+    function commitNoteWithImage(imageData = "") {
+      const nowIso = new Date().toISOString();
+
+      const entry = {
+        id: makeId(),
+        subject,
+        text,
+        image: imageData,
+        createdAt: nowIso
+      };
+
+      if (todayCard) {
+        if (!Array.isArray(todayCard.entries)) {
+          todayCard.entries = [];
+        }
+
+        // 旧形式カードを初回だけ entries に退避
+        if (
+          todayCard.entries.length === 0 &&
+          (todayCard.subject || todayCard.text || todayCard.image)
+        ) {
+          todayCard.entries.push({
+            id: makeId(),
+            subject: todayCard.subject || "",
+            text: todayCard.text || "",
+            image: todayCard.image || "",
+            createdAt: todayCard.createdAt || nowIso
+          });
+        }
+
+        const currentCount = todayCard.entries.length;
+        if (currentCount >= dailyLimit) {
+          showMessage(
+            currentMemberPlan === "paid"
+              ? "有料会員の今日の投稿上限は5回までだよ！"
+              : "無料会員の今日の投稿上限は1回までだよ！",
+            true
+          );
+          return;
+        }
+
+        todayCard.entries.push(entry);
+        todayCard.subject = subject;
+        todayCard.text = text;
+        todayCard.image = imageData;
+        todayCard.dateKey = todayDateKey;
+        todayCard.memberPlan = currentMemberPlan;
+        todayCard.updatedAt = nowIso;
+      } else {
+        const newNote = {
+          id: makeId(),
+          author: currentAuthor,
+          dateKey: todayDateKey,
+          memberPlan: currentMemberPlan,
+          entries: [entry],
+          subject,
+          text,
+          image: imageData,
+          likes: 0,
+          liked: false,
+          comments: [],
+          createdAt: nowIso,
+          updatedAt: nowIso,
+          points: 0,
+          isMine: true
+        };
+
+        notes.unshift(newNote);
+      }
+
+      saveNotes(notes);
+      renderNotes();
+      resetComposer();
+    }
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        commitNoteWithImage(event?.target?.result || "");
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    commitNoteWithImage("");
+  
     function commitNoteWithImage(imageData = "") {
       const nowIso = new Date().toISOString();
 
