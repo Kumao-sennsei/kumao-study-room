@@ -1418,7 +1418,7 @@ const samplePosts = [
 ];
 
 window.addEventListener("DOMContentLoaded", () => {
-  refreshStudyRoomView(samplePosts);
+  renderRoom();
 });
 
 const fakeNames = [
