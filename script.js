@@ -1203,37 +1203,16 @@ async function startStudy(mode) {
   if (isStarting) return;
   isStarting = true;
 
- try {
-  currentMode = mode;
-  totalSetIndex = 1;
-  transitionLock = false;
+  try {
+    currentMode = mode;
+    totalSetIndex = 1;
+    transitionLock = false;
 
-  // iPad向け：開始タップ直後に音声とBGMを明示的に解禁
-  const voice = ensureVoiceObject();
-  voice.src = SILENT_WAV;
-  voice.muted = true;
-  await voice.play().catch(() => {});
-  voice.pause();
-  voice.currentTime = 0;
-  voice.muted = false;
-
-  const ambient = ensureAmbientObject(mode);
-  ambient.muted = true;
-  await ambient.play().catch(() => {});
-  ambient.pause();
-  ambient.currentTime = 0;
-  ambient.muted = false;
-
-  audioUnlocked = true;
-
-  // 画面はそのまま進める
-  await goToPhase("focus");
-
-  // これは裏でよい
-  requestWakeLock().catch((e) => {
-    console.error("[startStudy] wakeLock失敗:", e);
-  });
-} finally {
+    await unlockAudioSystem();
+    await requestWakeLock();
+    await primeAmbient(mode);
+    await goToPhase("focus");
+  } finally {
     isStarting = false;
   }
 }
@@ -1241,43 +1220,6 @@ async function startStudy(mode) {
 // 初期化
 showHomeUI();
 window.startStudy = startStudy;
-
-function bindStartStudyButtonsForIPad() {
-  const startEls = Array.from(document.querySelectorAll("[onclick*='startStudy']"));
-
-  startEls.forEach((el) => {
-    if (el.dataset.startStudyBound === "1") return;
-
-    const attr = el.getAttribute("onclick") || "";
-    const match = attr.match(/startStudy\(['"]?(fire|forest|sea)['"]?\)/);
-    if (!match) return;
-
-    const mode = match[1];
-    let fired = false;
-
-    const handler = async (e) => {
-      if (e) e.stopPropagation();
-      if (fired) return;
-      fired = true;
-
-      try {
-        await startStudy(mode);
-      } finally {
-        setTimeout(() => {
-          fired = false;
-        }, 600);
-      }
-    };
-
-    el.onclick = handler;
-    el.onpointerup = handler;
-    el.ontouchend = handler;
-    el.dataset.startStudyBound = "1";
-  });
-}
-
-bindStartStudyButtonsForIPad();
-document.addEventListener("DOMContentLoaded", bindStartStudyButtonsForIPad);
 
 document.addEventListener("visibilitychange", async () => {
   if (document.visibilityState === "visible") {
