@@ -72,6 +72,65 @@
     ログアウト
   </button>
 </div>
+      <div
+  id="accessLimitModal"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.65);
+    z-index:30000;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  "
+>
+  <div
+    style="
+      width:100%;
+      max-width:420px;
+      background:#111827;
+      border:1px solid #374151;
+      border-radius:16px;
+      padding:22px 18px;
+      box-shadow:0 12px 30px rgba(0,0,0,0.35);
+      text-align:center;
+      color:#fff;
+    "
+  >
+    <div
+      id="accessLimitModalTitle"
+      style="font-size:22px; font-weight:bold; margin-bottom:12px;"
+    >
+      有料会員限定です🐻✨
+    </div>
+
+    <div
+      id="accessLimitModalBody"
+      style="font-size:14px; line-height:1.8; color:#d1d5db; margin-bottom:18px;"
+    >
+      この機能は有料会員のみ利用できます。
+    </div>
+
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <button
+        id="closeAccessLimitModalBtn"
+        type="button"
+        style="
+          padding:10px 16px;
+          border:none;
+          border-radius:10px;
+          background:#e5e7eb;
+          color:#111827;
+          font-weight:bold;
+          cursor:pointer;
+        "
+      >
+        閉じる
+      </button>
+    </div>
+  </div>
+</div>
 <div
   id="paidOnlyModal"
   style="
@@ -1114,33 +1173,43 @@ function syncCurrentUserNameUI() {
 }
 
   function addComment(noteId) {
-    const notes = getNotes();
-    const target = notes.find(note => note.id === noteId);
-    if (!target) return;
+  const currentMemberPlan = getCurrentMemberPlan();
 
-    const input = document.getElementById(`comment-input-${noteId}`);
-    if (!input) return;
-
-    const text = input.value.trim();
-    if (!text) return;
-
-    if (!Array.isArray(target.comments)) {
-      target.comments = [];
-    }
-
-    target.comments.push({
-      id: makeId(),
-      author: getCurrentUserName(),
-      text,
-      createdAt: new Date().toISOString()
-    });
-
-    target.updatedAt = new Date().toISOString();
-
-    saveNotes(notes);
-    renderNotes();
-    showMessage("コメントできたよ！");
+  if (currentMemberPlan !== "paid") {
+    openAccessLimitModal(
+      "コメント送信は有料会員限定です🐻✨",
+      "無料会員は自習室の閲覧・1日1回の投稿・いいねが利用できます。<br>コメント送信は有料会員で利用できます。"
+    );
+    return;
   }
+
+  const notes = getNotes();
+  const target = notes.find(note => note.id === noteId);
+  if (!target) return;
+
+  const input = document.getElementById(`comment-input-${noteId}`);
+  if (!input) return;
+
+  const text = input.value.trim();
+  if (!text) return;
+
+  if (!Array.isArray(target.comments)) {
+    target.comments = [];
+  }
+
+  target.comments.push({
+    id: makeId(),
+    author: getCurrentUserName(),
+    text,
+    createdAt: new Date().toISOString()
+  });
+
+  target.updatedAt = new Date().toISOString();
+
+  saveNotes(notes);
+  renderNotes();
+  showMessage("コメントできたよ！");
+}
   
   function bindEvents() {
   const addBtn = document.getElementById("addNoteBtn");
@@ -1376,6 +1445,24 @@ function syncCurrentUserNameUI() {
   }
 }
 
+  function openAccessLimitModal(title, body) {
+  const modal = document.getElementById("accessLimitModal");
+  const modalTitle = document.getElementById("accessLimitModalTitle");
+  const modalBody = document.getElementById("accessLimitModalBody");
+
+  if (!modal || !modalTitle || !modalBody) return;
+
+  modalTitle.textContent = title;
+  modalBody.innerHTML = body;
+  modal.style.display = "flex";
+}
+
+function closeAccessLimitModal() {
+  const modal = document.getElementById("accessLimitModal");
+  if (!modal) return;
+  modal.style.display = "none";
+}
+
 function openPaidOnlyModal() {
   const modal = document.getElementById("paidOnlyModal");
   if (!modal) return;
@@ -1419,6 +1506,21 @@ function initNotesFeature() {
 if (logoutBtn) {
   logoutBtn.addEventListener("click", handleLogoutClick);
 }
+
+const closeAccessLimitModalBtn = document.getElementById("closeAccessLimitModalBtn");
+if (closeAccessLimitModalBtn) {
+  closeAccessLimitModalBtn.addEventListener("click", closeAccessLimitModal);
+}
+
+const accessLimitModal = document.getElementById("accessLimitModal");
+if (accessLimitModal) {
+  accessLimitModal.addEventListener("click", (e) => {
+    if (e.target === accessLimitModal) {
+      closeAccessLimitModal();
+    }
+  });
+}
+  
  const closePaidOnlyModalBtn = document.getElementById("closePaidOnlyModalBtn");
 if (closePaidOnlyModalBtn) {
   closePaidOnlyModalBtn.addEventListener("click", closePaidOnlyModal);
