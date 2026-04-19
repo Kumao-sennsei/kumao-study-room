@@ -219,6 +219,50 @@
   </button>
 </div>
       <div
+  id="memberPlanTestBox"
+  style="
+    margin:0 0 18px;
+    padding:12px 16px;
+    border-radius:14px;
+    background:rgba(17, 24, 39, 0.92);
+    border:1px solid #374151;
+    color:#fff;
+    text-align:left;
+  "
+>
+  <div style="font-size:15px; font-weight:bold; margin-bottom:8px; color:#facc15;">
+    テスト用プラン切替
+  </div>
+
+  <div style="font-size:12px; line-height:1.7; color:#d1d5db; margin-bottom:10px;">
+    ログイン状態はそのままに、表示だけ無料/有料で切り替えて確認できます。
+  </div>
+
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <select
+      id="memberPlanSelect"
+      style="
+        padding:10px 12px;
+        border-radius:10px;
+        border:1px solid #4b5563;
+        background:#0b1220;
+        color:#fff;
+        font-size:14px;
+      "
+    >
+      <option value="free">無料会員</option>
+      <option value="paid">有料会員</option>
+    </select>
+
+    <div
+      id="memberPlanStatus"
+      style="font-size:13px; color:#e5e7eb;"
+    >
+      現在：無料会員（1日1回）
+    </div>
+  </div>
+</div>
+      <div
   id="planGuideBox"
   style="
     margin:0 0 18px;
