@@ -506,7 +506,6 @@
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  <script>
   function updateTopVisibility(isLoggedIn) {
     document.querySelectorAll(".guestOnly").forEach((el) => {
       el.style.display = isLoggedIn ? "none" : "";
@@ -516,7 +515,6 @@
       el.style.display = isLoggedIn ? "none" : "";
     });
   }
-</script>
 </script>
 
 <button id="backMainBtn" 
