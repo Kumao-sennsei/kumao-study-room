@@ -1361,33 +1361,39 @@ function syncCurrentUserNameUI() {
     });
   }
 
-  if (noteGrid) {
-    noteGrid.addEventListener("click", (e) => {
-      const editBtn = e.target.closest(".note-edit-btn");
-      const deleteBtn = e.target.closest(".note-delete-btn");
-      const likeBtn = e.target.closest(".like-btn");
-      const commentBtn = e.target.closest(".note-comment-btn");
+if (noteGrid) {
+  noteGrid.addEventListener("click", (e) => {
+    const target = e.target;
 
-      if (editBtn) {
-        editNote(editBtn.dataset.noteId);
-        return;
-      }
+    const editBtn = target.closest(".note-edit-btn");
+    if (editBtn) {
+      editNote(editBtn.dataset.noteId);
+      return;
+    }
 
-      if (deleteBtn) {
-        deleteNote(deleteBtn.dataset.noteId);
-        return;
-      }
+    const deleteBtn = target.closest(".note-delete-btn");
+    if (deleteBtn) {
+      deleteNote(deleteBtn.dataset.noteId);
+      return;
+    }
 
-      if (likeBtn) {
-        likeNote(likeBtn.dataset.noteId);
-        return;
-      }
-            if (commentBtn) {
-        addComment(commentBtn.dataset.noteId);
-        return;
-      }
-    });
-  }
+    const likeBtn = target.closest(".like-btn");
+    if (likeBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      likeNote(likeBtn.dataset.noteId);
+      return;
+    }
+
+    const commentBtn = target.closest(".note-comment-btn");
+    if (commentBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      addComment(commentBtn.dataset.noteId);
+      return;
+    }
+  });
+}
 }
   
 
