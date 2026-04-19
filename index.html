@@ -1230,22 +1230,64 @@ function syncCurrentUserNameUI() {
 }
   
 
-    function initNotesFeature() {
-    if (!getNoteGrid()) return;
-    getNotes();
-    renderNotes();
-    bindEvents();
-    syncMemberPlanUI();
-    syncCurrentUserNameUI();
-    syncProfileFromSupabase();
-    setComposerOpen(false);
-  }
+   async function handleGoStudyRoomClick() {
+  try {
+    const {
+      data: { session },
+      error
+    } = await supabaseClient.auth.getSession();
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initNotesFeature);
-  } else {
-    initNotesFeature();
+    if (error) {
+      console.error("session確認エラー", error);
+      window.location.href = "login.html";
+      return;
+    }
+
+    if (!session) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    const studyRoomView = document.getElementById("studyRoomView");
+    const backMainBtn = document.getElementById("backMainBtn");
+
+    if (studyRoomView) {
+      studyRoomView.style.display = "block";
+    }
+
+    if (backMainBtn) {
+      backMainBtn.style.display = "block";
+    }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (e) {
+    console.error("自習室移動エラー", e);
+    window.location.href = "login.html";
   }
+}
+
+function initNotesFeature() {
+  if (!getNoteGrid()) return;
+
+  getNotes();
+  renderNotes();
+  bindEvents();
+  syncMemberPlanUI();
+  syncCurrentUserNameUI();
+  syncProfileFromSupabase();
+  setComposerOpen(false);
+
+  const goStudyRoomBtn = document.getElementById("goStudyRoomBtn");
+  if (goStudyRoomBtn) {
+    goStudyRoomBtn.addEventListener("click", handleGoStudyRoomClick);
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initNotesFeature);
+} else {
+  initNotesFeature();
+}
 })();
 </script>
    
