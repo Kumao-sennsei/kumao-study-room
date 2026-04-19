@@ -567,9 +567,9 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   }
 
     function getCurrentMemberPlan() {
-    const savedPlan = localStorage.getItem("kumaoMemberPlan");
-    return savedPlan === "free" ? "free" : "paid";
-  }
+  const savedPlan = localStorage.getItem("kumaoMemberPlan");
+  return savedPlan === "paid" ? "paid" : "free";
+}
 
   function setCurrentMemberPlan(plan) {
     const safePlan = plan === "free" ? "free" : "paid";
