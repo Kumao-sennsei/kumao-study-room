@@ -162,7 +162,7 @@
       </div>
     </div>
 
-   <script src="script.js?v=20260419-03"></script>
+   <script src="script.js?v=20260419-04"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -661,6 +661,8 @@ function syncCurrentUserNameUI() {
     const input = document.getElementById("currentUserNameInput");
     const saveBtn = document.getElementById("saveUserNameBtn");
     const status = document.getElementById("currentUserNameStatus");
+    const authEntryBox = document.getElementById("authEntryBox");
+    const logoutEntryBox = document.getElementById("logoutEntryBox");
 
     if (!session) {
       setCurrentUserName("");
@@ -679,7 +681,23 @@ function syncCurrentUserNameUI() {
         status.textContent = "現在：未登録";
       }
 
+      if (authEntryBox) {
+        authEntryBox.style.display = "block";
+      }
+
+      if (logoutEntryBox) {
+        logoutEntryBox.style.display = "none";
+      }
+
       return;
+    }
+
+    if (authEntryBox) {
+      authEntryBox.style.display = "none";
+    }
+
+    if (logoutEntryBox) {
+      logoutEntryBox.style.display = "block";
     }
 
     const { data, error } = await supabaseClient
@@ -1286,6 +1304,24 @@ function syncCurrentUserNameUI() {
   }
 }
 
+  async function handleLogoutClick() {
+  try {
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+      console.error("ログアウトエラー", error);
+      return;
+    }
+
+    setCurrentUserName("");
+    localStorage.removeItem("kumaoCurrentUserName");
+
+    window.location.href = "index.html";
+  } catch (e) {
+    console.error("ログアウト失敗", e);
+  }
+}
+
 function initNotesFeature() {
   if (!getNoteGrid()) return;
 
@@ -1301,7 +1337,13 @@ function initNotesFeature() {
   if (goStudyRoomBtn) {
     goStudyRoomBtn.addEventListener("click", handleGoStudyRoomClick);
   }
+  const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", handleLogoutClick);
 }
+}
+
+  
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initNotesFeature);
