@@ -628,7 +628,7 @@ function syncCurrentUserNameUI() {
   }
 }
 
-  async function syncProfileFromSupabase() {
+ async function syncProfileFromSupabase() {
   try {
     const {
       data: { session },
@@ -707,6 +707,8 @@ function syncCurrentUserNameUI() {
       if (status) {
         status.textContent = "現在：未登録";
       }
+
+      window.location.href = "profile-setup.html";
     }
   } catch (e) {
     console.error("syncProfileFromSupabase エラー", e);
