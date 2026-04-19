@@ -73,6 +73,37 @@
   </button>
 </div>
       <div
+  id="planGuideBox"
+  style="
+    margin:0 0 22px;
+    padding:14px 16px;
+    border-radius:14px;
+    background:rgba(17, 24, 39, 0.92);
+    border:1px solid #374151;
+    color:#fff;
+    text-align:left;
+  "
+>
+  <div
+    id="planGuideTitle"
+    style="font-size:16px; font-weight:bold; margin-bottom:8px; color:#facc15;"
+  >
+    無料会員プラン
+  </div>
+
+  <div
+    id="planGuideBody"
+    style="font-size:13px; line-height:1.8; color:#d1d5db;"
+  >
+    ・自習室の閲覧<br>
+    ・ノート閲覧<br>
+    ・1日1回の投稿<br>
+    ・いいね可能<br>
+    ・コメント送信は不可<br>
+    ・ポモドーロ学習は不可
+  </div>
+</div>
+      <div
   id="accessLimitModal"
   style="
     display:none;
@@ -708,21 +739,35 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   }
 
   function syncMemberPlanUI() {
-    const select = document.getElementById("memberPlanSelect");
-    const status = document.getElementById("memberPlanStatus");
-    const plan = getCurrentMemberPlan();
+  const select = document.getElementById("memberPlanSelect");
+  const status = document.getElementById("memberPlanStatus");
+  const planGuideTitle = document.getElementById("planGuideTitle");
+  const planGuideBody = document.getElementById("planGuideBody");
+  const plan = getCurrentMemberPlan();
 
-    if (select) {
-      select.value = plan;
-    }
-
-    if (status) {
-      status.textContent =
-        plan === "free"
-          ? "現在：無料会員（1日1回）"
-          : "現在：有料会員（1日5回）";
-    }
+  if (select) {
+    select.value = plan;
   }
+
+  if (status) {
+    status.textContent =
+      plan === "free"
+        ? "現在：無料会員（1日1回）"
+        : "現在：有料会員（1日5回）";
+  }
+
+  if (planGuideTitle) {
+    planGuideTitle.textContent =
+      plan === "paid" ? "有料会員プラン" : "無料会員プラン";
+  }
+
+  if (planGuideBody) {
+    planGuideBody.innerHTML =
+      plan === "paid"
+        ? "・自習室の閲覧<br>・ノート閲覧<br>・1日5回まで投稿可能<br>・いいね可能<br>・コメント送信可能<br>・ポモドーロ学習が利用可能"
+        : "・自習室の閲覧<br>・ノート閲覧<br>・1日1回の投稿<br>・いいね可能<br>・コメント送信は不可<br>・ポモドーロ学習は不可";
+  }
+}
 
  function getCurrentUserName() {
   const savedName = localStorage.getItem("kumaoCurrentUserName");
