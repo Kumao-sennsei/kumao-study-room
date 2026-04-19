@@ -1048,6 +1048,18 @@ if (data?.display_name) {
       return;
     }
 
+    if (nextName.length < 2) {
+      showMessage("表示名は2文字以上で入力してね！", true);
+      currentUserNameInput?.focus();
+      return;
+    }
+
+    if (nextName.length > 12) {
+      showMessage("表示名は12文字以内で入力してね！", true);
+      currentUserNameInput?.focus();
+      return;
+    }
+
     try {
       saveUserNameBtn.disabled = true;
 
