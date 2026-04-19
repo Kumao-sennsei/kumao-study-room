@@ -650,9 +650,8 @@ if (data?.display_name) {
   if (status) {
     status.textContent = "現在：未登録";
   }
-}
-       
-    } catch (e) {
+　}
+  } catch (e) {
       console.error("syncProfileFromSupabase エラー", e);
     }
   }
@@ -1039,7 +1038,7 @@ if (data?.display_name) {
     });
   }
     
-　  if (saveUserNameBtn) {
+　 if (saveUserNameBtn) {
   saveUserNameBtn.addEventListener("click", async () => {
     const nextName = currentUserNameInput?.value?.trim() || "";
 
@@ -1052,7 +1051,7 @@ if (data?.display_name) {
     try {
       saveUserNameBtn.disabled = true;
 
-            const {
+      const {
         data: { session },
         error: sessionError
       } = await supabaseClient.auth.getSession();
@@ -1088,22 +1087,30 @@ if (data?.display_name) {
 
       setCurrentUserName(nextName);
       syncCurrentUserNameUI();
-            currentUserNameInput.disabled = true;
-      saveUserNameBtn.disabled = true;
-      saveUserNameBtn.textContent = "登録ずみ";
+
+      if (currentUserNameInput) {
+        currentUserNameInput.disabled = true;
+      }
+
+      if (saveUserNameBtn) {
+        saveUserNameBtn.disabled = true;
+        saveUserNameBtn.textContent = "登録ずみ";
+      }
 
       const currentUserNameStatus = document.getElementById("currentUserNameStatus");
       if (currentUserNameStatus) {
         currentUserNameStatus.textContent = `現在：${nextName}（登録ずみ）`;
       }
-      
+
       showMessage(`表示名を ${nextName} で登録したよ！`);
       console.log("create_initial_profile result:", data);
     } catch (e) {
       console.error(e);
       showMessage("保存中にエラーが起きたよ。", true);
     } finally {
-      saveUserNameBtn.disabled = false;
+      if (saveUserNameBtn && saveUserNameBtn.textContent !== "登録ずみ") {
+        saveUserNameBtn.disabled = false;
+      }
     }
   });
 }
