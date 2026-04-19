@@ -277,20 +277,10 @@ style="display:none; position:fixed; inset:0; background:#111; color:#fff; z-ind
         </button>
 
         <span id="noteFormMessage" style="font-size:12px; color:#bbb;"></span>
-              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px;">
-       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px;">
-  <label for="memberPlanSelect" style="font-size:12px; color:#bbb;">会員種別</label>
-  <select
-    id="memberPlanSelect"
-    style="padding:6px 10px; border-radius:8px; border:1px solid #444; background:#111; color:#fff;"
-  >
-    <option value="paid">有料会員</option>
-    <option value="free">無料会員</option>
-  </select>
-  <span id="memberPlanStatus" style="font-size:12px; color:#ffd54f;">現在：有料会員（1日5回）</span>
-</div>
-
-<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px;">
+             <div
+  id="currentUserNameBlock"
+  style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px;"
+>
   <label for="currentUserNameInput" style="font-size:12px; color:#bbb;">表示名</label>
   <input
     id="currentUserNameInput"
