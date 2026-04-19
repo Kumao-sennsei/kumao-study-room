@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>プラン・料金 | KUMAO STUDY ROOM</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+      color: #fff;
+      line-height: 1.8;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .backLink {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #e5e7eb;
+      color: #111827;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .hero {
+      background: rgba(17, 24, 39, 0.92);
+      border: 1px solid #374151;
+      border-radius: 22px;
+      padding: 30px 22px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+      margin-bottom: 22px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0 0 14px;
+      font-size: 40px;
+      line-height: 1.25;
+    }
+
+    .hero p {
+      margin: 0 auto;
+      max-width: 760px;
+      font-size: 17px;
+      color: #d1d5db;
+    }
+
+    .section {
+      background: rgba(17, 24, 39, 0.92);
+      border: 1px solid #374151;
+      border-radius: 20px;
+      padding: 24px 18px;
+      margin-bottom: 18px;
+    }
+
+    .section h2 {
+      margin: 0 0 14px;
+      font-size: 28px;
+      color: #facc15;
+    }
+
+    .section h3 {
+      margin: 18px 0 10px;
+      font-size: 22px;
+      color: #f3f4f6;
+    }
+
+    .section p {
+      margin: 0 0 10px;
+      color: #e5e7eb;
+      font-size: 16px;
+    }
+
+    .plans {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .planCard {
+      border-radius: 18px;
+      padding: 20px 16px;
+      border: 1px solid #374151;
+      background: #111827;
+    }
+
+    .planCard.free {
+      border-color: #4b5563;
+    }
+
+    .planCard.paid {
+      border-color: #facc15;
+      box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.15);
+    }
+
+    .planName {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .price {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #facc15;
+    }
+
+    .subText {
+      font-size: 14px;
+      color: #d1d5db;
+      margin-bottom: 14px;
+    }
+
+    .featureList {
+      margin: 0;
+      padding-left: 20px;
+      color: #f3f4f6;
+    }
+
+    .featureList li {
+      margin-bottom: 8px;
+    }
+
+    .notice {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(250, 204, 21, 0.08);
+      border: 1px solid rgba(250, 204, 21, 0.3);
+      color: #fef3c7;
+      font-size: 14px;
+    }
+
+    .ctaRow {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .ctaBtn {
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .ctaBtn.primary {
+      background: #facc15;
+      color: #111827;
+    }
+
+    .ctaBtn.secondary {
+      background: #60a5fa;
+      color: #111827;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .plans {
+        grid-template-columns: 1fr;
+      }
+
+      .section h2 {
+        font-size: 24px;
+      }
+
+      .section h3 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a class="backLink" href="index.html">← TOPへ戻る</a>
+    </div>
+
+    <section class="hero">
+      <h1>KUMAO STUDY ROOM ご利用プラン</h1>
+      <p>
+        KUMAO STUDY ROOMは、全国のがんばりやさんが集まり、
+        励まし合いながら学べるオンライン自習室です。<br>
+        自習室そのものは無料で参加できます。<br>
+        さらに、もっと集中したい方のために、
+        有料プラン（月額990円・税込）をご用意しています。
+      </p>
+
+      <div class="ctaRow" style="justify-content:center;">
+        <a class="ctaBtn primary" href="signup.html">新規登録する</a>
+        <a class="ctaBtn secondary" href="login.html">ログインする</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>プラン比較</h2>
+
+      <div class="plans">
+        <div class="planCard free">
+          <div class="planName">無料会員</div>
+          <div class="price">0円</div>
+          <div class="subText">まずは雰囲気を体験したい方向け</div>
+          <ul class="featureList">
+            <li>自習室の利用</li>
+            <li>ノート・写真投稿（1日1回まで）</li>
+            <li>他の人の投稿やコメントの閲覧</li>
+            <li>いいね</li>
+          </ul>
+
+          <div class="notice">
+            無料会員では利用できない機能<br>
+            ・ポモドーロ学習<br>
+            ・コメント投稿<br>
+            ・音声ガチャ<br>
+            ・くまおっち育成
+          </div>
+        </div>
+
+        <div class="planCard paid">
+          <div class="planName">有料会員</div>
+          <div class="price">月額990円（税込）</div>
+          <div class="subText">集中を続けたい方向けの拡張プラン</div>
+          <ul class="featureList">
+            <li>自習室の利用</li>
+            <li>ポモドーロ学習</li>
+            <li>音声ガチャ</li>
+            <li>くまおっち育成</li>
+            <li>ノート・写真投稿（1日5回まで）</li>
+            <li>コメント投稿</li>
+            <li>いいね</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>表示名について</h2>
+      <p>
+        表示名は登録時に設定し、その後は変更できません。<br>
+        また、同じ表示名は使用できません。<br>
+        すでに使われている表示名は登録できないため、別の名前を設定してください。
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>ノート投稿について</h2>
+      <p>
+        ノート投稿は、その日の頑張りを1枚のカードにまとめて残せる仕組みです。<br>
+        同じ日に複数回投稿した場合でも、カードが増え続けるのではなく、
+        その日のカードの中に記録が追加されていきます。<br>
+        これにより、今日どれだけ頑張ったかがひと目で分かります。
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>コメントについて</h2>
+      <p>
+        コメントは、みんなで見られる公開形式です。<br>
+        ただし、コメントを書き込めるのは有料会員のみです。<br>
+        無料会員は、コメントを見ることはできますが、書くことはできません。
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>アバターについて</h2>
+      <p>
+        無料会員は、シンプルなデフォルトアバターで利用します。<br>
+        有料会員は、学びを続けることで「くまおっち」を育てていくことができます。<br>
+        続けるほど成長していく、ちょっとした楽しみも用意しています。
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>まずは無料で体験</h2>
+      <p>
+        まずは無料会員で、自習室の雰囲気や仲間の頑張りを感じてみてください。<br>
+        「もっと集中したい」「毎日続けたい」と思ったら、有料会員でさらに深く使えます。
+      </p>
+
+      <div class="ctaRow">
+        <a class="ctaBtn primary" href="signup.html">無料で始める</a>
+        <a class="ctaBtn secondary" href="index.html">TOPに戻る</a>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
