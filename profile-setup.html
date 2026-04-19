@@ -192,27 +192,33 @@
     }
 
     async function checkExistingProfile() {
-      const session = await ensureLoggedIn();
-      if (!session) return null;
+  const session = await ensureLoggedIn();
+  if (!session) return null;
 
-      const { data, error } = await supabaseClient
-        .from("profiles")
-        .select("display_name")
-        .eq("id", session.user.id)
-        .maybeSingle();
+  try {
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("display_name")
+      .eq("id", session.user.id)
+      .maybeSingle();
 
-      if (error) {
-        showMessage("プロフィール確認でエラーが起きたよ", "error");
-        return null;
-      }
-
-      if (data?.display_name) {
-        window.location.href = "index.html";
-        return null;
-      }
-
-      return session;
+    if (error) {
+      showMessage("プロフィール確認でエラーが起きたよ", "error");
+      return null;
     }
+
+    if (data?.display_name && data.display_name.trim() !== "") {
+      window.location.replace("index.html");
+      return null;
+    }
+
+    return session;
+  } catch (e) {
+    console.error("checkExistingProfile error", e);
+    showMessage("プロフィール確認でエラーが起きたよ", "error");
+    return null;
+  }
+}
 
     async function handleProfileSetup() {
       const displayName = displayNameInput.value.trim();
