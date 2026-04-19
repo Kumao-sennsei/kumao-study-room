@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>初回表示名登録 | KUMAO STUDY ROOM</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(17, 24, 39, 0.96);
+      border: 1px solid #374151;
+      border-radius: 18px;
+      padding: 28px 22px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .subtitle {
+      margin: 0 0 20px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #d1d5db;
+      text-align: center;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #f3f4f6;
+    }
+
+    .input {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 12px;
+      border: 1px solid #4b5563;
+      background: #0b1220;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .input:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    }
+
+    .button {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #facc15;
+      color: #111827;
+      margin-top: 8px;
+    }
+
+    .button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .message {
+      min-height: 24px;
+      margin-top: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #d1d5db;
+      text-align: center;
+      white-space: pre-wrap;
+    }
+
+    .message.error {
+      color: #fca5a5;
+    }
+
+    .message.success {
+      color: #86efac;
+    }
+
+    .ruleBox {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid #374151;
+      font-size: 13px;
+      line-height: 1.8;
+      color: #d1d5db;
+    }
+
+    .ruleBox strong {
+      color: #fef3c7;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 class="title">初回表示名登録</h1>
+    <p class="subtitle">
+      自習室やノートに表示される名前を決めよう🐻✨<br>
+      表示名は<strong>最初の1回だけ</strong>登録できます。
+    </p>
+
+    <div class="field">
+      <label class="label" for="displayNameInput">表示名</label>
+      <input
+        id="displayNameInput"
+        class="input"
+        type="text"
+        placeholder="表示名を入力してください"
+        maxlength="12"
+        autocomplete="off"
+      />
+    </div>
+
+    <button id="saveProfileBtn" class="button" type="button">登録する</button>
+
+    <div id="messageBox" class="message"></div>
+
+    <div class="ruleBox">
+      <div><strong>ルール</strong></div>
+      <div>・表示名は 2文字以上 12文字以内</div>
+      <div>・他の人と重複する名前は使えません</div>
+      <div>・登録できるのは最初の1回だけです</div>
+      <div>・登録後は変更できません</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://jhsoakmlxbanbxlrhngb.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_veO7IC4DhSERkOMfsBPpMA_57UeYuwO";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const displayNameInput = document.getElementById("displayNameInput");
+    const saveProfileBtn = document.getElementById("saveProfileBtn");
+    const messageBox = document.getElementById("messageBox");
+
+    function showMessage(text, type = "") {
+      messageBox.textContent = text;
+      messageBox.className = "message";
+      if (type) {
+        messageBox.classList.add(type);
+      }
+    }
+
+    async function ensureLoggedIn() {
+      const {
+        data: { session },
+        error
+      } = await supabaseClient.auth.getSession();
+
+      if (error || !session) {
+        window.location.href = "login.html";
+        return null;
+      }
+
+      return session;
+    }
+
+    async function checkExistingProfile() {
+      const session = await ensureLoggedIn();
+      if (!session) return null;
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("display_name")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (error) {
+        showMessage("プロフィール確認でエラーが起きたよ", "error");
+        return null;
+      }
+
+      if (data?.display_name) {
+        window.location.href = "index.html";
+        return null;
+      }
+
+      return session;
+    }
+
+    async function handleProfileSetup() {
+      const displayName = displayNameInput.value.trim();
+
+      if (!displayName) {
+        showMessage("表示名を入力してね", "error");
+        displayNameInput.focus();
+        return;
+      }
+
+      if (displayName.length < 2) {
+        showMessage("表示名は2文字以上で入力してね", "error");
+        displayNameInput.focus();
+        return;
+      }
+
+      if (displayName.length > 12) {
+        showMessage("表示名は12文字以内で入力してね", "error");
+        displayNameInput.focus();
+        return;
+      }
+
+      const session = await ensureLoggedIn();
+      if (!session) return;
+
+      try {
+        saveProfileBtn.disabled = true;
+        showMessage("登録中です…");
+
+        const { data, error } = await supabaseClient.rpc("create_initial_profile", {
+          p_display_name: displayName
+        });
+
+        if (error) {
+          const msg = String(error.message || "").toLowerCase();
+
+          if (msg.includes("duplicate")) {
+            showMessage("その表示名はもう使われているよ！別の名前にしてね。", "error");
+            return;
+          }
+
+          if (msg.includes("profile already exists")) {
+            showMessage("このアカウントはもう表示名登録ずみだよ", "error");
+            setTimeout(() => {
+              window.location.href = "index.html";
+            }, 1000);
+            return;
+          }
+
+          showMessage("登録できなかったよ: " + error.message, "error");
+          return;
+        }
+
+        console.log("create_initial_profile result:", data);
+        showMessage("表示名を登録したよ😊 メイン画面へ移動します。", "success");
+
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1000);
+      } catch (e) {
+        console.error(e);
+        showMessage("登録中にエラーが起きたよ", "error");
+      } finally {
+        saveProfileBtn.disabled = false;
+      }
+    }
+
+    saveProfileBtn.addEventListener("click", handleProfileSetup);
+
+    displayNameInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        handleProfileSetup();
+      }
+    });
+
+    checkExistingProfile();
+  </script>
+</body>
+</html>
