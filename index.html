@@ -72,7 +72,61 @@
     ログアウト
   </button>
 </div>
+<div
+  id="paidOnlyModal"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.65);
+    z-index:30000;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  "
+>
+  <div
+    style="
+      width:100%;
+      max-width:420px;
+      background:#111827;
+      border:1px solid #374151;
+      border-radius:16px;
+      padding:22px 18px;
+      box-shadow:0 12px 30px rgba(0,0,0,0.35);
+      text-align:center;
+      color:#fff;
+    "
+  >
+    <div style="font-size:22px; font-weight:bold; margin-bottom:12px;">
+      ポモドーロ学習は有料会員限定です🐻✨
+    </div>
 
+    <div style="font-size:14px; line-height:1.8; color:#d1d5db; margin-bottom:18px;">
+      無料会員は自習室の閲覧が利用できます。<br>
+      ポモドーロ学習・投稿・コメントは有料会員で利用できます。
+    </div>
+
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <button
+        id="closePaidOnlyModalBtn"
+        type="button"
+        style="
+          padding:10px 16px;
+          border:none;
+          border-radius:10px;
+          background:#e5e7eb;
+          color:#111827;
+          font-weight:bold;
+          cursor:pointer;
+        "
+      >
+        閉じる
+      </button>
+    </div>
+  </div>
+</div>
+      
       <!-- レアボイスボタン -->
       <button id="rareBtn" class="hidden" type="button">
         レアボイス当選！おめでとう🎉 押してみてね🐻✨
@@ -1322,16 +1376,29 @@ function syncCurrentUserNameUI() {
   }
 }
 
+function openPaidOnlyModal() {
+  const modal = document.getElementById("paidOnlyModal");
+  if (!modal) return;
+  modal.style.display = "flex";
+}
+
+function closePaidOnlyModal() {
+  const modal = document.getElementById("paidOnlyModal");
+  if (!modal) return;
+  modal.style.display = "none";
+}
+  
   function handleModeStart(mode) {
   const plan = getCurrentMemberPlan();
 
   if (plan !== "paid") {
-    alert("ポモドーロ学習は有料会員限定です🐻✨\n無料会員は自習室の閲覧が利用できます。");
+    openPaidOnlyModal();
     return;
   }
 
   startStudy(mode);
 }
+  
 
 function initNotesFeature() {
   if (!getNoteGrid()) return;
@@ -1352,9 +1419,20 @@ function initNotesFeature() {
 if (logoutBtn) {
   logoutBtn.addEventListener("click", handleLogoutClick);
 }
+ const closePaidOnlyModalBtn = document.getElementById("closePaidOnlyModalBtn");
+if (closePaidOnlyModalBtn) {
+  closePaidOnlyModalBtn.addEventListener("click", closePaidOnlyModal);
 }
 
-  
+const paidOnlyModal = document.getElementById("paidOnlyModal");
+if (paidOnlyModal) {
+  paidOnlyModal.addEventListener("click", (e) => {
+    if (e.target === paidOnlyModal) {
+      closePaidOnlyModal();
+    }
+  });
+} 
+} 
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initNotesFeature);
