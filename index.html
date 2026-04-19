@@ -561,29 +561,29 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     }
   }
 
-  function getCurrentUserName() {
-    const savedName = localStorage.getItem("kumaoCurrentUserName");
-    return savedName && savedName.trim() ? savedName.trim() : "たかちゃん";
+ function getCurrentUserName() {
+  const savedName = localStorage.getItem("kumaoCurrentUserName");
+  return savedName && savedName.trim() ? savedName.trim() : "";
+}
+
+function setCurrentUserName(name) {
+  const safeName = name && name.trim() ? name.trim() : "";
+  localStorage.setItem("kumaoCurrentUserName", safeName);
+}
+
+function syncCurrentUserNameUI() {
+  const input = document.getElementById("currentUserNameInput");
+  const status = document.getElementById("currentUserNameStatus");
+  const name = getCurrentUserName();
+
+  if (input) {
+    input.value = name;
   }
 
-  function setCurrentUserName(name) {
-    const safeName = name && name.trim() ? name.trim() : "たかちゃん";
-    localStorage.setItem("kumaoCurrentUserName", safeName);
+  if (status) {
+    status.textContent = name ? `現在：${name}` : "現在：未登録";
   }
-
-    function syncCurrentUserNameUI() {
-    const input = document.getElementById("currentUserNameInput");
-    const status = document.getElementById("currentUserNameStatus");
-    const name = getCurrentUserName();
-
-    if (input) {
-      input.value = name;
-    }
-
-    if (status) {
-      status.textContent = `現在：${name}`;
-    }
-  }
+}
 
   async function syncProfileFromSupabase() {
     try {
