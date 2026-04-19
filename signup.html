@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>新規会員登録 | KUMAO STUDY ROOM</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid #374151;
+      border-radius: 18px;
+      padding: 28px 22px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .subtitle {
+      margin: 0 0 22px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #d1d5db;
+      text-align: center;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #f3f4f6;
+    }
+
+    .input {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 12px;
+      border: 1px solid #4b5563;
+      background: #0b1220;
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .input:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    }
+
+    .button {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #facc15;
+      color: #111827;
+      margin-top: 8px;
+    }
+
+    .button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .message {
+      min-height: 24px;
+      margin-top: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #d1d5db;
+      text-align: center;
+      white-space: pre-wrap;
+    }
+
+    .message.error {
+      color: #fca5a5;
+    }
+
+    .message.success {
+      color: #86efac;
+    }
+
+    .linkRow {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 14px;
+      color: #d1d5db;
+    }
+
+    .linkRow a {
+      color: #93c5fd;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .linkRow a:hover {
+      text-decoration: underline;
+    }
+
+    .note {
+      margin-top: 18px;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #9ca3af;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 class="title">新規会員登録</h1>
+    <p class="subtitle">
+      メールアドレスとパスワードを登録して、自習室を始めよう🐻✨
+    </p>
+
+    <div class="field">
+      <label class="label" for="emailInput">メールアドレス</label>
+      <input
+        id="emailInput"
+        class="input"
+        type="email"
+        placeholder="メールアドレスを入力"
+        autocomplete="email"
+      />
+    </div>
+
+    <div class="field">
+      <label class="label" for="passwordInput">パスワード</label>
+      <input
+        id="passwordInput"
+        class="input"
+        type="password"
+        placeholder="パスワードを入力"
+        autocomplete="new-password"
+      />
+    </div>
+
+    <div class="field">
+      <label class="label" for="passwordConfirmInput">パスワード確認</label>
+      <input
+        id="passwordConfirmInput"
+        class="input"
+        type="password"
+        placeholder="パスワードをもう一度入力"
+        autocomplete="new-password"
+      />
+    </div>
+
+    <button id="signupBtn" class="button" type="button">登録する</button>
+
+    <div id="messageBox" class="message"></div>
+
+    <div class="linkRow">
+      すでにアカウントがある方は
+      <a href="login.html">ログイン画面へ</a>
+    </div>
+
+    <div class="note">
+      登録後、ログインしてから初回表示名を設定します。
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://jhsoakmlxbanbxlrhngb.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_veO7IC4DhSERkOMfsBPpMA_57UeYuwO";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const emailInput = document.getElementById("emailInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const passwordConfirmInput = document.getElementById("passwordConfirmInput");
+    const signupBtn = document.getElementById("signupBtn");
+    const messageBox = document.getElementById("messageBox");
+
+    function showMessage(text, type = "") {
+      messageBox.textContent = text;
+      messageBox.className = "message";
+      if (type) {
+        messageBox.classList.add(type);
+      }
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    async function handleSignup() {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const passwordConfirm = passwordConfirmInput.value;
+
+      if (!email) {
+        showMessage("メールアドレスを入力してね", "error");
+        emailInput.focus();
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        showMessage("正しいメールアドレス形式で入力してね", "error");
+        emailInput.focus();
+        return;
+      }
+
+      if (!password) {
+        showMessage("パスワードを入力してね", "error");
+        passwordInput.focus();
+        return;
+      }
+
+      if (password.length < 6) {
+        showMessage("パスワードは6文字以上で入力してね", "error");
+        passwordInput.focus();
+        return;
+      }
+
+      if (!passwordConfirm) {
+        showMessage("確認用パスワードを入力してね", "error");
+        passwordConfirmInput.focus();
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        showMessage("パスワードが一致していないよ", "error");
+        passwordConfirmInput.focus();
+        return;
+      }
+
+      try {
+        signupBtn.disabled = true;
+        showMessage("登録中です…");
+
+        const { error } = await supabaseClient.auth.signUp({
+          email,
+          password
+        });
+
+        if (error) {
+          const msg = String(error.message || "").toLowerCase();
+
+          if (
+            msg.includes("already registered") ||
+            msg.includes("already been registered") ||
+            msg.includes("user already registered")
+          ) {
+            showMessage("このメールアドレスはすでに登録されているよ", "error");
+            return;
+          }
+
+          showMessage("登録できなかったよ: " + error.message, "error");
+          return;
+        }
+
+        showMessage("登録できたよ😊 ログイン画面へ移動します。", "success");
+
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 1200);
+      } catch (e) {
+        console.error(e);
+        showMessage("登録中にエラーが起きたよ", "error");
+      } finally {
+        signupBtn.disabled = false;
+      }
+    }
+
+    signupBtn.addEventListener("click", handleSignup);
+
+    passwordConfirmInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        handleSignup();
+      }
+    });
+  </script>
+</body>
+</html>
