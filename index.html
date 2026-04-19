@@ -604,7 +604,9 @@ function setCurrentUserName(name) {
 }
 
 function syncCurrentUserNameUI() {
+  const block = document.getElementById("currentUserNameBlock");
   const input = document.getElementById("currentUserNameInput");
+  const saveBtn = document.getElementById("saveUserNameBtn");
   const status = document.getElementById("currentUserNameStatus");
   const name = getCurrentUserName();
 
@@ -614,6 +616,15 @@ function syncCurrentUserNameUI() {
 
   if (status) {
     status.textContent = name ? `現在：${name}` : "現在：未登録";
+  }
+
+  if (block) {
+    block.style.display = name ? "none" : "flex";
+  }
+
+  if (saveBtn && name) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = "登録ずみ";
   }
 }
 
