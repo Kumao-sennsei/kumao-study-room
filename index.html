@@ -134,11 +134,11 @@
       </div>
 
       <!-- メニュー -->
-      <div id="startMenu">
-        <button class="modeBtn" onclick="startStudy('fire')">🔥　闘志の火を燃やす</button>
-        <button class="modeBtn" onclick="startStudy('forest')">🌲　思考の森に入る</button>
-        <button class="modeBtn" onclick="startStudy('sea')">🌊　静寂の海に沈む</button>
-      </div>
+     <div id="startMenu">
+  <button class="modeBtn" onclick="handleModeStart('fire')">🔥　闘志の火を燃やす</button>
+  <button class="modeBtn" onclick="handleModeStart('forest')">🌲　思考の森に入る</button>
+  <button class="modeBtn" onclick="handleModeStart('sea')">🌊　静寂の海に沈む</button>
+</div>
     </div>
 
          <!-- 右 -->
@@ -1320,6 +1320,17 @@ function syncCurrentUserNameUI() {
   } catch (e) {
     console.error("ログアウト失敗", e);
   }
+}
+
+  function handleModeStart(mode) {
+  const plan = getCurrentMemberPlan();
+
+  if (plan !== "paid") {
+    alert("ポモドーロ学習は有料会員限定です🐻✨\n無料会員は自習室の閲覧が利用できます。");
+    return;
+  }
+
+  startStudy(mode);
 }
 
 function initNotesFeature() {
