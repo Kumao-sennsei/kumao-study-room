@@ -8,27 +8,39 @@
   <style>
 @media (max-width: 768px) {
   #kumaoSenseiIntro > div {
-    flex-direction: column;
-    align-items: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
   }
 
   #kumaoSenseiImg {
     order: 1 !important;
-    margin-bottom: 8px;
+    display: block !important;
+    margin: 0 0 10px auto !important;
   }
 
   #kumaoSenseiTextBox {
     order: 2 !important;
+    width: 100% !important;
     min-width: 0 !important;
-    width: 100%;
-    text-align: center !important;
+    text-align: right !important;
   }
 
-  #kumaoSenseiTextBox > div {
-    text-align: center !important;
+  #kumaoSenseiTextBox > div:first-child {
+    text-align: right !important;
+    margin-bottom: 10px !important;
+  }
+
+  #kumaoSenseiTextBox > div:last-child {
+    text-align: right !important;
+    max-width: 78% !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    line-height: 1.9 !important;
   }
 }
 </style>
+  
   
 </head>
 <body>
