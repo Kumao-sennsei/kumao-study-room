@@ -5,6 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KUMAO STUDY ROOM</title>
  <link rel="stylesheet" href="style.css?v=20260415-02">
+  <style>
+@media (max-width: 768px) {
+  #kumaoSenseiIntro > div {
+    flex-direction: column;
+    align-items: center !important;
+  }
+
+  #kumaoSenseiImg {
+    order: 1 !important;
+    margin-bottom: 8px;
+  }
+
+  #kumaoSenseiTextBox {
+    order: 2 !important;
+    min-width: 0 !important;
+    width: 100%;
+    text-align: center !important;
+  }
+
+  #kumaoSenseiTextBox > div {
+    text-align: center !important;
+  }
+}
+</style>
 </head>
 <body>
   <div id="app">
@@ -121,38 +145,40 @@
   "
 >
   <div
-    style="
-      display:flex;
-      align-items:center;
-      gap:14px;
-      flex-wrap:wrap;
-    "
-  >
-    <div style="flex:1; min-width:220px; text-align:right;">
-      <div style="font-size:20px; font-weight:800; color:#111827; margin-bottom:8px; text-align:right;">
-        くまお先生
-      </div>
-
-      <div style="font-size:13px; line-height:1.9; color:#374151; text-align:right;">
-        東大教授10人分の頭脳を持つ、生徒にとことん寄り添うやさしい先生。<br>
-        むずかしいことも、やさしく・楽しく・わかるまで一緒に進めてくれる。<br>
-        ドンくまお伝説の欠片の中には、ある“つながり”の気配もあるらしい。
-      </div>
+  style="
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+  "
+>
+  <div style="flex:1; min-width:220px; text-align:right; order:2;" id="kumaoSenseiTextBox">
+    <div style="font-size:20px; font-weight:800; color:#111827; margin-bottom:8px; text-align:right;">
+      くまお先生
     </div>
 
-    <img
-      src="kumao_teacher.png"
-      alt="くまお先生"
-      style="
-        width:88px;
-        height:88px;
-        object-fit:cover;
-        border-radius:16px;
-        border:2px solid #60a5fa;
-        background:#fff;
-      "
-    />
+    <div style="font-size:13px; line-height:1.9; color:#374151; text-align:right;">
+      東大教授10人分の頭脳を持つ、生徒にとことん寄り添うやさしい先生。<br>
+      むずかしいことも、やさしく・楽しく・わかるまで一緒に進めてくれる。<br>
+      ドンくまお伝説の欠片の中には、ある“つながり”の気配もあるらしい。
+    </div>
   </div>
+
+  <img
+    src="kumao_teacher.png"
+    alt="くまお先生"
+    id="kumaoSenseiImg"
+    style="
+      width:88px;
+      height:88px;
+      object-fit:cover;
+      border-radius:16px;
+      border:2px solid #60a5fa;
+      background:#fff;
+      order:1;
+    "
+  />
+</div>
 </div>
       <div class="guestOnly" style="margin:10px 0 18px; text-align:center;">
   <a
