@@ -5,8 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KUMAO STUDY ROOM</title>
  <link rel="stylesheet" href="style.css?v=20260415-02">
-  <style>
+ <style>
 @media (max-width: 768px) {
+  #kumaoSenseiIntro {
+    display: block !important;
+    max-width: 86% !important;
+    margin: 8px 0 18px auto !important;
+  }
+
   #kumaoSenseiIntro > div {
     display: flex !important;
     flex-direction: column !important;
@@ -16,7 +22,7 @@
   #kumaoSenseiImg {
     order: 1 !important;
     display: block !important;
-    margin: 0 0 10px auto !important;
+    margin: 0 0 12px auto !important;
   }
 
   #kumaoSenseiTextBox {
@@ -28,15 +34,15 @@
 
   #kumaoSenseiTextBox > div:first-child {
     text-align: right !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 12px !important;
   }
 
   #kumaoSenseiTextBox > div:last-child {
-    text-align: right !important;
-    max-width: 78% !important;
+    text-align: left !important;
+    max-width: 88% !important;
     margin-left: auto !important;
     margin-right: 0 !important;
-    line-height: 1.9 !important;
+    line-height: 1.95 !important;
   }
 }
 </style>
@@ -165,7 +171,7 @@
     flex-wrap:wrap;
   "
 >
-  <div style="flex:1; min-width:220px; text-align:right; order:2;" id="kumaoSenseiTextBox">
+  <div style="flex:1; min-width:220px; text-align:right; order:1;" id="kumaoSenseiTextBox">
     <div style="font-size:20px; font-weight:800; color:#111827; margin-bottom:8px; text-align:right;">
       くまお先生
     </div>
@@ -178,19 +184,19 @@
   </div>
 
   <img
-    src="kumao_teacher.png"
-    alt="くまお先生"
-    id="kumaoSenseiImg"
-    style="
-      width:88px;
-      height:88px;
-      object-fit:cover;
-      border-radius:16px;
-      border:2px solid #60a5fa;
-      background:#fff;
-      order:1;
-    "
-  />
+  src="kumao_teacher.png"
+  alt="くまお先生"
+  id="kumaoSenseiImg"
+  style="
+    width:88px;
+    height:88px;
+    object-fit:cover;
+    border-radius:16px;
+    border:2px solid #60a5fa;
+    background:#fff;
+    order:2;
+  "
+/>
 </div>
 </div>
       <div class="guestOnly" style="margin:10px 0 18px; text-align:center;">
