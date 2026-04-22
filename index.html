@@ -1894,8 +1894,9 @@ function closePaidOnlyModal() {
   
   function handleModeStart(mode) {
   const plan = getCurrentMemberPlan();
+  const FORCE_AUDIO_TEST = true; // テスト中だけ true。本番前に false に戻す
 
-  if (plan !== "paid") {
+  if (plan !== "paid" && !FORCE_AUDIO_TEST) {
     openPaidOnlyModal();
     return;
   }
