@@ -847,7 +847,7 @@ const elRareBtn = document.getElementById("rareBtn");
 const elStoryBtn = document.getElementById("storyBtn");
 const storyBookBtn = document.getElementById("storyBookBtn");
 const storyBookModal = document.getElementById("storyBookModal");
-
+const elLoggedInGuideText = document.getElementById("loggedInGuideText");
 
 function closeStoryBook() {
   storyBookModal.classList.add("hidden");
@@ -1006,6 +1006,7 @@ function showHomeUI() {
 
   updateRing(currentTime, FOCUS_SEC);
   setTimerText(currentTime);
+  if (elLoggedInGuideText) elLoggedInGuideText.classList.remove("hidden");
 }
 
 function prepareFocusUI() {
@@ -1024,6 +1025,7 @@ elLap.textContent = `${getDisplayRound()}周目`;
   updateBears();
   setTimerText(currentTime);
   updateRing(currentTime, FOCUS_SEC);
+  if (elLoggedInGuideText) elLoggedInGuideText.classList.add("hidden");
 }
 
 function prepareBreakUI() {
@@ -1041,6 +1043,7 @@ function prepareBreakUI() {
   updateBears();
   setTimerText(currentTime);
   updateRing(currentTime, BREAK_SEC);
+  if (elLoggedInGuideText) elLoggedInGuideText.classList.add("hidden");
 }
 
 // ======================
