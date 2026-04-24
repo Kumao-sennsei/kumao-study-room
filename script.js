@@ -889,7 +889,6 @@ function updateVoiceCollectionStatus() {
 
   status.innerHTML = `
     <span style="font-size:15px;">${month}月ボイス ${monthlyCount}/16</span>
-    <span style="font-size:30px; color:#fff;">${titleText}</span>
     <span style="font-size:15px;">レアボイス ${rareCount}/4</span>
   `;
 
