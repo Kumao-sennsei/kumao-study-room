@@ -1208,6 +1208,7 @@ async function goToPhase(nextPhase) {
 
   if (nextPhase === "focus") {
     stopVoice();
+    stopBreakCafeBgm();
     prepareFocusUI();
 
 
@@ -1238,6 +1239,7 @@ return;
   stopAmbient();
   stopVoice();
   prepareBreakUI();
+  startBreakCafeBgm();
 
  const FORCE_RARE_TEST = false; // レアボイステスト中だけ true。本番前に false
 const showRare = FORCE_RARE_TEST;
