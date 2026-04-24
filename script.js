@@ -858,12 +858,13 @@ function ensureVoiceCollectionStatus() {
   if (!elVoiceCollectionStatus) {
     elVoiceCollectionStatus = document.createElement("div");
     elVoiceCollectionStatus.id = "voiceCollectionStatus";
-   elVoiceCollectionStatus.style.display = "flex";
-elVoiceCollectionStatus.style.justifyContent = "space-between";
+  
+elVoiceCollectionStatus.style.display = "flex";
+elVoiceCollectionStatus.style.justifyContent = "center";
 elVoiceCollectionStatus.style.alignItems = "center";
-elVoiceCollectionStatus.style.width = "min(280px, 78%)";
+elVoiceCollectionStatus.style.gap = "18px";
+elVoiceCollectionStatus.style.width = "100%";
 elVoiceCollectionStatus.style.margin = "8px auto 14px";
-elVoiceCollectionStatus.style.fontSize = "18px";
 elVoiceCollectionStatus.style.fontWeight = "800";
 elVoiceCollectionStatus.style.color = "#facc15";
 elVoiceCollectionStatus.style.textAlign = "center";
@@ -884,11 +885,14 @@ function updateVoiceCollectionStatus() {
   const month = getCurrentMonth();
   const monthlyCount = Math.min(16, countSavedMonthlyBreakAudios(month));
   const rareCount = countSavedRareItems(month);
+  const titleText = phase === "break" ? "休憩TIME" : "集中TIME";
 
   status.innerHTML = `
-  <span>${month}月ボイス ${monthlyCount}/16</span>
-  <span>レア ${rareCount}/4</span>
-`;
+    <span style="font-size:15px;">${month}月ボイス ${monthlyCount}/16</span>
+    <span style="font-size:30px; color:#fff;">${titleText}</span>
+    <span style="font-size:15px;">レアボイス ${rareCount}/4</span>
+  `;
+
   status.classList.remove("hidden");
 }
 
