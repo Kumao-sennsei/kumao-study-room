@@ -858,12 +858,16 @@ function ensureVoiceCollectionStatus() {
   if (!elVoiceCollectionStatus) {
     elVoiceCollectionStatus = document.createElement("div");
     elVoiceCollectionStatus.id = "voiceCollectionStatus";
-    elVoiceCollectionStatus.style.margin = "6px 0 10px";
-    elVoiceCollectionStatus.style.fontSize = "15px";
-    elVoiceCollectionStatus.style.fontWeight = "800";
-    elVoiceCollectionStatus.style.color = "#facc15";
-    elVoiceCollectionStatus.style.textAlign = "center";
-    elVoiceCollectionStatus.style.letterSpacing = "0.02em";
+   elVoiceCollectionStatus.style.display = "flex";
+elVoiceCollectionStatus.style.justifyContent = "space-between";
+elVoiceCollectionStatus.style.alignItems = "center";
+elVoiceCollectionStatus.style.width = "min(360px, 86%)";
+elVoiceCollectionStatus.style.margin = "8px auto 14px";
+elVoiceCollectionStatus.style.fontSize = "20px";
+elVoiceCollectionStatus.style.fontWeight = "800";
+elVoiceCollectionStatus.style.color = "#facc15";
+elVoiceCollectionStatus.style.textAlign = "center";
+elVoiceCollectionStatus.style.letterSpacing = "0.02em";
 
     if (elModeTitle && elModeTitle.parentNode) {
       elModeTitle.insertAdjacentElement("afterend", elVoiceCollectionStatus);
@@ -881,7 +885,10 @@ function updateVoiceCollectionStatus() {
   const monthlyCount = Math.min(16, countSavedMonthlyBreakAudios(month));
   const rareCount = countSavedRareItems(month);
 
-  status.textContent = `${month}月ボイス ${monthlyCount}/16 ｜ レア ${rareCount}/4`;
+  status.innerHTML = `
+  <span>${month}月ボイス ${monthlyCount}/16</span>
+  <span>レア ${rareCount}/4</span>
+`;
   status.classList.remove("hidden");
 }
 
