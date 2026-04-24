@@ -1195,7 +1195,7 @@ return;
 const showRare = FORCE_RARE_TEST;
 
 if (showRare) {
-  elQuote.textContent = "今日は、ちょっと特別だ。";
+  elQuote.textContent = "今日は、ちょっと特別だ😎💣";
 
   const month = getCurrentMonth();
 const monthStr = String(month).padStart(2, "0");
@@ -1211,8 +1211,8 @@ const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
 
   showRareButton({
     label: shouldUseStory
-      ? "物語の欠片ゲット！おめでとう🎉 押してみてね😎💣"
-      : "レアボイス当選！おめでとう🎉 押してみてね🐻✨",
+      ? "物語の欠片ゲット！おめでとう🎉 \n押してみてね😎💣"
+      : "レアボイス当選！おめでとう🎉 \n押してみてね🐻✨",
 
     onClickHandler: () => {
       if (elRareBtn.disabled) return;
