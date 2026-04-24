@@ -911,15 +911,14 @@ function hideVoiceCollectionStatus() {
 }
 
 function getAvailableRareQuotesForCurrentMonth() {
-  const month = getCurrentMonth();
   const pool = getRarePoolForCurrentMonth();
 
-  const fragmentId = `story_${String(month).padStart(2, "0")}`;
-  const filteredPool = hasStoryFragment(fragmentId)
-    ? pool.filter((quote) => !/_rare_ultra_04\.mp3$/.test(quote.audio))
-    : pool;
+  if (!Array.isArray(pool)) return [];
 
-  return filteredPool.filter((quote) => !hasSavedRareAudio(quote.audio));
+  return pool.filter((quote) =>
+    typeof quote.audio === "string" &&
+    !/_rare_ultra_04\.mp3$/.test(quote.audio)
+  );
 }
 
 // ======================
@@ -1216,7 +1215,8 @@ const storyQuote =
     (quote) => quote.audio === `audio/rare/${monthStr}/month${monthStr}_rare_ultra_04.mp3`
   ) || null;
 
-const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
+const FORCE_STORY_TEST = true; // 物語欠片テスト中だけ true。本番前に false
+const shouldUseStory = FORCE_STORY_TEST && !!storyQuote;
 
   showRareButton({
     label: shouldUseStory
