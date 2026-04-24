@@ -1238,17 +1238,44 @@ const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
 
       elQuote.textContent = selectedQuote.display;
 
-     setTimeout(() => {
-  playVoiceAudio(selectedQuote.audio, () => {
-    if (phase !== "break") {
-      transitionLock = false;
-      return;
-    }
+         let selectedQuote = shouldUseStory ? storyQuote : getRareQuote();
 
-    startTimerLoop(BREAK_SEC);
-    transitionLock = false;
-  });
-}, 180);
+      if (!selectedQuote) {
+        const rarePool = getRarePoolForCurrentMonth();
+        selectedQuote = Array.isArray(rarePool) && rarePool.length > 0
+          ? rarePool[0]
+          : null;
+      }
+
+      if (!selectedQuote) {
+        elQuote.textContent = "レアボイスのデータが見つからなかったよ🐻💦";
+        startTimerLoop(BREAK_SEC);
+        transitionLock = false;
+        return;
+      }
+
+      if (shouldUseStory) {
+        saveStoryFragment(fragmentId);
+      } else {
+        saveRareAudio(selectedQuote.audio);
+      }
+
+      updateVoiceCollectionStatus();
+
+      elQuote.textContent = selectedQuote.display;
+      console.log("[rare] selectedQuote =", selectedQuote);
+
+      setTimeout(() => {
+        playVoiceAudio(selectedQuote.audio, () => {
+          if (phase !== "break") {
+            transitionLock = false;
+            return;
+          }
+
+          startTimerLoop(BREAK_SEC);
+          transitionLock = false;
+        });
+      }, 180);
     }
   });
 
