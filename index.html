@@ -666,15 +666,23 @@
 
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  function updateTopVisibility(isLoggedIn) {
-    document.querySelectorAll(".guestOnly").forEach((el) => {
-      el.style.display = isLoggedIn ? "none" : "";
-    });
+ function updateTopVisibility(isLoggedIn) {
+  document.querySelectorAll(".guestOnly").forEach((el) => {
+    if (isLoggedIn) {
+      el.style.setProperty("display", "none", "important");
+    } else {
+      el.style.removeProperty("display");
+    }
+  });
 
-    document.querySelectorAll(".testOnly").forEach((el) => {
-      el.style.display = isLoggedIn ? "none" : "";
-    });
-  }
+  document.querySelectorAll(".testOnly").forEach((el) => {
+    if (isLoggedIn) {
+      el.style.setProperty("display", "none", "important");
+    } else {
+      el.style.removeProperty("display");
+    }
+  });
+}
 </script>
 
 <button id="backMainBtn" 
