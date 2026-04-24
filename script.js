@@ -723,7 +723,16 @@ function getRareCategoryByWeight(monthPool) {
 
 function getRarePoolForCurrentMonth() {
   const month = getCurrentMonth();
-  return RARE_QUOTES_BY_MONTH[month] || FALLBACK_RARE_QUOTES;
+  const arr = BREAK_QUOTES_BY_MONTH[month];
+
+  const rareQuotes = Array.isArray(arr)
+    ? arr.filter((quote) =>
+        typeof quote.audio === "string" &&
+        quote.audio.startsWith(`audio/rare/${String(month).padStart(2, "0")}/`)
+      )
+    : [];
+
+  return rareQuotes.length > 0 ? rareQuotes : FALLBACK_RARE_QUOTES;
 }
 
 
