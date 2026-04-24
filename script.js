@@ -1221,31 +1221,7 @@ const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
       elRareBtn.classList.add("hidden");
       elRareBtn.classList.remove("rare-glow");
 
-      const selectedQuote = shouldUseStory ? storyQuote : getRareQuote();
-      if (!selectedQuote) {
-        transitionLock = false;
-        return;
-      }
-
-      if (shouldUseStory) {
-        saveStoryFragment(fragmentId);
-      }
-
-      if (!shouldUseStory) {
-        saveRareAudio(selectedQuote.audio);
-      }
-      updateVoiceCollectionStatus();
-
-      elQuote.textContent = selectedQuote.display;
-
-         let selectedQuote = shouldUseStory ? storyQuote : getRareQuote();
-
-      if (!selectedQuote) {
-        const rarePool = getRarePoolForCurrentMonth();
-        selectedQuote = Array.isArray(rarePool) && rarePool.length > 0
-          ? rarePool[0]
-          : null;
-      }
+           const selectedQuote = shouldUseStory ? storyQuote : getRareQuote();
 
       if (!selectedQuote) {
         elQuote.textContent = "レアボイスのデータが見つからなかったよ🐻💦";
@@ -1265,17 +1241,15 @@ const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
       elQuote.textContent = selectedQuote.display;
       console.log("[rare] selectedQuote =", selectedQuote);
 
-      setTimeout(() => {
-        playVoiceAudio(selectedQuote.audio, () => {
-          if (phase !== "break") {
-            transitionLock = false;
-            return;
-          }
-
-          startTimerLoop(BREAK_SEC);
+      playVoiceAudio(selectedQuote.audio, () => {
+        if (phase !== "break") {
           transitionLock = false;
-        });
-      }, 180);
+          return;
+        }
+
+        startTimerLoop(BREAK_SEC);
+        transitionLock = false;
+      });
     }
   });
 
