@@ -487,6 +487,7 @@ const BREAK_QUOTES_BY_MONTH = {
 { display: "You ain’t average, not even close. You built different. \n【訳】お前は普通じゃねぇ。マジで別格だ。", audio: "audio/rare/05/month05_rare_ultra_01.mp3" },
 { display: "That grind? Yeah… it speaks loud. People notice that. \n【訳】その努力な、ちゃんと響いてる。みんな気づいてる。", audio: "audio/rare/05/month05_rare_ultra_02.mp3" },
 { display: "お前は、この５月めちゃ頑張ってる。\nニョキニョキ　伸びているはずだ。　\nそう。　筍のようにな。", audio: "audio/rare/05/month05_rare_ultra_03.mp3" },
+{ display: "生きるってのはな、綺麗ごとじゃねぇ。\n腹が減ったら、食えるもんを探す。\n雨が降ったら、濡れねぇ場所を探す。\nそれだけだ。\nだが、それを続けたやつだけが、生き残る。\nそう信じてた。", audio: "audio/rare/05/month05_rare_ultra_04.mp3" },
   ],
   6: [
     { display: "紫陽花ってのはな、雨ん中でもちゃんと咲く。\nお前も同じだ。今の積み、無駄じゃねぇ。\n少し休んで整えろ。", audio: "audio/monthly/06/month06_break_01.mp3" },
