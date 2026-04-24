@@ -861,9 +861,9 @@ function ensureVoiceCollectionStatus() {
    elVoiceCollectionStatus.style.display = "flex";
 elVoiceCollectionStatus.style.justifyContent = "space-between";
 elVoiceCollectionStatus.style.alignItems = "center";
-elVoiceCollectionStatus.style.width = "min(360px, 86%)";
+elVoiceCollectionStatus.style.width = "min(280px, 78%)";
 elVoiceCollectionStatus.style.margin = "8px auto 14px";
-elVoiceCollectionStatus.style.fontSize = "20px";
+elVoiceCollectionStatus.style.fontSize = "18px";
 elVoiceCollectionStatus.style.fontWeight = "800";
 elVoiceCollectionStatus.style.color = "#facc15";
 elVoiceCollectionStatus.style.textAlign = "center";
