@@ -1200,7 +1200,7 @@ return;
   stopVoice();
   prepareBreakUI();
 
-  const FORCE_RARE_TEST = true; // レアボイステスト中だけ true。本番前に false
+ const FORCE_RARE_TEST = false; // レアボイステスト中だけ true。本番前に false
 const showRare = FORCE_RARE_TEST;
 
 if (showRare) {
@@ -1216,7 +1216,7 @@ const storyQuote =
     (quote) => quote.audio === `audio/rare/${monthStr}/month${monthStr}_rare_ultra_04.mp3`
   ) || null;
 
-const FORCE_STORY_TEST = true; // 物語欠片テスト中だけ true。本番前に false
+const FORCE_STORY_TEST = false;// 物語欠片テスト中だけ true。本番前に false
 const shouldUseStory = FORCE_STORY_TEST && !!storyQuote;
 
   showRareButton({
