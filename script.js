@@ -1191,7 +1191,8 @@ return;
   stopVoice();
   prepareBreakUI();
 
-  const showRare = false;
+  const FORCE_RARE_TEST = true; // レアボイステスト中だけ true。本番前に false
+const showRare = FORCE_RARE_TEST;
 
 if (showRare) {
   elQuote.textContent = "今日は、ちょっと特別だ。";
