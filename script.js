@@ -1238,15 +1238,17 @@ const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
 
       elQuote.textContent = selectedQuote.display;
 
-      playVoiceAudio(selectedQuote.audio, () => {
-        if (phase !== "break") {
-          transitionLock = false;
-          return;
-        }
+     setTimeout(() => {
+  playVoiceAudio(selectedQuote.audio, () => {
+    if (phase !== "break") {
+      transitionLock = false;
+      return;
+    }
 
-        startTimerLoop(BREAK_SEC);
-        transitionLock = false;
-      });
+    startTimerLoop(BREAK_SEC);
+    transitionLock = false;
+  });
+}, 180);
     }
   });
 
