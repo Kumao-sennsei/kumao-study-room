@@ -804,6 +804,93 @@ function saveRareAudio(audio) {
   console.log("[rare] 保存済みレア音声:", saved);
 }
 
+const MONTHLY_BREAK_STORAGE_KEY = "kumao_saved_monthly_break_audios";
+let elVoiceCollectionStatus = null;
+
+function getSavedMonthlyBreakAudios() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(MONTHLY_BREAK_STORAGE_KEY) || "[]");
+    return Array.isArray(saved) ? saved : [];
+  } catch (e) {
+    console.error("[monthly] 保存済み月ボイス読込エラー:", e);
+    return [];
+  }
+}
+
+function saveMonthlyBreakAudio(audio) {
+  if (!audio) return;
+
+  const saved = getSavedMonthlyBreakAudios();
+
+  if (!saved.includes(audio)) {
+    saved.push(audio);
+    localStorage.setItem(MONTHLY_BREAK_STORAGE_KEY, JSON.stringify(saved));
+  }
+
+  console.log("[monthly] 保存済み月ボイス:", saved);
+}
+
+function countSavedMonthlyBreakAudios(month) {
+  const monthStr = String(month).padStart(2, "0");
+  return getSavedMonthlyBreakAudios().filter((audio) =>
+    typeof audio === "string" &&
+    audio.startsWith(`audio/monthly/${monthStr}/`)
+  ).length;
+}
+
+function countSavedRareItems(month) {
+  const monthStr = String(month).padStart(2, "0");
+  const rareAudioCount = getSavedRareAudios().filter((audio) =>
+    typeof audio === "string" &&
+    audio.startsWith(`audio/rare/${monthStr}/`)
+  ).length;
+
+  const storyCount = hasStoryFragment(`story_${monthStr}`) ? 1 : 0;
+
+  return Math.min(4, rareAudioCount + storyCount);
+}
+
+function ensureVoiceCollectionStatus() {
+  if (elVoiceCollectionStatus) return elVoiceCollectionStatus;
+
+  elVoiceCollectionStatus = document.getElementById("voiceCollectionStatus");
+
+  if (!elVoiceCollectionStatus) {
+    elVoiceCollectionStatus = document.createElement("div");
+    elVoiceCollectionStatus.id = "voiceCollectionStatus";
+    elVoiceCollectionStatus.style.margin = "6px 0 10px";
+    elVoiceCollectionStatus.style.fontSize = "15px";
+    elVoiceCollectionStatus.style.fontWeight = "800";
+    elVoiceCollectionStatus.style.color = "#facc15";
+    elVoiceCollectionStatus.style.textAlign = "center";
+    elVoiceCollectionStatus.style.letterSpacing = "0.02em";
+
+    if (elModeTitle && elModeTitle.parentNode) {
+      elModeTitle.insertAdjacentElement("afterend", elVoiceCollectionStatus);
+    }
+  }
+
+  return elVoiceCollectionStatus;
+}
+
+function updateVoiceCollectionStatus() {
+  const status = ensureVoiceCollectionStatus();
+  if (!status) return;
+
+  const month = getCurrentMonth();
+  const monthlyCount = Math.min(16, countSavedMonthlyBreakAudios(month));
+  const rareCount = countSavedRareItems(month);
+
+  status.textContent = `${month}月ボイス ${monthlyCount}/16 ｜ レア ${rareCount}/4`;
+  status.classList.remove("hidden");
+}
+
+function hideVoiceCollectionStatus() {
+  const status = document.getElementById("voiceCollectionStatus");
+  if (!status) return;
+  status.classList.add("hidden");
+}
+
 function getAvailableRareQuotesForCurrentMonth() {
   const month = getCurrentMonth();
   const pool = getRarePoolForCurrentMonth();
@@ -995,7 +1082,8 @@ function showHomeUI() {
   [elModeTitle, elQuote, elRingWrap, elLap, elBears].forEach((el) => el.classList.add("hidden"));
 
   hideRareButton();
-
+  hideVoiceCollectionStatus();
+  
   elCharacter.style.opacity = "1";
   phase = "focus";
   currentTime = FOCUS_SEC;
@@ -1019,6 +1107,7 @@ function prepareFocusUI() {
   hideRareButton();
 
   elModeTitle.textContent = "集中TIME";
+  updateVoiceCollectionStatus();
  setCharacterImage(currentMode, getDisplayRound());
 elLap.textContent = `${getDisplayRound()}周目`;
 
@@ -1035,6 +1124,8 @@ function prepareBreakUI() {
   hideRareButton();
 
   elModeTitle.textContent = "休憩TIME";
+  updateVoiceCollectionStatus();
+  
   elQuote.textContent = "";
 
   const breakImages = ["break1.png", "break2.png", "break3.png", "break4.png"];
@@ -1132,6 +1223,7 @@ const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
       if (!shouldUseStory) {
         saveRareAudio(selectedQuote.audio);
       }
+      updateVoiceCollectionStatus();
 
       elQuote.textContent = selectedQuote.display;
 
@@ -1153,6 +1245,8 @@ const shouldUseStory = !hasStoryFragment(fragmentId) && !!storyQuote;
 
   const quote = getBreakQuoteForCurrentMonth();
   elQuote.textContent = quote.display;
+  saveMonthlyBreakAudio(quote.audio);
+  updateVoiceCollectionStatus();
 
   setTimeout(() => {
     playVoiceAudio(quote.audio, () => {
