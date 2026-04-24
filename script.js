@@ -193,7 +193,45 @@ function stopAmbient() {
     } catch (e) {}
   }
 }
+function ensureBreakCafeAudio() {
+  if (!breakCafeAudio) {
+    breakCafeAudio = createManagedAudio("audio/ambient/break_cafe_loop.mp3");
+    breakCafeAudio.loop = true;
+    breakCafeAudio.volume = 0.18;
+  }
 
+  return breakCafeAudio;
+}
+
+async function startBreakCafeBgm() {
+  try {
+    await unlockAudioSystem();
+
+    const audio = ensureBreakCafeAudio();
+    audio.loop = true;
+    audio.volume = 0.18;
+
+    if (audio.paused) {
+      await audio.play();
+    }
+
+    console.log("[breakCafe] 再生開始");
+  } catch (e) {
+    console.error("[breakCafe] 再生失敗:", e);
+  }
+}
+
+function stopBreakCafeBgm() {
+  if (!breakCafeAudio) return;
+
+  try {
+    breakCafeAudio.pause();
+    breakCafeAudio.currentTime = 0;
+    console.log("[breakCafe] 停止");
+  } catch (e) {
+    console.error("[breakCafe] 停止失敗:", e);
+  }
+}
 // iPad / iPhone 向け：最初のユーザー操作時に環境音を準備
 async function primeAmbient(mode) {
   if (!mode) return;
