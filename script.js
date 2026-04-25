@@ -975,8 +975,8 @@ function getAvailableRareQuotesForCurrentMonth() {
 // ======================
 // 設定・状態管理
 // ======================
-const FOCUS_SEC = 0.4 * 60;
-const BREAK_SEC = 0.4 * 60;
+const FOCUS_SEC = 0.3 * 60;
+const BREAK_SEC = 0.1 * 60;
 const SETS_PER_ROUND = 4;
 
 let currentMode = "";
@@ -1305,9 +1305,9 @@ if (isStoryQuote) {
 
       updateVoiceCollectionStatus();
 
-      elQuote.textContent = isStoryQuote
-  ? `📖【物語のかけら】を発見した！\n\n${selectedQuote.display}`
-  : selectedQuote.display;
+     elQuote.innerHTML = isStoryQuote
+  ? `<span style="color:#d12ba8;font-weight:900;">📖【物語のかけら】を発見した！</span><br><br>${selectedQuote.display.replace(/\n/g, "<br>")}`
+  : selectedQuote.display.replace(/\n/g, "<br>");
       console.log("[rare] selectedQuote =", selectedQuote);
 
       playVoiceAudio(selectedQuote.audio, () => {
