@@ -727,7 +727,7 @@ function getCurrentMonth() {
     month: "numeric"
   }).format(now);
 console.log("[month] monthText =", monthText, "Number(monthText) =", Number(monthText));
-    return 9;
+    return 10;
 }
 
 function pickByWeight(items) {
@@ -976,7 +976,7 @@ function getAvailableRareQuotesForCurrentMonth() {
 // 設定・状態管理
 // ======================
 const FOCUS_SEC = 0.3 * 60;
-const BREAK_SEC = 0.1 * 60;
+const BREAK_SEC = 0.05 * 60;
 const SETS_PER_ROUND = 4;
 
 let currentMode = "";
