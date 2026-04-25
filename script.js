@@ -1481,14 +1481,14 @@ function getStudyLabelByUser(userName) {
   return studyMap[userName] || "自由に学習中";
 }
 
-function renderGroupedPostCard(summary) {
+function renderGroupedPostCard(summary, index) {
   const latestImage = summary.latestPost?.image || "";
   const latestComment = summary.latestPost?.comment || "";
   const safeUserName = summary.userName || "unknown";
 　const avatarSrc = getAvatarByPostCount(summary.postCount);
   const studyLabel = summary.latestPost?.studyLabel || "自由に学習中";
   return `
-    <div class="noteCard">
+    <div class="noteCard ${index === 0 ? "featuredNote" : ""}">
 
 <div style="text-align:center; margin-bottom:8px;">
   <img src="${avatarSrc}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; display:block; margin:0 auto;" />
