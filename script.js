@@ -1649,19 +1649,70 @@ window.addEventListener("DOMContentLoaded", () => {
 // 👉 部屋に入る（仮）
 function enterRoom(roomName) {
   const detail = document.getElementById("roomDetail");
+  if (!detail) return;
+
+  const seatCount = 36;
 
   detail.innerHTML = `
-    <h3>${roomName}</h3>
-    <div style="display:grid; grid-template-columns: repeat(5, 60px); gap:10px;">
-      ${Array.from({ length: 20 }).map(() => `
-        <div style="width:60px; height:60px; background:#333; display:flex; align-items:center; justify-content:center;">
-          ○
+    <h3 style="margin:0 0 16px; text-align:center;">${roomName}</h3>
+
+    <div style="
+      display:grid;
+      grid-template-columns: repeat(6, 92px);
+      gap:14px;
+      justify-content:center;
+    ">
+      ${Array.from({ length: seatCount }).map(() => `
+        <div style="
+          width:92px;
+          height:112px;
+          background:#2f2f2f;
+          border:1px solid #444;
+          border-radius:12px;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          justify-content:center;
+          padding:6px;
+          box-sizing:border-box;
+        ">
+          <img
+            src="kumao_avatar_free_default.png"
+            alt="くまおアバター"
+            style="
+              width:42px;
+              height:42px;
+              object-fit:contain;
+              margin-bottom:5px;
+            "
+          >
+          <div style="
+            font-size:12px;
+            font-weight:bold;
+            color:#fff;
+            max-width:80px;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+          ">
+            空席
+          </div>
+          <div style="
+            font-size:10px;
+            color:#bbb;
+            max-width:80px;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            margin-top:3px;
+          ">
+            学習内容
+          </div>
         </div>
       `).join("")}
     </div>
   `;
 }
-
 /* =========================
    ストーリー図鑑（新）
 ========================= */
