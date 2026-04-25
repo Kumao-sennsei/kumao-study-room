@@ -657,7 +657,7 @@ const BREAK_QUOTES_BY_MONTH = {
 { display: "ここまで来たやつは強ぇ。あとはやるだけだ。\nいいな？次の一手、準備しとけ。", audio: "audio/monthly/11/month11_break_16.mp3" },
 { display: "You hungry. I can see it. Keep going. \n【訳】その貪欲さ、見えてるぞ。そのまま行け。", audio: "audio/rare/11/month11_rare_ultra_01.mp3" },
 { display: "You ain’t lucky. You earned that. \n【訳】それは運じゃねぇ。ちゃんと勝ち取ったもんだ。", audio: "audio/rare/11/month11_rare_ultra_02.mp3" },
-{ display: "俺が休憩中に加えているのはポッキーだ。\nたけのこの里も好きだが、ポッキーもいいよな。　\n最近、寒くなってきてる。暖かくして、風邪ひくんじゃねーぞ。", audio: "audio/rare/11/month11_rare_ultra_03.mp3" },
+{ display: "今年も残り２か月をきったか。\n来年につなげる月にしようぜ。\n寒くなってきてるから、暖かくして、風邪ひくんじゃねーぞ。", audio: "audio/rare/11/month11_rare_ultra_03.mp3" },
 { display: "気づけば、金は増えていた。\nだがな、金そのものには興味がなかった。\n面白かったのは、「勝てる」って事実だ。\n積み上げたのは金じゃねぇ。自分への確信だ。", audio: "audio/rare/11/month11_rare_ultra_04.mp3" },
   ],
   12: [
