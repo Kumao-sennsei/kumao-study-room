@@ -437,8 +437,8 @@ const BREAK_QUOTES_BY_MONTH = {
 { display: "今年もやるだけだ。特別なことはいらねぇ。\nいつも通り積め。一回落ち着け。", audio: "audio/monthly/01/month01_break_16.mp3" },
 { display: "You didn’t fold under pressure. That’s big. \n【訳】プレッシャーで折れなかったな。それはデカい。", audio: "audio/rare/01/month01_rare_ultra_01.mp3" },
 { display: "You building something real. Don’t rush it. \n【訳】ちゃんとしたもん作ってるな。焦んな。", audio: "audio/rare/01/month01_rare_ultra_02.mp3" },
-{ display: "明けまして、おめでとうございます。\n今年も、ニョキニョキ伸びようぜ。お前に限界なんてねぇからな。\nただ、身体は大事にするんだぞ。", audio: "audio/rare/01/month01_rare_ultra_03.mp3" },
-{ display: "ある時ふと、昔を思い出した。山の匂い、土の感触、タケノコの味。\n全部、妙にリアルだった。ああ、俺はあそこから来たんだなってな。", audio: "audio/rare/01/month01_rare_ultra_04.mp3" },
+{ display: "明けまして、おめでとうございます。\n今年も、ニョキニョキ伸びようぜ。\nお前に限界なんてねぇからな。\nただ、身体は大事にするんだぞ。", audio: "audio/rare/01/month01_rare_ultra_03.mp3" },
+{ display: "ある時ふと、昔を思い出した。\n山の匂い、土の感触、タケノコの味。\n全部、妙にリアルだった。\nああ、俺はあそこから来たんだなってな。", audio: "audio/rare/01/month01_rare_ultra_04.mp3" },
   ],
   2: [
     { display: "梅の花、もう咲き始めてる。まだ寒いのにな。\nお前も同じだ、見えないとこでちゃんと進んでる。\n一回落ち着け。", audio: "audio/monthly/02/month02_break_01.mp3" },
@@ -459,8 +459,8 @@ const BREAK_QUOTES_BY_MONTH = {
 { display: "もうすぐ抜けるぞ。この感じ、わかるだろ。\n最後までいけ。一回落ち着け。", audio: "audio/monthly/02/month02_break_16.mp3" },
 { display: "You stayed in the game. That’s already a win. \n【訳】ゲームから降りなかったな。それだけでもう勝ちだ。", audio: "audio/rare/02/month02_rare_ultra_01.mp3" },
 { display: "You got more in you. I know it. You know it too. \n【訳】まだ力残ってるだろ。俺も知ってるし、お前もわかってる。", audio: "audio/rare/02/month02_rare_ultra_02.mp3" },
-{ display: "梅の花が咲いたら次は桜の花か、、。その次は、筍だよな。\n季節は移り行く。そしてお前は成長する。\nニョキニョキな。", audio: "audio/rare/02/month02_rare_ultra_03.mp3" },
-{ display: "日本の若いやつらを見た。下向いて、力あるのに止まってる。\nもったいねぇな、と思った。なら、俺が励ましてやるか。\nそう思っただけだ。", audio: "audio/rare/02/month02_rare_ultra_04.mp3" },
+{ display: "梅の花が咲いたら次は桜の花か、、。\nその次は、筍だよな。\n季節は移り行く。そしてお前は成長する。\nニョキニョキな。", audio: "audio/rare/02/month02_rare_ultra_03.mp3" },
+{ display: "日本の若いやつらを見た。\n下向いて、力あるのに止まってる。\nもったいねぇな、と思った。\nなら、俺が励ましてやるか。\nそう思っただけだ。", audio: "audio/rare/02/month02_rare_ultra_04.mp3" },
   ],
   3: [
    { display: "梅の花、少しずつ開いてきたな。\n春の気配はあるが、まだ途中だ。\nお前も同じだ。ちゃんと進んでる。少し休め。", audio: "audio/monthly/03/month03_break_01.mp3" },
