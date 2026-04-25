@@ -664,7 +664,7 @@ const BREAK_QUOTES_BY_MONTH = {
    { display: "クリスマスが近いな。今年の自分に何を渡せるか、それが全部だ。\nお前、ちゃんと積んできた。一回落ち着け。", audio: "audio/monthly/12/month12_break_01.mp3" },
 { display: "師走はな、流されるやつが多い。\nでもお前は違う。\nここまで来た積み、無駄じゃねぇ。\n少し整えとけ。", audio: "audio/monthly/12/month12_break_02.mp3" },
 { display: "サンタクロースはな、頑張ったやつに来る。\nお前、自分でちゃんと用意してる側だ。\n軽く休憩入れろ。", audio: "audio/monthly/12/month12_break_03.mp3" },
-{ display: "ここまで来たな。今年の積み、ちゃんと形になってる。\n最後まで崩すな。水でも飲んどけ。", audio: "audio/monthly/12/month12_break_04.mp3" },
+{ display: "ここまで来たな。\n今年の積み、ちゃんと形になってる。\n最後まで崩すな。水でも飲んどけ。", audio: "audio/monthly/12/month12_break_04.mp3" },
 { display: "クリスマスの光、綺麗だろ。\nだがな、お前の積みの方が価値ある。\n一回深呼吸しとけ。", audio: "audio/monthly/12/month12_break_05.mp3" },
 { display: "師走は忙しい。\nそれでもやってるお前、かなり強ぇ。\nここで一息入れとけ。", audio: "audio/monthly/12/month12_break_06.mp3" },
 { display: "サンタなんて待つな。\n自分で取りに行ったもんが一番デカい。\n今のお前、それできてる。少し抜け。", audio: "audio/monthly/12/month12_break_07.mp3" },
