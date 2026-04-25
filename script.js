@@ -1242,8 +1242,8 @@ return;
   prepareBreakUI();
   startBreakCafeBgm();
 
-const FORCE_RARE_TEST = false;// レアボイステスト中だけ true。本番前に false
-const showRare = FORCE_RARE_TEST;
+const FORCE_RARE_TEST = false; // レアボイステスト中だけ true。本番前に false
+const showRare = FORCE_RARE_TEST || shouldShowRareButton();
 
 if (showRare) {
   elQuote.textContent = "今日は、ちょっと特別だ😎💣";
