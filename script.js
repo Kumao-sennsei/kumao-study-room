@@ -1484,8 +1484,8 @@ function getStudyLabelByUser(userName) {
 function renderGroupedPostCard(summary, index) {
   const latestImage = summary.latestPost?.image || "";
   const latestComment = summary.latestPost?.comment || "";
-  const safeUserName = summary.userName || "unknown";
-　const avatarSrc = getAvatarByPostCount(summary.postCount);
+　const safeUserName = summary.userName || "unknown";
+  const avatarSrc = getAvatarByPostCount(summary.postCount);
   const studyLabel = summary.latestPost?.studyLabel || "自由に学習中";
   return `
     <div class="noteCard ${index === 0 ? "featuredNote" : ""}">
