@@ -1305,6 +1305,10 @@ if (isStoryQuote) {
 
       updateVoiceCollectionStatus();
 
+      if (elQuote && elRareBtn && elQuote.parentNode) {
+  elQuote.parentNode.insertBefore(elRareBtn, elQuote);
+}
+
      elQuote.innerHTML = isStoryQuote
   ? `<span style="color:#d12ba8;font-weight:900;">📖【物語のかけら】を発見した！</span><br><br>${selectedQuote.display.replace(/\n/g, "<br>")}`
   : selectedQuote.display.replace(/\n/g, "<br>");
