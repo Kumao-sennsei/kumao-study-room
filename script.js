@@ -1167,7 +1167,7 @@ function prepareFocusUI() {
 
   elModeTitle.textContent = "集中TIME";
   updateVoiceCollectionStatus();
- setCharacterImage(currentMode, getSetInRound());
+setCharacterImage(currentMode, getDisplayRound());
 elLap.textContent = `${getDisplayRound()}周目`;
 
   updateBears();
