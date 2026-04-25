@@ -1071,10 +1071,10 @@ function startTimerLoop(phaseMaxSec) {
 // ======================
 function getRareProbability(round) {
   if (round === 1) return 0.01; //1%
-if (round === 2) return 0.05; //3%
-if (round === 3) return 0.08; //6%
-if (round === 4) return 0.10; //10%
-return 0.15;                  //5周目以降15%
+if (round === 2) return 0.06; //3%
+if (round === 3) return 0.10; //6%
+if (round === 4) return 0.20; //10%
+return 0.30;                  //5周目以降15%
 }
 
 function shouldShowRareButton() {
