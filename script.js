@@ -1488,8 +1488,7 @@ function renderGroupedPostCard(summary, index) {
   const avatarSrc = getAvatarByPostCount(summary.postCount);
   const studyLabel = summary.latestPost?.studyLabel || "自由に学習中";
   return `
-    <div class="noteCard ${index === 0 ? "featuredNote" : ""}">
-
+   <div class="noteCard ${index === 0 ? "featuredNote" : ""}" onclick="alert('投稿詳細を開く予定です🐻')">
 <div style="text-align:center; margin-bottom:8px;">
   <img src="${avatarSrc}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; display:block; margin:0 auto;" />
   <div style="margin-top:6px; font-weight:700;">${safeUserName}</div>
