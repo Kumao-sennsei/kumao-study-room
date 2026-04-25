@@ -1274,7 +1274,7 @@ const shouldUseStory = FORCE_STORY_TEST && !!storyQuote;
 
   showRareButton({
     label: shouldUseStory
-      ? "物語の欠片ゲット！おめでとう🎉 \n押してみてね😎💣"
+      ? "【物語のかけら】を発見した！🎉 \n押してみてね😎💣"
       : "レアボイス当選！おめでとう🎉 \n押してみてね🐻✨",
 
     onClickHandler: () => {
