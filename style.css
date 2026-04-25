@@ -1103,3 +1103,19 @@ grid-column: span 1;
 }
 }
 
+#noteGrid,
+#noteGrid .noteCard {
+  position: relative;
+  z-index: 60000;
+  pointer-events: auto !important;
+}
+
+#noteGrid .noteCard * {
+  pointer-events: none;
+}
+
+#noteGrid .noteCard {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
