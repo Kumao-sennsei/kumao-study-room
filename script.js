@@ -727,7 +727,7 @@ function getCurrentMonth() {
     month: "numeric"
   }).format(now);
 console.log("[month] monthText =", monthText, "Number(monthText) =", Number(monthText));
-    return 10;
+    return 11;
 }
 
 function pickByWeight(items) {
@@ -1082,10 +1082,10 @@ function startTimerLoop(phaseMaxSec) {
 // ======================
 function getRareProbability(round) {
   if (round === 1) return 0.5; //1%
-if (round === 2) return 0.6; //3%
-if (round === 3) return 0.8; //6%
-if (round === 4) return 0.9; //10%
-return 0.95;                  //5周目以降15%
+if (round === 2) return 0.5; //3%
+if (round === 3) return 0.5; //6%
+if (round === 4) return 0.5; //10%
+return 0.5;                  //5周目以降15%
 }
 
 function shouldShowRareButton() {
