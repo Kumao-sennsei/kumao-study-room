@@ -727,7 +727,7 @@ function getCurrentMonth() {
     month: "numeric"
   }).format(now);
 console.log("[month] monthText =", monthText, "Number(monthText) =", Number(monthText));
-    return 2;
+    return 3;
 }
 
 function pickByWeight(items) {
