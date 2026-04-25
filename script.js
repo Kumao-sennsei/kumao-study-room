@@ -1116,8 +1116,8 @@ function showRareButton(config) {
   const isFunctionOnly = typeof config === "function";
   const onClickHandler = isFunctionOnly ? config : config?.onClickHandler;
   const label = isFunctionOnly
-    ? "レアボイス当選！おめでとう🎉\n 押してみてね🐻✨"
-    : (config?.label || "レアボイス当選！おめでとう🎉 \n押してみてね🐻✨");
+    ? "レアボイス当選！おめでとう🎉\n押してみてね🐻✨"
+    : (config?.label || "レアボイス当選！おめでとう🎉\n押してみてね🐻✨");
 
   elRareBtn.textContent = label;
   elRareBtn.disabled = false;
