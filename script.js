@@ -679,7 +679,7 @@ const BREAK_QUOTES_BY_MONTH = {
 { display: "今年やりきったな。その顔してるぞ。\nあとは締めるだけだ。次の一手、準備しとけ。", audio: "audio/monthly/12/month12_break_16.mp3" },
 { display: "That mindset? Top tier. Stay like that. \n【訳】その考え方、トップクラスだ。\nそのままでいけ。", audio: "audio/rare/12/month12_rare_ultra_01.mp3" },
 { display: "You moving different now. Level up looks good on you. \n【訳】動き変わってきてるな。ちゃんとレベル上がってる。", audio: "audio/rare/12/month12_rare_ultra_02.mp3" },
-{ display: "この寒い時期だからこそ、足もと（基礎）にも目を向けるんだ。\n筍だって根をはらないとニョキニョキ伸びないからな。", audio: "audio/rare/12/month12_rare_ultra_03.mp3" },
+{ display: "この寒い時期だからこそ、\n足もと（基礎）にも目を向けるんだ。\n筍だって根をはらないと\nニョキニョキ伸びないからな。", audio: "audio/rare/12/month12_rare_ultra_03.mp3" },
 { display: "表に出る必要はなかった。\n裏で動かす方が、楽だからな。\n気づけば、名前も知らねぇ連中が俺の判断で動いてた。笑える話だ。\nだが、それが現実だった。", audio: "audio/rare/12/month12_rare_ultra_04.mp3" },
   ]
 };
