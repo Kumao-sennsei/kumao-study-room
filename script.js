@@ -1293,11 +1293,15 @@ const shouldUseStory = FORCE_STORY_TEST && !!storyQuote;
         return;
       }
 
-      if (shouldUseStory) {
-        saveStoryFragment(fragmentId);
-      } else {
-        saveRareAudio(selectedQuote.audio);
-      }
+      const isStoryQuote =
+  selectedQuote.audio &&
+  /_rare_ultra_04\.mp3$/.test(selectedQuote.audio);
+
+if (isStoryQuote) {
+  saveStoryFragment(fragmentId);
+} else {
+  saveRareAudio(selectedQuote.audio);
+}
 
       updateVoiceCollectionStatus();
 
