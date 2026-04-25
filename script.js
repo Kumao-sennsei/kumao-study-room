@@ -1241,7 +1241,7 @@ return;
   prepareBreakUI();
   startBreakCafeBgm();
 
-const FORCE_RARE_TEST = true; // レアボイステスト中だけ true。本番前に false
+const FORCE_RARE_TEST = false;// レアボイステスト中だけ true。本番前に false
 const showRare = FORCE_RARE_TEST;
 
 if (showRare) {
