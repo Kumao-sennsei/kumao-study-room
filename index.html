@@ -1298,6 +1298,9 @@ function syncCurrentUserNameUI() {
         ? `<div style="font-size:12px; color:#ffd54f; margin-bottom:4px;">${escapeHtml(note.subject)}</div>`
         : "";
 
+      const profileHtml = note.author === "くまお太郎"
+  ? `<div style="font-size:12px; color:#facc15; font-weight:bold; margin:2px 0 6px;">高2 京大農志望</div>`
+  : "";
       const actionHtml = note.isMine
         ? `
           <div style="display:flex; gap:6px; margin-top:10px;">
@@ -1356,9 +1359,10 @@ function syncCurrentUserNameUI() {
           ${imageHtml}
           ${subjectHtml}
           <div style="white-space:pre-wrap; word-break:break-word; line-height:1.5;">${escapeHtml(note.text)}</div>
-          <div style="margin-top:8px; font-size:12px; color:#aaa;">
-            ${escapeHtml(note.author)} ・ ${escapeHtml(formatDate(note.createdAt))}
-          </div>
+         <div style="margin-top:8px; font-size:12px; color:#aaa;">
+  ${escapeHtml(note.author)} ・ ${escapeHtml(formatDate(note.createdAt))}
+</div>
+${profileHtml}
           ${entriesHtml}
           <div style="margin-top:6px;">
             <button 
