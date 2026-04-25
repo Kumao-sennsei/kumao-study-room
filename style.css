@@ -1085,3 +1085,21 @@ transform: translate(-50%, -50%);
   box-shadow: 0 0 0 2px rgba(255, 214, 10, 0.35);
   transition: background 0.2s ease, box-shadow 0.2s ease;
 }
+.featuredNote{
+grid-column: span 2;
+padding:12px;
+}
+
+.featuredNote img{
+width:100%;
+height:180px !important;
+object-fit:cover;
+border-radius:12px;
+}
+
+@media (max-width:768px){
+.featuredNote{
+grid-column: span 1;
+}
+}
+
