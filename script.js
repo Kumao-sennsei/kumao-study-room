@@ -1517,6 +1517,10 @@ function renderGroupedPosts(posts) {
   const noteGrid = document.getElementById("noteGrid");
   if (!noteGrid) return;
 
+  if (!Array.isArray(posts) || posts.length === 0) {
+    return;
+  }
+
   const summaries = buildGroupedPostSummaries(posts);
 
   noteGrid.innerHTML = summaries
