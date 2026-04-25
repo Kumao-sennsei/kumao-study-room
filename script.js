@@ -951,14 +951,25 @@ function hideVoiceCollectionStatus() {
 }
 
 function getAvailableRareQuotesForCurrentMonth() {
+  const month = getCurrentMonth();
   const pool = getRarePoolForCurrentMonth();
 
   if (!Array.isArray(pool)) return [];
 
-  return pool.filter((quote) =>
-    typeof quote.audio === "string" &&
-    !/_rare_ultra_04\.mp3$/.test(quote.audio)
-  );
+  const monthStr = String(month).padStart(2, "0");
+  const fragmentId = `story_${monthStr}`;
+
+  return pool.filter((quote) => {
+    if (!quote || typeof quote.audio !== "string") return false;
+
+    const isStory = /_rare_ultra_04\.mp3$/.test(quote.audio);
+
+    // 物語欠片は取得済みなら再取得候補から外す
+    if (isStory && hasStoryFragment(fragmentId)) return false;
+
+    // 通常レアは取得済みでも再当選OK
+    return true;
+  });
 }
 
 // ======================
