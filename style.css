@@ -859,7 +859,7 @@ body{
 
   #right {
     width: 100% !important;
-    height: 42vh !important;
+    height: auto !important;
     min-height: 320px;
     margin-top: 12px;
   }
