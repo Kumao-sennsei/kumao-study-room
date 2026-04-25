@@ -1481,6 +1481,17 @@ function getStudyLabelByUser(userName) {
   return studyMap[userName] || "自由に学習中";
 }
 
+function getProfileByUser(userName) {
+  const profileMap = {
+    "くまお太郎": "高2 京大農志望",
+    "たかちゃん": "塾講師 開発中",
+    "Aさん": "英語やり直し中",
+    "Bさん": "数学Ⅱ 勉強中"
+  };
+
+  return profileMap[userName] || "プロフィール未設定";
+}
+
 function renderGroupedPostCard(summary, index) {
   const latestImage = summary.latestPost?.image || "";
   const latestComment = summary.latestPost?.comment || "";
@@ -1492,6 +1503,9 @@ function renderGroupedPostCard(summary, index) {
 <div style="text-align:center; margin-bottom:8px;">
   <img src="${avatarSrc}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; display:block; margin:0 auto;" />
   <div style="margin-top:6px; font-weight:700;">${safeUserName}</div>
+  <div style="margin-top:4px; font-size:12px; color:#facc15; font-weight:700;">
+  ${getProfileByUser(safeUserName)}
+</div>
   <div style="margin-top:4px; font-size:12px; color:#555; background:#f3f4f6; display:inline-block; padding:4px 10px; border-radius:999px;">${studyLabel}</div>
 </div>
 
