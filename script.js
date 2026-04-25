@@ -1677,7 +1677,7 @@ function enterRoom(roomName) {
           box-sizing:border-box;
         ">
           <img
-            src="kumao_avatar_free_default.png"
+            src="kumao_baby.png"
             alt="くまおアバター"
             style="
               width:42px;
