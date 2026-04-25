@@ -635,7 +635,7 @@ const BREAK_QUOTES_BY_MONTH = {
 { display: "ここまで積んできたやつだけが見える景色だ。\nお前、ちゃんと来てる。少し休憩だ。", audio: "audio/monthly/10/month10_break_16.mp3" },
 { display: "You got that main character energy. Don’t lose it. \n【訳】主役のオーラ出てるぞ。それ、手放すな。", audio: "audio/rare/10/month10_rare_ultra_01.mp3" },
 { display: "Pressure didn’t break you. It built you. \n【訳】プレッシャーで潰れなかったな。むしろ強くなってる。", audio: "audio/rare/10/month10_rare_ultra_02.mp3" },
-{ display: "筍といえば、かぐや姫だよな。　\nかぐや姫が生まれたのは７月７日だ。　意外だよな。　\nそう。この意外だなって感触を学習に取り入れると強ぇ。", audio: "audio/rare/10/month10_rare_ultra_03.mp3" },
+{ display: "筍といえば、かぐや姫だよな。　\nかぐや姫が生まれたのは７月７日だ。　意外だよな。　\nそう。この意外だなって感覚を学習に取り入れると強ぇ。", audio: "audio/rare/10/month10_rare_ultra_03.mp3" },
 { display: "負け続けた。笑えるくらいな。\nだがな、ある日突然、流れが見えた。\n理由は説明できねぇ。\nただ、「ああ、そういうことか」ってな。\nそこからは、負け方が変わった。", audio: "audio/rare/10/month10_rare_ultra_04.mp3" },
   ],
   11: [
