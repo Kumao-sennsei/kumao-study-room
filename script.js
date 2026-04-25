@@ -975,7 +975,7 @@ function getAvailableRareQuotesForCurrentMonth() {
 // ======================
 // 設定・状態管理
 // ======================
-const FOCUS_SEC = 0.3 * 60;
+const FOCUS_SEC = 0.2 * 60;
 const BREAK_SEC = 0.05 * 60;
 const SETS_PER_ROUND = 4;
 
