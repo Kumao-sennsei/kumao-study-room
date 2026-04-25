@@ -1305,7 +1305,9 @@ if (isStoryQuote) {
 
       updateVoiceCollectionStatus();
 
-      elQuote.textContent = selectedQuote.display;
+      elQuote.textContent = isStoryQuote
+  ? `📖【物語のかけら】を発見した！\n\n${selectedQuote.display}`
+  : selectedQuote.display;
       console.log("[rare] selectedQuote =", selectedQuote);
 
       playVoiceAudio(selectedQuote.audio, () => {
