@@ -1520,7 +1520,8 @@ function renderGroupedPosts(posts) {
   const summaries = buildGroupedPostSummaries(posts);
 
   noteGrid.innerHTML = summaries
-    .map((summary) => renderGroupedPostCard(summary))
+    .slice(0, 10)
+    .map((summary, index) => renderGroupedPostCard(summary, index))
     .join("");
 }
 
