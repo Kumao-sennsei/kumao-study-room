@@ -710,10 +710,28 @@ style="display:none; position:fixed; inset:0; background:#111; color:#fff; z-ind
  <div class="studyRoomSide" style="flex:1;">
     <div id="noticeBox" style="background:#1a1a1a; border:1px solid #333; border-radius:10px; padding:12px; margin-bottom:20px;">
       <div style="font-weight:bold; margin-bottom:8px;">📢 お知らせ</div>
-      <div>KUMAO STUDY ROOMへようこそ！</div>
-      <div style="margin-top:6px;">✨ ポモドーロ学習で集中力アップを目指そう</div>
-      <div style="margin-top:6px;">🏆 Kumaoさん、学習時間4時間突破！</div>
+　　　<div>今日、頑張ったことを投稿してみよう！</div>
+　　　<div style="margin-top:6px;">👍 いいねやコメント機能も使ってね(≧▽≦)</div>
+　　　<div style="margin-top:6px;">　小さな積み重ねが、未来の自分を助けてくれるよ🐻✨</div>
     </div>
+   <div
+  id="studyRoomTicker"
+  style="
+    display:none;
+    margin:0 0 16px;
+    padding:10px 14px;
+    border-radius:999px;
+    background:rgba(250, 204, 21, 0.16);
+    border:1px solid rgba(250, 204, 21, 0.55);
+    color:#facc15;
+    font-size:14px;
+    font-weight:bold;
+    text-align:center;
+    box-shadow:0 8px 18px rgba(0,0,0,0.20);
+  "
+></div>
+
+    <div id="noteArea">
 
     <div id="noteArea">
       <h3>📘 みんなの学習ノート</h3>
@@ -1470,6 +1488,22 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     }, 2500);
   }
 
+    function showStudyRoomTicker(msg) {
+  const ticker = document.getElementById("studyRoomTicker");
+  if (!ticker) return;
+
+  ticker.textContent = msg;
+  ticker.style.display = "block";
+
+  clearTimeout(window.studyRoomTickerTimer);
+  window.studyRoomTickerTimer = setTimeout(() => {
+    if (ticker.textContent === msg) {
+      ticker.style.display = "none";
+      ticker.textContent = "";
+    }
+  }, 3500);
+}
+
   function previewSelectedImage() {
   const fileInput = document.getElementById("noteImageInput");
   const previewWrap = document.getElementById("noteImagePreviewWrap");
@@ -1932,11 +1966,12 @@ ${profileHtml}
         imageData
       });
 
-      if (!saved) {
-        return;
-      }
+    if (!saved) {
+  return;
+}
 
-      resetComposer();
+showStudyRoomTicker(`📒 ${currentAuthor}さんがノートを投稿しました！`);
+resetComposer();
     }
 
     if (file) {
