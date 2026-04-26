@@ -1206,6 +1206,66 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   return true;
 }
 
+  async function updateNoteInSupabase(noteId, { subject, text, image }) {
+  const notes = getNotes();
+  const target = notes.find(note => note.id === noteId);
+
+  if (!target || !target.isMine) {
+    showMessage("編集できる投稿が見つからなかったよ", true);
+    return false;
+  }
+
+  const entryList = Array.isArray(target.entries) ? target.entries : [];
+  const latestEntry = entryList[entryList.length - 1];
+
+  if (!latestEntry?.id) {
+    showMessage("編集対象の投稿本文が見つからなかったよ", true);
+    return false;
+  }
+
+  const nextSubject = String(subject || "").trim();
+  const nextText = String(text || "").trim();
+  const nextImage = String(image || "").trim();
+
+  if (!nextText) {
+    showMessage("本文は空にできないよ！", true);
+    return false;
+  }
+
+  const { error: entryError } = await supabaseClient
+    .from("daily_note_entries")
+    .update({
+      subject: nextSubject,
+      text: nextText,
+      image_path: nextImage
+    })
+    .eq("id", latestEntry.id);
+
+  if (entryError) {
+    console.error("daily_note_entries編集エラー", entryError);
+    showMessage("投稿本文の編集でエラーが起きたよ", true);
+    return false;
+  }
+
+  const { error: noteError } = await supabaseClient
+    .from("daily_notes")
+    .update({
+      latest_subject: nextSubject
+    })
+    .eq("id", noteId);
+
+  if (noteError) {
+    console.error("daily_notes編集エラー", noteError);
+    showMessage("投稿カードの編集でエラーが起きたよ", true);
+    return false;
+  }
+
+  await loadNotesFromSupabase();
+  renderNotes();
+
+  return true;
+}
+
  function escapeHtml(str) {
   return String(str ?? "")
       .replace(/&/g, "&amp;")
@@ -1863,35 +1923,32 @@ ${profileHtml}
     commitNoteWithImage("");
   }
     
-  function editNote(noteId) {
-    const notes = getNotes();
-    const target = notes.find(note => note.id === noteId);
-    if (!target || !target.isMine) return;
+  async function editNote(noteId) {
+  const notes = getNotes();
+  const target = notes.find(note => note.id === noteId);
+  if (!target || !target.isMine) return;
 
-    const newSubject = prompt("教科を編集してね", target.subject || "");
-    if (newSubject === null) return;
+  const newSubject = prompt("教科を編集してね", target.subject || "");
+  if (newSubject === null) return;
 
-    const newText = prompt("ノート本文を編集してね", target.text || "");
-    if (newText === null) return;
+  const newText = prompt("ノート本文を編集してね", target.text || "");
+  if (newText === null) return;
 
-    const newImage = prompt("画像URLを編集してね（空欄OK）", target.image || "");
-    if (newImage === null) return;
+  const newImage = prompt("画像URLを編集してね（空欄OK）", target.image || "");
+  if (newImage === null) return;
 
-    const trimmedText = newText.trim();
-    if (!trimmedText) {
-      alert("本文は空にできないよ！");
-      return;
-    }
+  const saved = await updateNoteInSupabase(noteId, {
+    subject: newSubject,
+    text: newText,
+    image: newImage
+  });
 
-    target.subject = newSubject.trim();
-    target.text = trimmedText;
-    target.image = newImage.trim();
-    target.updatedAt = new Date().toISOString();
-
-    saveNotes(notes);
-    renderNotes();
-    showMessage("編集したよ！");
+  if (!saved) {
+    return;
   }
+
+  showMessage("編集したよ！");
+}
 
   function deleteNote(noteId) {
     const notes = getNotes();
