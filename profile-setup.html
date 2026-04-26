@@ -235,8 +235,8 @@
         return;
       }
 
-      if (displayName.length > 12) {
-        showMessage("表示名は12文字以内で入力してね", "error");
+     if (displayName.length > 20) {
+        showMessage("20文字以内で入力してください", "error");
         displayNameInput.focus();
         return;
       }
