@@ -1763,7 +1763,7 @@ async function enterRoom(roomName) {
   renderStudyRoomSeats(roomName, seats || []);
 
   if (typeof window.showStudyRoomTicker === "function") {
-    window.showStudyRoomTicker(`🐻 ${studyLabel} 学習中で入室しました！`);
+    window.showStudyRoomTicker(`🐻 ${studyLabel} で入室しました！`);
   }
 }
 
@@ -1961,14 +1961,16 @@ function renderStudyRoomSeats(roomName, seats) {
   detail.innerHTML = `
     <h3 style="margin:0 0 16px; text-align:center;">${escapeSeatHtml(roomName)}</h3>
 
-    <div style="
-      width:100%;
-      overflow-x:auto;
-      overflow-y:hidden;
-      -webkit-overflow-scrolling:touch;
-      padding:0 0 10px;
-      box-sizing:border-box;
-    ">
+   <div style="
+  width:100%;
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  padding:0 0 10px;
+  box-sizing:border-box;
+">
       <div style="
         display:grid;
         grid-template-columns: repeat(5, ${cardWidth}px);
@@ -1976,7 +1978,7 @@ function renderStudyRoomSeats(roomName, seats) {
         justify-content:start;
         align-items:start;
         width:max-content;
-        margin:0 auto;
+        margin:${isMobile ? "0" : "0 auto"};
         box-sizing:border-box;
       ">
         ${cardsHtml}
