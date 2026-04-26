@@ -1816,21 +1816,33 @@ function renderStudyRoomSeats(roomName, seats) {
     if (!seat) {
       return `
         <div style="
-         width:136px;
-　　　　　　min-height:166px;
-          background:#242424;
+          width:136px;
+          min-height:178px;
+          background:#202020;
           border:1px dashed #444;
-          border-radius:14px;
+          border-radius:16px;
           display:flex;
           flex-direction:column;
           align-items:center;
           justify-content:center;
           padding:8px;
           box-sizing:border-box;
-          opacity:0.65;
+          opacity:0.68;
         ">
-          <div style="font-size:34px; margin-bottom:6px;">🪑</div>
-          <div style="font-size:12px; color:#aaa;">空席</div>
+          <div style="
+            width:96px;
+            height:96px;
+            border-radius:16px;
+            background:rgba(255,255,255,0.04);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin-bottom:10px;
+          ">
+            <div style="font-size:38px; opacity:0.72;">🪑</div>
+          </div>
+
+          <div style="font-size:13px; color:#aaa; font-weight:bold;">空席</div>
         </div>
       `;
     }
@@ -1843,10 +1855,10 @@ function renderStudyRoomSeats(roomName, seats) {
     return `
       <div style="
         width:136px;
-　　　　 min-height:166px;
+        min-height:178px;
         background:#2f2f2f;
         border:1px solid #555;
-        border-radius:14px;
+        border-radius:16px;
         display:flex;
         flex-direction:column;
         align-items:center;
@@ -1854,57 +1866,77 @@ function renderStudyRoomSeats(roomName, seats) {
         padding:8px;
         box-sizing:border-box;
         box-shadow:0 8px 18px rgba(0,0,0,0.18);
+        overflow:hidden;
       ">
-        <img
-          src="${avatarSrc}"
-          alt="くまおアバター"
-          style="
-           width:62px;
-           height:62px;
-            object-fit:contain;
-            margin-bottom:5px;
-          "
-        >
+        <div style="
+          width:112px;
+          height:96px;
+          border-radius:16px;
+          background:linear-gradient(180deg, rgba(250,204,21,0.16), rgba(255,255,255,0.04));
+          border:1px solid rgba(250,204,21,0.24);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          margin-bottom:7px;
+          position:relative;
+          overflow:hidden;
+        ">
+          <img
+            src="${avatarSrc}"
+            alt="くまおアバター"
+            style="
+              width:86px;
+              height:86px;
+              object-fit:contain;
+              position:relative;
+              z-index:2;
+            "
+          >
+        </div>
 
         <div style="
+          width:118px;
           font-size:12px;
           font-weight:bold;
           color:#fff;
-          max-width:118px;
           white-space:nowrap;
           overflow:hidden;
           text-overflow:ellipsis;
           text-align:center;
+          line-height:1.35;
         ">
           ${displayName}
         </div>
 
         <div style="
+          width:118px;
           font-size:10px;
           color:#facc15;
-          max-width:96px;
           white-space:nowrap;
           overflow:hidden;
           text-overflow:ellipsis;
           text-align:center;
           margin-top:3px;
+          line-height:1.35;
         ">
           ${profileText}
         </div>
 
         <div style="
+          width:118px;
           font-size:10px;
           color:#ddd;
           background:#111;
           border:1px solid #444;
           border-radius:999px;
-          max-width:96px;
           white-space:nowrap;
           overflow:hidden;
           text-overflow:ellipsis;
           text-align:center;
-          margin-top:5px;
+          margin-top:6px;
           padding:3px 7px;
+          box-sizing:border-box;
+          line-height:1.35;
         ">
           ${studyLabel} 学習中
         </div>
@@ -1918,14 +1950,14 @@ function renderStudyRoomSeats(roomName, seats) {
     <div style="
       display:grid;
       grid-template-columns: repeat(5, 136px);
-      gap:14px;
+      gap:18px;
       justify-content:center;
+      align-items:start;
     ">
       ${cardsHtml}
     </div>
   `;
 }
-
 
 /* =========================
    ストーリー図鑑（新）
