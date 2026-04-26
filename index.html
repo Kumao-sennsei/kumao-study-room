@@ -1266,6 +1266,32 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   return true;
 }
 
+    async function deleteNoteFromSupabase(noteId) {
+  const notes = getNotes();
+  const target = notes.find(note => note.id === noteId);
+
+  if (!target || !target.isMine) {
+    showMessage("削除できる投稿が見つからなかったよ", true);
+    return false;
+  }
+
+  const { error: deleteError } = await supabaseClient
+    .from("daily_notes")
+    .delete()
+    .eq("id", noteId);
+
+  if (deleteError) {
+    console.error("daily_notes削除エラー", deleteError);
+    showMessage("投稿の削除でエラーが起きたよ", true);
+    return false;
+  }
+
+  await loadNotesFromSupabase();
+  renderNotes();
+
+  return true;
+}
+
  function escapeHtml(str) {
   return String(str ?? "")
       .replace(/&/g, "&amp;")
@@ -1950,19 +1976,22 @@ ${profileHtml}
   showMessage("編集したよ！");
 }
 
-  function deleteNote(noteId) {
-    const notes = getNotes();
-    const target = notes.find(note => note.id === noteId);
-    if (!target || !target.isMine) return;
+  async function deleteNote(noteId) {
+  const notes = getNotes();
+  const target = notes.find(note => note.id === noteId);
+  if (!target || !target.isMine) return;
 
-    const ok = confirm("このノートを削除する？");
-    if (!ok) return;
+  const ok = confirm("このノートを削除する？");
+  if (!ok) return;
 
-    const nextNotes = notes.filter(note => note.id !== noteId);
-    saveNotes(nextNotes);
-    renderNotes();
-    showMessage("削除したよ！");
+  const deleted = await deleteNoteFromSupabase(noteId);
+
+  if (!deleted) {
+    return;
   }
+
+  showMessage("削除したよ！");
+}
 
   async function likeNote(noteId) {
   const notes = getNotes();
