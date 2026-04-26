@@ -1172,6 +1172,40 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   return true;
 } 
 
+  async function saveCommentToSupabase(noteId, commentText) {
+  const user = await getCurrentSessionUser();
+
+  if (!user) {
+    showMessage("ログイン情報が確認できません。もう一度ログインしてね。", true);
+    return false;
+  }
+
+  const text = String(commentText || "").trim();
+
+  if (!text) {
+    return false;
+  }
+
+  const { error: insertError } = await supabaseClient
+    .from("note_comments")
+    .insert({
+      daily_note_id: noteId,
+      user_id: user.id,
+      comment_text: text
+    });
+
+  if (insertError) {
+    console.error("note_comments保存エラー", insertError);
+    showMessage("コメント保存でエラーが起きたよ", true);
+    return false;
+  }
+
+  await loadNotesFromSupabase();
+  renderNotes();
+
+  return true;
+}
+
  function escapeHtml(str) {
   return String(str ?? "")
       .replace(/&/g, "&amp;")
@@ -1887,7 +1921,7 @@ ${profileHtml}
   }
 }
 
-  function addComment(noteId) {
+ async function addComment(noteId) {
   const currentMemberPlan = getCurrentMemberPlan();
 
   if (currentMemberPlan !== "paid") {
@@ -1898,31 +1932,18 @@ ${profileHtml}
     return;
   }
 
-  const notes = getNotes();
-  const target = notes.find(note => note.id === noteId);
-  if (!target) return;
-
   const input = document.getElementById(`comment-input-${noteId}`);
   if (!input) return;
 
   const text = input.value.trim();
   if (!text) return;
 
-  if (!Array.isArray(target.comments)) {
-    target.comments = [];
+  const saved = await saveCommentToSupabase(noteId, text);
+
+  if (!saved) {
+    return;
   }
 
-  target.comments.push({
-    id: makeId(),
-    author: getCurrentUserName(),
-    text,
-    createdAt: new Date().toISOString()
-  });
-
-  target.updatedAt = new Date().toISOString();
-
-  saveNotes(notes);
-  renderNotes();
   showMessage("コメントできたよ！");
 }
   
