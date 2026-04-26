@@ -1902,7 +1902,7 @@ function closePaidOnlyModal() {
   
   function handleModeStart(mode) {
   const plan = getCurrentMemberPlan();
-  const FORCE_AUDIO_TEST = true; // テスト中だけ true。本番前に false に戻す
+  const FORCE_AUDIO_TEST = false; // 本番用：無料会員はポモドーロ不可
 
   if (plan !== "paid" && !FORCE_AUDIO_TEST) {
     openPaidOnlyModal();
