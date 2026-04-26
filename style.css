@@ -1165,16 +1165,20 @@ grid-column: span 1;
 
  #startMenu {
   margin-top: 0 !important;
-  gap: 14px !important;
+  gap: 12px !important;
   width: 100% !important;
 }
 
   .modeBtn {
-  height: 88px !important;
+  height: 72px !important;
+  min-height: 72px !important;
+  padding: 0 12px !important;
   font-size: clamp(18px, 5vw, 22px) !important;
   font-weight: 800 !important;
   border-radius: 16px !important;
-  padding: 0 12px !important;
-  line-height: 1.25 !important;
+  line-height: 1.1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 }
