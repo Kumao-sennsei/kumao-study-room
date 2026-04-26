@@ -1132,3 +1132,47 @@ grid-column: span 1;
     line-height: 1.15;
   }
 }
+
+/* ===== TOP画面：スマホ表示の間隔・入口ボタン最終調整 ===== */
+@media (max-width: 768px) {
+  #left {
+    gap: 0 !important;
+  }
+
+  #productName {
+    margin: 0 0 18px !important;
+  }
+
+  #subTitle {
+    margin: 0 0 18px !important;
+  }
+
+  #loggedInGuideText {
+    margin: 0 0 18px !important;
+    font-size: 22px !important;
+    line-height: 1.35 !important;
+  }
+
+  #storyBookBtn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 0 18px !important;
+    font-size: 22px !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+  }
+
+  #startMenu {
+    margin-top: 0 !important;
+    gap: 18px !important;
+    width: 100% !important;
+  }
+
+  .modeBtn {
+    height: 112px !important;
+    font-size: clamp(23px, 6vw, 28px) !important;
+    font-weight: 800 !important;
+    border-radius: 18px !important;
+  }
+}
