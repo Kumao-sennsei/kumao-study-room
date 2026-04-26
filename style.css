@@ -1123,3 +1123,12 @@ grid-column: span 1;
   touch-action: manipulation;
 }
 
+@media (max-width: 768px) {
+  #productName {
+    font-size: clamp(28px, 7.6vw, 34px);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    max-width: 100%;
+    line-height: 1.15;
+  }
+}
