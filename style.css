@@ -310,13 +310,25 @@ body{
 
 #brandBox{
   position:absolute;
-  right: clamp(10px, 1.6vmin, 18px);
+  left: clamp(10px, 1.6vmin, 18px);
   bottom: clamp(10px, 1.6vmin, 18px);
   z-index:4;
   display:flex;
   flex-direction:column;
-  align-items:flex-end;
+  align-items:flex-start;
   gap: clamp(4px, .8vmin, 6px);
+  text-decoration:none;
+  cursor:pointer;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+#brandBox:hover{
+  transform: translateY(-2px);
+  opacity:0.94;
+}
+
+#brandBox:active{
+  transform: translateY(1px);
 }
 
 #goodayLogo{
