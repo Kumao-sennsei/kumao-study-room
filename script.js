@@ -1592,6 +1592,10 @@ function joinRoom() {
   isInRoom = true;
   roomUsers.push(CURRENT_USER_NAME);
   renderRoom();
+
+  if (typeof showStudyRoomTicker === "function") {
+    showStudyRoomTicker(`🐻 ${CURRENT_USER_NAME}さんが入室しました！`);
+  }
 }
 
 function leaveRoom() {
@@ -1600,6 +1604,10 @@ function leaveRoom() {
   isInRoom = false;
   roomUsers = roomUsers.filter(name => name !== CURRENT_USER_NAME);
   renderRoom();
+
+  if (typeof showStudyRoomTicker === "function") {
+    showStudyRoomTicker(`👋 ${CURRENT_USER_NAME}さんが退出しました！`);
+  }
 }
 
 const samplePosts = [
