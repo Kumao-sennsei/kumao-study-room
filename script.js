@@ -1863,7 +1863,8 @@ function renderStudyRoomSeats(roomName, seats) {
     const avatarSrc = getStudyRoomAvatarSrc(seat);
     const displayName = escapeSeatHtml(seat.display_name || "名無し");
     const profileText = escapeSeatHtml(seat.profile_text || "プロフィール未設定");
-    const studyLabel = escapeSeatHtml(seat.study_label || "自習");
+    const rawStudyLabel = String(seat.study_label || "自習").replace(/\s*学習中\s*$/u, "");
+　　 const studyLabel = escapeSeatHtml(rawStudyLabel || "自習");
 
     return `
       <div style="
@@ -1952,7 +1953,7 @@ function renderStudyRoomSeats(roomName, seats) {
           box-sizing:border-box;
           line-height:1.35;
         ">
-          ${studyLabel} 学習中
+          ${studyLabel} 
         </div>
       </div>
     `;
