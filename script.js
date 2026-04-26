@@ -726,8 +726,16 @@ function getCurrentMonth() {
     timeZone: "Asia/Tokyo",
     month: "numeric"
   }).format(now);
-console.log("[month] monthText =", monthText, "Number(monthText) =", Number(monthText));
-    return 3;
+
+  const month = Number(monthText);
+
+  console.log("[month] monthText =", monthText, "month =", month);
+
+  if (!Number.isFinite(month) || month < 1 || month > 12) {
+    return new Date().getMonth() + 1;
+  }
+
+  return month;
 }
 
 function pickByWeight(items) {
@@ -975,8 +983,8 @@ function getAvailableRareQuotesForCurrentMonth() {
 // ======================
 // 設定・状態管理
 // ======================
-const FOCUS_SEC = 0.2 * 60;
-const BREAK_SEC = 0.05 * 60;
+const FOCUS_SEC = 25 * 60;
+const BREAK_SEC = 5 * 60;
 const SETS_PER_ROUND = 4;
 
 let currentMode = "";
@@ -1081,11 +1089,25 @@ function startTimerLoop(phaseMaxSec) {
 // 4周目以降: 10%
 // ======================
 function getRareProbability(round) {
-  if (round === 1) return 0.3; //1%
-if (round === 2) return 0.3; //3%
-if (round === 3) return 0.3; //6%
-if (round === 4) return 0.3; //10%
-return 0.3;                  //5周目以降15%
+  // ローンチ記念：2026年5月末までレアボイス高確率
+  const now = new Date();
+  const launchBoostEnd = new Date("2026-06-01T00:00:00+09:00");
+  const isLaunchBoost = now < launchBoostEnd;
+
+  if (isLaunchBoost) {
+    if (round === 1) return 0.10; // 1周目：10%
+    if (round === 2) return 0.20; // 2周目：20%
+    if (round === 3) return 0.30; // 3周目：30%
+    if (round === 4) return 0.30; // 4周目：30%
+    return 0.30;                  // 5周目以降：30%
+  }
+
+  // 通常運用：6月以降
+  if (round === 1) return 0.05;
+  if (round === 2) return 0.10;
+  if (round === 3) return 0.15;
+  if (round === 4) return 0.20;
+  return 0.20;
 }
 
 function shouldShowRareButton() {
