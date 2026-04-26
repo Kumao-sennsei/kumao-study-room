@@ -1807,7 +1807,19 @@ function renderStudyRoomSeats(roomName, seats) {
   const detail = document.getElementById("roomDetail");
   if (!detail) return;
 
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
   const seatCount = 25;
+
+  // PCは大きめ、スマホは3列見えるくらいに調整
+  const cardWidth = isMobile ? 104 : 136;
+  const cardHeight = isMobile ? 158 : 178;
+  const avatarAreaWidth = isMobile ? 84 : 112;
+  const avatarAreaHeight = isMobile ? 78 : 96;
+  const avatarSize = isMobile ? 72 : 86;
+  const textWidth = isMobile ? 92 : 118;
+  const gridGap = isMobile ? 10 : 18;
+
   const occupiedSeats = Array.isArray(seats) ? seats.slice(0, seatCount) : [];
 
   const cardsHtml = Array.from({ length: seatCount }).map((_, index) => {
@@ -1816,8 +1828,8 @@ function renderStudyRoomSeats(roomName, seats) {
     if (!seat) {
       return `
         <div style="
-          width:136px;
-          min-height:178px;
+          width:${cardWidth}px;
+          min-height:${cardHeight}px;
           background:#202020;
           border:1px dashed #444;
           border-radius:16px;
@@ -1828,10 +1840,11 @@ function renderStudyRoomSeats(roomName, seats) {
           padding:8px;
           box-sizing:border-box;
           opacity:0.68;
+          flex:0 0 auto;
         ">
           <div style="
-            width:96px;
-            height:96px;
+            width:${avatarAreaWidth}px;
+            height:${avatarAreaHeight}px;
             border-radius:16px;
             background:rgba(255,255,255,0.04);
             display:flex;
@@ -1839,7 +1852,7 @@ function renderStudyRoomSeats(roomName, seats) {
             justify-content:center;
             margin-bottom:10px;
           ">
-            <div style="font-size:38px; opacity:0.72;">🪑</div>
+            <div style="font-size:${isMobile ? 32 : 38}px; opacity:0.72;">🪑</div>
           </div>
 
           <div style="font-size:13px; color:#aaa; font-weight:bold;">空席</div>
@@ -1854,8 +1867,8 @@ function renderStudyRoomSeats(roomName, seats) {
 
     return `
       <div style="
-        width:136px;
-        min-height:178px;
+        width:${cardWidth}px;
+        min-height:${cardHeight}px;
         background:#2f2f2f;
         border:1px solid #555;
         border-radius:16px;
@@ -1867,10 +1880,11 @@ function renderStudyRoomSeats(roomName, seats) {
         box-sizing:border-box;
         box-shadow:0 8px 18px rgba(0,0,0,0.18);
         overflow:hidden;
+        flex:0 0 auto;
       ">
         <div style="
-          width:112px;
-          height:96px;
+          width:${avatarAreaWidth}px;
+          height:${avatarAreaHeight}px;
           border-radius:16px;
           background:linear-gradient(180deg, rgba(250,204,21,0.16), rgba(255,255,255,0.04));
           border:1px solid rgba(250,204,21,0.24);
@@ -1885,8 +1899,8 @@ function renderStudyRoomSeats(roomName, seats) {
             src="${avatarSrc}"
             alt="くまおアバター"
             style="
-              width:86px;
-              height:86px;
+              width:${avatarSize}px;
+              height:${avatarSize}px;
               object-fit:contain;
               position:relative;
               z-index:2;
@@ -1895,8 +1909,8 @@ function renderStudyRoomSeats(roomName, seats) {
         </div>
 
         <div style="
-          width:118px;
-          font-size:12px;
+          width:${textWidth}px;
+          font-size:${isMobile ? 11 : 12}px;
           font-weight:bold;
           color:#fff;
           white-space:nowrap;
@@ -1909,8 +1923,8 @@ function renderStudyRoomSeats(roomName, seats) {
         </div>
 
         <div style="
-          width:118px;
-          font-size:10px;
+          width:${textWidth}px;
+          font-size:${isMobile ? 9 : 10}px;
           color:#facc15;
           white-space:nowrap;
           overflow:hidden;
@@ -1923,8 +1937,8 @@ function renderStudyRoomSeats(roomName, seats) {
         </div>
 
         <div style="
-          width:118px;
-          font-size:10px;
+          width:${textWidth}px;
+          font-size:${isMobile ? 9 : 10}px;
           color:#ddd;
           background:#111;
           border:1px solid #444;
@@ -1948,13 +1962,25 @@ function renderStudyRoomSeats(roomName, seats) {
     <h3 style="margin:0 0 16px; text-align:center;">${escapeSeatHtml(roomName)}</h3>
 
     <div style="
-      display:grid;
-      grid-template-columns: repeat(5, 136px);
-      gap:18px;
-      justify-content:center;
-      align-items:start;
+      width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
+      padding:0 0 10px;
+      box-sizing:border-box;
     ">
-      ${cardsHtml}
+      <div style="
+        display:grid;
+        grid-template-columns: repeat(5, ${cardWidth}px);
+        gap:${gridGap}px;
+        justify-content:start;
+        align-items:start;
+        width:max-content;
+        margin:0 auto;
+        box-sizing:border-box;
+      ">
+        ${cardsHtml}
+      </div>
     </div>
   `;
 }
