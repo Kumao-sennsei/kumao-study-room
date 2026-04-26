@@ -1694,77 +1694,239 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 });
 
-// 👉 部屋に入る（仮）
-function enterRoom(roomName) {
+async function enterRoom(roomName) {
+  const detail = document.getElementById("roomDetail");
+  if (!detail) return;
+
+  const sessionResult = await supabaseClient.auth.getSession();
+  const user = sessionResult?.data?.session?.user;
+
+  if (!user) {
+    detail.innerHTML = `
+      <div style="color:#ff8a80; text-align:center; padding:20px;">
+        ログイン情報が確認できません。もう一度ログインしてね。
+      </div>
+    `;
+    return;
+  }
+
+  let studyLabel = prompt("今日は何を勉強する？（20字以内）", "自習");
+
+  if (studyLabel === null) return;
+
+  studyLabel = studyLabel.trim();
+
+  if (!studyLabel) {
+    studyLabel = "自習";
+  }
+
+  if (studyLabel.length > 20) {
+    alert("学習内容は20字以内で入力してね🐻");
+    return;
+  }
+
+  const { error: upsertError } = await supabaseClient
+    .from("study_room_presence")
+    .upsert({
+      user_id: user.id,
+      room_name: roomName,
+      study_label: studyLabel,
+      updated_at: new Date().toISOString()
+    });
+
+  if (upsertError) {
+    console.error("study_room_presence 保存エラー", upsertError);
+    detail.innerHTML = `
+      <div style="color:#ff8a80; text-align:center; padding:20px;">
+        入室情報を保存できませんでした。RLSかテーブル設定を確認してね。
+      </div>
+    `;
+    return;
+  }
+
+  const { data: seats, error: seatError } = await supabaseClient
+    .from("study_room_seat_view")
+    .select("user_id, room_name, display_name, current_title, avatar_type, avatar_stage, study_label, entered_at, updated_at, profile_text")
+    .eq("room_name", roomName)
+    .order("entered_at", { ascending: true });
+
+  if (seatError) {
+    console.error("study_room_seat_view 取得エラー", seatError);
+    detail.innerHTML = `
+      <div style="color:#ff8a80; text-align:center; padding:20px;">
+        座席情報を取得できませんでした。
+      </div>
+    `;
+    return;
+  }
+
+  renderStudyRoomSeats(roomName, seats || []);
+
+  if (typeof window.showStudyRoomTicker === "function") {
+    window.showStudyRoomTicker(`🐻 ${studyLabel} 学習中で入室しました！`);
+  }
+}
+
+function getStudyRoomAvatarSrc(seat) {
+  const avatarType = seat?.avatar_type || "free_default";
+  const avatarStage = seat?.avatar_stage || "baby";
+
+  if (avatarType === "free_default") {
+    return "kumao_baby.png";
+  }
+
+  if (avatarStage === "kindergarten") {
+    return "kumao_kindergarten.png";
+  }
+
+  if (avatarStage === "elementary") {
+    return "kumao_elementary.png";
+  }
+
+  if (avatarStage === "teacher") {
+    return "kumao_teacher.png";
+  }
+
+  if (avatarStage === "don") {
+    return "don_space.png";
+  }
+
+  return "kumao_baby.png";
+}
+
+function escapeSeatHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function renderStudyRoomSeats(roomName, seats) {
   const detail = document.getElementById("roomDetail");
   if (!detail) return;
 
   const seatCount = 36;
+  const occupiedSeats = Array.isArray(seats) ? seats.slice(0, seatCount) : [];
 
-  detail.innerHTML = `
-    <h3 style="margin:0 0 16px; text-align:center;">${roomName}</h3>
+  const cardsHtml = Array.from({ length: seatCount }).map((_, index) => {
+    const seat = occupiedSeats[index] || null;
 
-    <div style="
-      display:grid;
-      grid-template-columns: repeat(6, 92px);
-      gap:14px;
-      justify-content:center;
-    ">
-      ${Array.from({ length: seatCount }).map(() => `
+    if (!seat) {
+      return `
         <div style="
-          width:92px;
-          height:112px;
-          background:#2f2f2f;
-          border:1px solid #444;
-          border-radius:12px;
+          width:112px;
+          min-height:138px;
+          background:#242424;
+          border:1px dashed #444;
+          border-radius:14px;
           display:flex;
           flex-direction:column;
           align-items:center;
           justify-content:center;
-          padding:6px;
+          padding:8px;
           box-sizing:border-box;
+          opacity:0.65;
         ">
-          <img
-            src="kumao_baby.png"
-            alt="くまおアバター"
-            style="
-              width:42px;
-              height:42px;
-              object-fit:contain;
-              margin-bottom:5px;
-            "
-          >
-          <div style="
-            font-size:12px;
-            font-weight:bold;
-            color:#fff;
-            max-width:80px;
-            white-space:nowrap;
-            overflow:hidden;
-            text-overflow:ellipsis;
-          ">
-            空席
-          </div>
-          <div style="
-            font-size:10px;
-            color:#bbb;
-            max-width:80px;
-            white-space:nowrap;
-            overflow:hidden;
-            text-overflow:ellipsis;
-            margin-top:3px;
-          ">
-            学習内容
-          </div>
+          <div style="font-size:26px; margin-bottom:6px;">🪑</div>
+          <div style="font-size:12px; color:#aaa;">空席</div>
         </div>
-      `).join("")}
-    </div>
-    `;
+      `;
+    }
 
-  if (typeof window.showStudyRoomTicker === "function") {
-    window.showStudyRoomTicker(`🐻 ${CURRENT_USER_NAME}さんが${roomName}に入室しました！`);
-  }
+    const avatarSrc = getStudyRoomAvatarSrc(seat);
+    const displayName = escapeSeatHtml(seat.display_name || "名無し");
+    const profileText = escapeSeatHtml(seat.profile_text || "プロフィール未設定");
+    const studyLabel = escapeSeatHtml(seat.study_label || "自習");
+
+    return `
+      <div style="
+        width:112px;
+        min-height:138px;
+        background:#2f2f2f;
+        border:1px solid #555;
+        border-radius:14px;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:flex-start;
+        padding:8px;
+        box-sizing:border-box;
+        box-shadow:0 8px 18px rgba(0,0,0,0.18);
+      ">
+        <img
+          src="${avatarSrc}"
+          alt="くまおアバター"
+          style="
+            width:42px;
+            height:42px;
+            object-fit:contain;
+            margin-bottom:5px;
+          "
+        >
+
+        <div style="
+          font-size:12px;
+          font-weight:bold;
+          color:#fff;
+          max-width:96px;
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          text-align:center;
+        ">
+          ${displayName}
+        </div>
+
+        <div style="
+          font-size:10px;
+          color:#facc15;
+          max-width:96px;
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          text-align:center;
+          margin-top:3px;
+        ">
+          ${profileText}
+        </div>
+
+        <div style="
+          font-size:10px;
+          color:#ddd;
+          background:#111;
+          border:1px solid #444;
+          border-radius:999px;
+          max-width:96px;
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          text-align:center;
+          margin-top:5px;
+          padding:3px 7px;
+        ">
+          ${studyLabel} 学習中
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  detail.innerHTML = `
+    <h3 style="margin:0 0 16px; text-align:center;">${escapeSeatHtml(roomName)}</h3>
+
+    <div style="
+      display:grid;
+      grid-template-columns: repeat(6, 112px);
+      gap:14px;
+      justify-content:center;
+    ">
+      ${cardsHtml}
+    </div>
+  `;
 }
+
+
 /* =========================
    ストーリー図鑑（新）
 ========================= */
