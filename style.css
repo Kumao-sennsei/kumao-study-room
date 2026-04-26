@@ -1111,7 +1111,7 @@ grid-column: span 1;
 }
 
 #noteGrid .noteCard * {
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 #noteGrid .noteCard {
