@@ -5,7 +5,9 @@
 
 html, body{
   height:100%;
+  width:100%;
   margin:0;
+  overflow-x:hidden;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
 }
 
@@ -50,6 +52,8 @@ body{
   min-height:100vh;
   height:100dvh;
   width:100%;
+  max-width:100%;
+  overflow-x:hidden;
   display:flex;
   gap:0;
   padding: var(--pad);
