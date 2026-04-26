@@ -1816,7 +1816,7 @@ function renderStudyRoomSeats(roomName, seats) {
   const cardHeight = isMobile ? 158 : 178;
   const avatarAreaWidth = isMobile ? 84 : 112;
   const avatarAreaHeight = isMobile ? 78 : 96;
-  const avatarSize = isMobile ? 92 : 106;
+  const avatarSize = isMobile ? 110 : 128;
   const textWidth = isMobile ? 92 : 118;
   const gridGap = isMobile ? 10 : 18;
 
