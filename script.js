@@ -1569,21 +1569,18 @@ function refreshStudyRoomView(posts) {
   renderGroupedPosts(posts || []);
 }
 
-
-
-
 function renderRoom() {
   const list = document.getElementById("roomList");
   const count = document.getElementById("roomCount");
 
-  list.innerHTML = "";
-  roomUsers.forEach(name => {
-    const li = document.createElement("li");
-    li.textContent = name;
-    list.appendChild(li);
-  });
+  if (list) {
+    list.innerHTML = "";
+    list.style.display = "none";
+  }
 
-  count.textContent = roomUsers.length;
+  if (count) {
+    count.textContent = roomUsers.length;
+  }
 }
 
 function joinRoom() {
