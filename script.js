@@ -1807,7 +1807,7 @@ function renderStudyRoomSeats(roomName, seats) {
   const detail = document.getElementById("roomDetail");
   if (!detail) return;
 
-  const seatCount = 36;
+  const seatCount = 25;
   const occupiedSeats = Array.isArray(seats) ? seats.slice(0, seatCount) : [];
 
   const cardsHtml = Array.from({ length: seatCount }).map((_, index) => {
@@ -1816,8 +1816,8 @@ function renderStudyRoomSeats(roomName, seats) {
     if (!seat) {
       return `
         <div style="
-          width:112px;
-          min-height:138px;
+         width:136px;
+　　　　　　min-height:166px;
           background:#242424;
           border:1px dashed #444;
           border-radius:14px;
@@ -1829,7 +1829,7 @@ function renderStudyRoomSeats(roomName, seats) {
           box-sizing:border-box;
           opacity:0.65;
         ">
-          <div style="font-size:26px; margin-bottom:6px;">🪑</div>
+          <div style="font-size:34px; margin-bottom:6px;">🪑</div>
           <div style="font-size:12px; color:#aaa;">空席</div>
         </div>
       `;
@@ -1842,8 +1842,8 @@ function renderStudyRoomSeats(roomName, seats) {
 
     return `
       <div style="
-        width:112px;
-        min-height:138px;
+        width:136px;
+　　　　 min-height:166px;
         background:#2f2f2f;
         border:1px solid #555;
         border-radius:14px;
@@ -1859,8 +1859,8 @@ function renderStudyRoomSeats(roomName, seats) {
           src="${avatarSrc}"
           alt="くまおアバター"
           style="
-            width:42px;
-            height:42px;
+           width:62px;
+           height:62px;
             object-fit:contain;
             margin-bottom:5px;
           "
@@ -1870,7 +1870,7 @@ function renderStudyRoomSeats(roomName, seats) {
           font-size:12px;
           font-weight:bold;
           color:#fff;
-          max-width:96px;
+          max-width:118px;
           white-space:nowrap;
           overflow:hidden;
           text-overflow:ellipsis;
@@ -1917,7 +1917,7 @@ function renderStudyRoomSeats(roomName, seats) {
 
     <div style="
       display:grid;
-      grid-template-columns: repeat(6, 112px);
+      grid-template-columns: repeat(5, 136px);
       gap:14px;
       justify-content:center;
     ">
