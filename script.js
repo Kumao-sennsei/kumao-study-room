@@ -1759,7 +1759,11 @@ function enterRoom(roomName) {
         </div>
       `).join("")}
     </div>
-  `;
+    `;
+
+  if (typeof window.showStudyRoomTicker === "function") {
+    window.showStudyRoomTicker(`🐻 ${CURRENT_USER_NAME}さんが${roomName}に入室しました！`);
+  }
 }
 /* =========================
    ストーリー図鑑（新）
