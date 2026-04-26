@@ -1692,7 +1692,7 @@ ${profileHtml}
       setComposerOpen(false);
     }
 
-    function commitNoteWithImage(imageData = "") {
+    async function commitNoteWithImage(imageData = "") {
       const nowIso = new Date().toISOString();
 
       const entry = {
