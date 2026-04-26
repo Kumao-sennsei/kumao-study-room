@@ -878,6 +878,256 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   <script>
 (() => {
   const STORAGE_KEY = "kumaoStudyRoomNotes_v1";
+  let notesCache = [];
+　let currentSessionUserId = "";
+
+  async function getCurrentSessionUser() {
+  const {
+    data: { session },
+    error
+  } = await supabaseClient.auth.getSession();
+
+  if (error || !session?.user?.id) {
+    currentSessionUserId = "";
+    return null;
+  }
+
+  currentSessionUserId = session.user.id;
+  return session.user;
+}
+
+  async function loadNotesFromSupabase() {
+  try {
+    const user = await getCurrentSessionUser();
+
+    if (!user) {
+      notesCache = [];
+      return [];
+    }
+
+    const { data: dailyNotes, error: notesError } = await supabaseClient
+      .from("daily_notes")
+      .select("id, user_id, date_key, latest_subject")
+      .order("date_key", { ascending: false });
+
+    if (notesError) {
+      console.error("daily_notes取得エラー", notesError);
+      notesCache = [];
+      return [];
+    }
+
+    if (!Array.isArray(dailyNotes) || dailyNotes.length === 0) {
+      notesCache = [];
+      return [];
+    }
+
+    const dailyNoteIds = dailyNotes.map(note => note.id);
+    const userIds = [...new Set(dailyNotes.map(note => note.user_id).filter(Boolean))];
+
+    const { data: entries, error: entriesError } = await supabaseClient
+      .from("daily_note_entries")
+      .select("id, daily_note_id, subject, text, image_path, created_at")
+      .in("daily_note_id", dailyNoteIds)
+      .order("created_at", { ascending: true });
+
+    if (entriesError) {
+      console.error("daily_note_entries取得エラー", entriesError);
+    }
+
+    const { data: comments, error: commentsError } = await supabaseClient
+      .from("note_comments")
+      .select("id, daily_note_id, user_id, comment_text, created_at")
+      .in("daily_note_id", dailyNoteIds)
+      .order("created_at", { ascending: true });
+
+    if (commentsError) {
+      console.error("note_comments取得エラー", commentsError);
+    }
+
+    const { data: likes, error: likesError } = await supabaseClient
+      .from("note_likes")
+      .select("daily_note_id, user_id, created_at")
+      .in("daily_note_id", dailyNoteIds);
+
+    if (likesError) {
+      console.error("note_likes取得エラー", likesError);
+    }
+
+    const commentUserIds = Array.isArray(comments)
+      ? comments.map(comment => comment.user_id).filter(Boolean)
+      : [];
+
+    const allUserIds = [...new Set([...userIds, ...commentUserIds])];
+
+    let profileMap = {};
+
+    if (allUserIds.length > 0) {
+      const { data: profiles, error: profilesError } = await supabaseClient
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", allUserIds);
+
+      if (profilesError) {
+        console.error("profiles取得エラー", profilesError);
+      } else if (Array.isArray(profiles)) {
+        profileMap = profiles.reduce((map, profile) => {
+          map[profile.id] = profile.display_name || "名無し";
+          return map;
+        }, {});
+      }
+    }
+
+    const entriesByNoteId = {};
+    (entries || []).forEach(entry => {
+      if (!entriesByNoteId[entry.daily_note_id]) {
+        entriesByNoteId[entry.daily_note_id] = [];
+      }
+
+      entriesByNoteId[entry.daily_note_id].push(entry);
+    });
+
+    const commentsByNoteId = {};
+    (comments || []).forEach(comment => {
+      if (!commentsByNoteId[comment.daily_note_id]) {
+        commentsByNoteId[comment.daily_note_id] = [];
+      }
+
+      commentsByNoteId[comment.daily_note_id].push(comment);
+    });
+
+    const likesByNoteId = {};
+    (likes || []).forEach(like => {
+      if (!likesByNoteId[like.daily_note_id]) {
+        likesByNoteId[like.daily_note_id] = [];
+      }
+
+      likesByNoteId[like.daily_note_id].push(like);
+    });
+
+    notesCache = dailyNotes.map(note => {
+      const noteEntries = entriesByNoteId[note.id] || [];
+      const noteComments = commentsByNoteId[note.id] || [];
+      const noteLikes = likesByNoteId[note.id] || [];
+      const latestEntry = noteEntries[noteEntries.length - 1] || null;
+      const firstEntry = noteEntries[0] || null;
+
+      return {
+        id: note.id,
+        author: profileMap[note.user_id] || "名無し",
+        userId: note.user_id,
+        dateKey: note.date_key,
+        subject: latestEntry?.subject || note.latest_subject || "",
+        text: latestEntry?.text || "",
+        image: latestEntry?.image_path || "",
+        likes: noteLikes.length,
+        liked: noteLikes.some(like => like.user_id === currentSessionUserId),
+        comments: noteComments.map(comment => ({
+          id: comment.id,
+          author: profileMap[comment.user_id] || "名無し",
+          text: comment.comment_text || "",
+          createdAt: comment.created_at
+        })),
+        entries: noteEntries.map(entry => ({
+          id: entry.id,
+          subject: entry.subject || "",
+          text: entry.text || "",
+          image: entry.image_path || "",
+          createdAt: entry.created_at
+        })),
+        createdAt: firstEntry?.created_at || note.date_key,
+        updatedAt: latestEntry?.created_at || note.date_key,
+        points: noteLikes.length,
+        isMine: note.user_id === currentSessionUserId
+      };
+    });
+
+    return notesCache;
+  } catch (e) {
+    console.error("loadNotesFromSupabase エラー", e);
+    notesCache = [];
+    return [];
+  }
+}
+
+  async function saveNoteToSupabase({ subject, text, imageData }) {
+  const user = await getCurrentSessionUser();
+
+  if (!user) {
+    showMessage("ログイン情報が確認できません。もう一度ログインしてね。", true);
+    return false;
+  }
+
+  const todayDateKey = getNoteDateKey(new Date());
+
+  const { data: existingNote, error: selectError } = await supabaseClient
+    .from("daily_notes")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("date_key", todayDateKey)
+    .maybeSingle();
+
+  if (selectError) {
+    console.error("daily_notes確認エラー", selectError);
+    showMessage("投稿の確認中にエラーが起きたよ", true);
+    return false;
+  }
+
+  let dailyNoteId = existingNote?.id || "";
+
+  if (!dailyNoteId) {
+    const { data: insertedNote, error: insertNoteError } = await supabaseClient
+      .from("daily_notes")
+      .insert({
+        user_id: user.id,
+        date_key: todayDateKey,
+        latest_subject: subject
+      })
+      .select("id")
+      .single();
+
+    if (insertNoteError) {
+      console.error("daily_notes作成エラー", insertNoteError);
+      showMessage("投稿カードの作成でエラーが起きたよ", true);
+      return false;
+    }
+
+    dailyNoteId = insertedNote.id;
+  } else {
+    const { error: updateNoteError } = await supabaseClient
+      .from("daily_notes")
+      .update({
+        latest_subject: subject
+      })
+      .eq("id", dailyNoteId);
+
+    if (updateNoteError) {
+      console.error("daily_notes更新エラー", updateNoteError);
+      showMessage("投稿カードの更新でエラーが起きたよ", true);
+      return false;
+    }
+  }
+
+  const { error: insertEntryError } = await supabaseClient
+    .from("daily_note_entries")
+    .insert({
+      daily_note_id: dailyNoteId,
+      subject,
+      text,
+      image_path: imageData || ""
+    });
+
+  if (insertEntryError) {
+    console.error("daily_note_entries作成エラー", insertEntryError);
+    showMessage("投稿本文の保存でエラーが起きたよ", true);
+    return false;
+  }
+
+  await loadNotesFromSupabase();
+  renderNotes();
+
+  return true;
+}
+  
 
  function escapeHtml(str) {
   return String(str ?? "")
@@ -1042,12 +1292,7 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   }
 
   function getNotes() {
-    const saved = loadNotes();
-    if (saved && saved.length) return saved;
-
-    const seed = extractSeedNotesFromHtml();
-    saveNotes(seed);
-    return seed;
+    return Array.isArray(notesCache) ? notesCache : [];
   }
 
   function showMessage(msg, isError = false) {
@@ -1407,7 +1652,7 @@ ${profileHtml}
     }).join("");
   }
 
-   function addNote() {
+   async function addNote() {
     const subjectEl = document.getElementById("noteSubjectInput");
     const textEl = document.getElementById("noteTextInput");
     const imageEl = document.getElementById("noteImageInput");
@@ -1516,8 +1761,16 @@ ${profileHtml}
         notes.unshift(newNote);
       }
 
-      saveNotes(notes);
-      renderNotes();
+      const saved = await saveNoteToSupabase({
+        subject,
+        text,
+        imageData
+      });
+
+      if (!saved) {
+        return;
+      }
+
       resetComposer();
     }
 
@@ -1915,10 +2168,10 @@ function closePaidOnlyModal() {
 window.handleModeStart = handleModeStart;
   
 
-function initNotesFeature() {
+async function initNotesFeature() {
   if (!getNoteGrid()) return;
 
-  getNotes();
+  await loadNotesFromSupabase();
   renderNotes();
   bindEvents();
   syncMemberPlanUI();
