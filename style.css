@@ -519,9 +519,10 @@ body{
 }
 
 #studyRoom ul {
+  display: none;
   list-style: none;
   padding: 0;
-  margin: 8px 0;
+  margin: 0;
 }
 
 .studyRoomButtons {
