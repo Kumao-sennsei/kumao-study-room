@@ -1127,7 +1127,50 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
 
   return true;
 }
-  
+
+  async function saveLikeToSupabase(noteId) {
+  const user = await getCurrentSessionUser();
+
+  if (!user) {
+    showMessage("ログイン情報が確認できません。もう一度ログインしてね。", true);
+    return false;
+  }
+
+  const { data: existingLike, error: selectError } = await supabaseClient
+    .from("note_likes")
+    .select("daily_note_id")
+    .eq("daily_note_id", noteId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (selectError) {
+    console.error("note_likes確認エラー", selectError);
+    showMessage("いいね確認中にエラーが起きたよ", true);
+    return false;
+  }
+
+  if (existingLike) {
+    return true;
+  }
+
+  const { error: insertError } = await supabaseClient
+    .from("note_likes")
+    .insert({
+      daily_note_id: noteId,
+      user_id: user.id
+    });
+
+  if (insertError) {
+    console.error("note_likes保存エラー", insertError);
+    showMessage("いいね保存でエラーが起きたよ", true);
+    return false;
+  }
+
+  await loadNotesFromSupabase();
+  renderNotes();
+
+  return true;
+} 
 
  function escapeHtml(str) {
   return String(str ?? "")
@@ -1830,18 +1873,18 @@ ${profileHtml}
     showMessage("削除したよ！");
   }
 
-  function likeNote(noteId) {
+  async function likeNote(noteId) {
   const notes = getNotes();
   const target = notes.find(note => note.id === noteId);
   if (!target) return;
 
   if (target.liked) return; // すでに押してる
 
-  target.likes += 1;
-  target.liked = true;
+  const saved = await saveLikeToSupabase(noteId);
 
-  saveNotes(notes);
-  renderNotes();
+  if (!saved) {
+    return;
+  }
 }
 
   function addComment(noteId) {
