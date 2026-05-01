@@ -339,6 +339,17 @@ async function primeAmbient(mode) {
 async function startAmbient(mode) {
   if (!mode) return;
 
+    const targetVolume =
+    WEB_AMBIENT_VOLUME_BY_MODE[mode] ?? WEB_AMBIENT_VOLUME;
+
+  // すでに同じ環境音が鳴っているなら、再起動しない
+  // セリフ音声終了後に startAmbient が再度呼ばれても、音を止めないための安全策
+  if (ambientSourceNode && ambientGainNode && ambientWebAudioMode === mode) {
+    fadeGainTo(ambientGainNode, targetVolume, WEB_AMBIENT_FADE_SEC);
+    console.log("[ambient-web] すでに再生中なので再起動しません:", mode);
+    return;
+  }
+
   const token = ambientWebAudioToken + 1;
   ambientWebAudioToken = token;
 
@@ -373,12 +384,7 @@ async function startAmbient(mode) {
     ambientGainNode = gain;
     ambientWebAudioMode = mode;
 
-    fadeGainTo(gain, WEB_AMBIENT_VOLUME, WEB_AMBIENT_FADE_SEC);
-
-    const targetVolume =
-  WEB_AMBIENT_VOLUME_BY_MODE[mode] ?? WEB_AMBIENT_VOLUME;
-
-fadeGainTo(gain, targetVolume, WEB_AMBIENT_FADE_SEC);
+  　fadeGainTo(gain, targetVolume, WEB_AMBIENT_FADE_SEC);
 
     source.onended = () => {
       if (ambientSourceNode === source) {
