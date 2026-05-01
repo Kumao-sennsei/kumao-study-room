@@ -397,27 +397,44 @@ async function startAmbient(mode) {
   try {
     await unlockAudioSystem();
 
+    const token = ambientLoopToken + 1;
+    ambientLoopToken = token;
+
     const audio = ensureAmbientObject(mode);
     if (!audio) return;
 
-    audio.loop = true;
-    audio.volume = 0.5;
+    clearAmbientTimers();
 
-    if (audio.paused) {
+    ambientActiveIndex = 0;
+    currentAudio = ambientAudios[ambientActiveIndex];
+
+    ambientAudios.forEach((item, index) => {
+      if (!item) return;
+
       try {
-        await audio.play();
-      } catch (e) {
-        console.warn("[audio] 通常再生失敗、再試行します:", e);
+        item.pause();
+        item.currentTime = 0;
+        item.loop = false;
+        item.volume = index === ambientActiveIndex ? AMBIENT_VOLUME : 0;
+      } catch (e) {}
+    });
 
-        audio.muted = true;
-        await audio.play().catch(() => {});
-        audio.pause();
-        audio.currentTime = 0;
-        audio.muted = false;
+    try {
+      await currentAudio.play();
+    } catch (e) {
+      console.warn("[ambient] 通常再生失敗、再試行します:", e);
 
-        await audio.play();
-      }
+      currentAudio.muted = true;
+      await currentAudio.play().catch(() => {});
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio.muted = false;
+
+      await currentAudio.play();
     }
+
+    scheduleAmbientCrossfade(mode, token);
+    console.log("[ambient] クロスフェード環境音開始:", mode);
   } catch (e) {
     console.error("環境音再生エラー:", e);
   }
