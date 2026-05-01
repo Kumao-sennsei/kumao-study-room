@@ -138,30 +138,162 @@ async function unlockAudioSystem() {
   return audioUnlockPromise;
 }
 
+// ======================
+// 環境音：クロスフェード・ループ管理
+// ======================
+const AMBIENT_VOLUME = 0.5;
+const AMBIENT_CROSSFADE_SEC = 4;
+
+let ambientAudios = [null, null];
+let ambientActiveIndex = 0;
+let ambientLoopTimer = null;
+let ambientFadeTimer = null;
+let ambientLoopToken = 0;
+
+function clearAmbientTimers() {
+  if (ambientLoopTimer) {
+    clearTimeout(ambientLoopTimer);
+    ambientLoopTimer = null;
+  }
+
+  if (ambientFadeTimer) {
+    clearInterval(ambientFadeTimer);
+    ambientFadeTimer = null;
+  }
+}
+
+function createAmbientAudio(mode) {
+  const audio = createManagedAudio(`${mode}.wav`);
+  audio.loop = false;
+  audio.volume = 0;
+  audio.currentTime = 0;
+  return audio;
+}
+
+function fadeAudioVolume(audio, from, to, durationMs, onDone) {
+  if (!audio) return;
+
+  const steps = Math.max(1, Math.floor(durationMs / 50));
+  let count = 0;
+
+  audio.volume = from;
+
+  const timer = setInterval(() => {
+    count += 1;
+    const rate = Math.min(1, count / steps);
+    audio.volume = from + (to - from) * rate;
+
+    if (rate >= 1) {
+      clearInterval(timer);
+      if (typeof onDone === "function") onDone();
+    }
+  }, 50);
+
+  return timer;
+}
+
 function ensureAmbientObject(mode) {
   if (!mode) return null;
 
-  if (!currentAudio) {
-    currentAudio = createManagedAudio(`${mode}.wav`);
-    currentAudio.loop = true;
-    currentAudio.volume = 0.5;
-    currentAudioMode = mode;
-    return currentAudio;
-  }
-
   if (currentAudioMode !== mode) {
-    try {
-      currentAudio.pause();
-    } catch (e) {}
-    currentAudio.src = `${mode}.wav`;
-    currentAudio.load();
-    currentAudio.loop = true;
-    currentAudio.volume = 0.5;
-    currentAudio.currentTime = 0;
+    stopAmbient();
+
+    ambientAudios = [
+      createAmbientAudio(mode),
+      createAmbientAudio(mode)
+    ];
+
+    ambientActiveIndex = 0;
+    currentAudio = ambientAudios[0];
     currentAudioMode = mode;
   }
 
+  if (!ambientAudios[0]) ambientAudios[0] = createAmbientAudio(mode);
+  if (!ambientAudios[1]) ambientAudios[1] = createAmbientAudio(mode);
+
+  currentAudio = ambientAudios[ambientActiveIndex];
   return currentAudio;
+}
+
+function scheduleAmbientCrossfade(mode, token) {
+  clearAmbientTimers();
+
+  const activeAudio = ambientAudios[ambientActiveIndex];
+  if (!activeAudio) return;
+
+  const setupSchedule = () => {
+    if (token !== ambientLoopToken) return;
+    if (currentAudioMode !== mode) return;
+
+    const duration = activeAudio.duration;
+
+    if (!Number.isFinite(duration) || duration <= AMBIENT_CROSSFADE_SEC + 1) {
+      ambientLoopTimer = setTimeout(() => {
+        scheduleAmbientCrossfade(mode, token);
+      }, 1000);
+      return;
+    }
+
+    const delayMs = Math.max(1000, (duration - AMBIENT_CROSSFADE_SEC) * 1000);
+
+    ambientLoopTimer = setTimeout(() => {
+      crossfadeAmbient(mode, token);
+    }, delayMs);
+  };
+
+  if (activeAudio.readyState >= 1) {
+    setupSchedule();
+  } else {
+    activeAudio.onloadedmetadata = setupSchedule;
+  }
+}
+
+async function crossfadeAmbient(mode, token) {
+  if (token !== ambientLoopToken) return;
+  if (currentAudioMode !== mode) return;
+
+  const oldIndex = ambientActiveIndex;
+  const newIndex = oldIndex === 0 ? 1 : 0;
+
+  const oldAudio = ambientAudios[oldIndex];
+  const newAudio = ambientAudios[newIndex];
+
+  if (!oldAudio || !newAudio) return;
+
+  try {
+    newAudio.pause();
+    newAudio.currentTime = 0;
+    newAudio.volume = 0;
+    newAudio.loop = false;
+
+    await newAudio.play();
+
+    fadeAudioVolume(newAudio, 0, AMBIENT_VOLUME, AMBIENT_CROSSFADE_SEC * 1000);
+
+    ambientFadeTimer = fadeAudioVolume(
+      oldAudio,
+      oldAudio.volume,
+      0,
+      AMBIENT_CROSSFADE_SEC * 1000,
+      () => {
+        try {
+          oldAudio.pause();
+          oldAudio.currentTime = 0;
+        } catch (e) {}
+
+        ambientActiveIndex = newIndex;
+        currentAudio = newAudio;
+
+        scheduleAmbientCrossfade(mode, token);
+      }
+    );
+  } catch (e) {
+    console.error("[ambient] クロスフェード失敗:", e);
+
+    ambientActiveIndex = newIndex;
+    currentAudio = newAudio;
+    scheduleAmbientCrossfade(mode, token);
+  }
 }
 
 function ensureVoiceObject() {
@@ -186,13 +318,29 @@ function stopVoice() {
 }
 
 function stopAmbient() {
+  ambientLoopToken += 1;
+  clearAmbientTimers();
+
+  ambientAudios.forEach((audio) => {
+    if (!audio) return;
+
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.volume = 0;
+      audio.onloadedmetadata = null;
+    } catch (e) {}
+  });
+
   if (currentAudio) {
     try {
       currentAudio.pause();
       currentAudio.currentTime = 0;
+      currentAudio.volume = 0;
     } catch (e) {}
   }
 }
+
 function ensureBreakCafeAudio() {
   if (!breakCafeAudio) {
     breakCafeAudio = createManagedAudio("audio/ambient/break_cafe_loop.mp3");
