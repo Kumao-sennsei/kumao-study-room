@@ -226,6 +226,7 @@ function scheduleAmbientCrossfade(mode, token) {
     if (currentAudioMode !== mode) return;
 
     const duration = activeAudio.duration;
+    const currentTime = activeAudio.currentTime || 0;
 
     if (!Number.isFinite(duration) || duration <= AMBIENT_CROSSFADE_SEC + 1) {
       ambientLoopTimer = setTimeout(() => {
@@ -234,65 +235,33 @@ function scheduleAmbientCrossfade(mode, token) {
       return;
     }
 
-    const delayMs = Math.max(1000, (duration - AMBIENT_CROSSFADE_SEC) * 1000);
+    // 重要：
+    // 2回目以降は、次の音声がすでに数秒進んだ状態でactiveになる。
+    // そのため duration だけでなく currentTime を引いて予約する。
+    const secondsUntilFade =
+      duration - currentTime - AMBIENT_CROSSFADE_SEC;
+
+    const delayMs = Math.max(100, secondsUntilFade * 1000);
 
     ambientLoopTimer = setTimeout(() => {
       crossfadeAmbient(mode, token);
     }, delayMs);
+
+    console.log(
+      "[ambient] 次のクロスフェード予約:",
+      {
+        mode,
+        duration,
+        currentTime,
+        delaySec: delayMs / 1000
+      }
+    );
   };
 
   if (activeAudio.readyState >= 1) {
     setupSchedule();
   } else {
     activeAudio.onloadedmetadata = setupSchedule;
-  }
-}
-
-async function crossfadeAmbient(mode, token) {
-  if (token !== ambientLoopToken) return;
-  if (currentAudioMode !== mode) return;
-
-  const oldIndex = ambientActiveIndex;
-  const newIndex = oldIndex === 0 ? 1 : 0;
-
-  const oldAudio = ambientAudios[oldIndex];
-  const newAudio = ambientAudios[newIndex];
-
-  if (!oldAudio || !newAudio) return;
-
-  try {
-    newAudio.pause();
-    newAudio.currentTime = 0;
-    newAudio.volume = 0;
-    newAudio.loop = false;
-
-    await newAudio.play();
-
-    fadeAudioVolume(newAudio, 0, AMBIENT_VOLUME, AMBIENT_CROSSFADE_SEC * 1000);
-
-    ambientFadeTimer = fadeAudioVolume(
-      oldAudio,
-      oldAudio.volume,
-      0,
-      AMBIENT_CROSSFADE_SEC * 1000,
-      () => {
-        try {
-          oldAudio.pause();
-          oldAudio.currentTime = 0;
-        } catch (e) {}
-
-        ambientActiveIndex = newIndex;
-        currentAudio = newAudio;
-
-        scheduleAmbientCrossfade(mode, token);
-      }
-    );
-  } catch (e) {
-    console.error("[ambient] クロスフェード失敗:", e);
-
-    ambientActiveIndex = newIndex;
-    currentAudio = newAudio;
-    scheduleAmbientCrossfade(mode, token);
   }
 }
 
