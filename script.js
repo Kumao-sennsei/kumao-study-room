@@ -111,9 +111,9 @@ async function loadAmbientBuffer(mode) {
     return ambientBufferCache[mode];
   }
 
-  const response = await fetch(`${mode}.wav`, {
-    cache: "force-cache"
-  });
+  const response = await fetch(`${mode}.wav?v=20260501_forest2`, {
+  cache: "no-cache"
+});
 
   if (!response.ok) {
     throw new Error(`環境音の読み込み失敗: ${mode}.wav`);
