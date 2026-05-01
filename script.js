@@ -63,6 +63,74 @@ async function releaseWakeLock() {
 const SILENT_WAV =
   "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=";
 
+// ======================
+// 環境音：Web Audio API管理
+// ======================
+let ambientAudioContext = null;
+let ambientBufferCache = {};
+let ambientSourceNode = null;
+let ambientGainNode = null;
+let ambientWebAudioMode = "";
+let ambientWebAudioToken = 0;
+
+const WEB_AMBIENT_VOLUME = 0.5;
+const WEB_AMBIENT_FADE_SEC = 0.8;
+
+function getAudioContext() {
+  if (!ambientAudioContext) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+      throw new Error("このブラウザはWeb Audio APIに対応していません");
+    }
+
+    ambientAudioContext = new AudioContextClass();
+  }
+
+  return ambientAudioContext;
+}
+
+async function resumeAudioContextIfNeeded() {
+  const ctx = getAudioContext();
+
+  if (ctx.state === "suspended") {
+    await ctx.resume();
+  }
+
+  return ctx;
+}
+
+async function loadAmbientBuffer(mode) {
+  if (ambientBufferCache[mode]) {
+    return ambientBufferCache[mode];
+  }
+
+  const response = await fetch(`${mode}.wav`, {
+    cache: "force-cache"
+  });
+
+  if (!response.ok) {
+    throw new Error(`環境音の読み込み失敗: ${mode}.wav`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  const ctx = getAudioContext();
+  const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+
+  ambientBufferCache[mode] = audioBuffer;
+  return audioBuffer;
+}
+
+function fadeGainTo(gainNode, targetValue, durationSec) {
+  if (!ambientAudioContext || !gainNode) return;
+
+  const now = ambientAudioContext.currentTime;
+  gainNode.gain.cancelScheduledValues(now);
+  gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+  gainNode.gain.linearRampToValueAtTime(targetValue, now + durationSec);
+}
+
+
 function createManagedAudio(src = "") {
   const audio = new Audio(src);
   audio.preload = "auto";
@@ -138,133 +206,6 @@ async function unlockAudioSystem() {
   return audioUnlockPromise;
 }
 
-// ======================
-// 環境音：クロスフェード・ループ管理
-// ======================
-const AMBIENT_VOLUME = 0.5;
-const AMBIENT_CROSSFADE_SEC = 4;
-
-let ambientAudios = [null, null];
-let ambientActiveIndex = 0;
-let ambientLoopTimer = null;
-let ambientFadeTimer = null;
-let ambientLoopToken = 0;
-
-function clearAmbientTimers() {
-  if (ambientLoopTimer) {
-    clearTimeout(ambientLoopTimer);
-    ambientLoopTimer = null;
-  }
-
-  if (ambientFadeTimer) {
-    clearInterval(ambientFadeTimer);
-    ambientFadeTimer = null;
-  }
-}
-
-function createAmbientAudio(mode) {
-  const audio = createManagedAudio(`${mode}.wav`);
-  audio.loop = false;
-  audio.volume = 0;
-  audio.currentTime = 0;
-  return audio;
-}
-
-function fadeAudioVolume(audio, from, to, durationMs, onDone) {
-  if (!audio) return;
-
-  const steps = Math.max(1, Math.floor(durationMs / 50));
-  let count = 0;
-
-  audio.volume = from;
-
-  const timer = setInterval(() => {
-    count += 1;
-    const rate = Math.min(1, count / steps);
-    audio.volume = from + (to - from) * rate;
-
-    if (rate >= 1) {
-      clearInterval(timer);
-      if (typeof onDone === "function") onDone();
-    }
-  }, 50);
-
-  return timer;
-}
-
-function ensureAmbientObject(mode) {
-  if (!mode) return null;
-
-  if (currentAudioMode !== mode) {
-    stopAmbient();
-
-    ambientAudios = [
-      createAmbientAudio(mode),
-      createAmbientAudio(mode)
-    ];
-
-    ambientActiveIndex = 0;
-    currentAudio = ambientAudios[0];
-    currentAudioMode = mode;
-  }
-
-  if (!ambientAudios[0]) ambientAudios[0] = createAmbientAudio(mode);
-  if (!ambientAudios[1]) ambientAudios[1] = createAmbientAudio(mode);
-
-  currentAudio = ambientAudios[ambientActiveIndex];
-  return currentAudio;
-}
-
-function scheduleAmbientCrossfade(mode, token) {
-  clearAmbientTimers();
-
-  const activeAudio = ambientAudios[ambientActiveIndex];
-  if (!activeAudio) return;
-
-  const setupSchedule = () => {
-    if (token !== ambientLoopToken) return;
-    if (currentAudioMode !== mode) return;
-
-    const duration = activeAudio.duration;
-    const currentTime = activeAudio.currentTime || 0;
-
-    if (!Number.isFinite(duration) || duration <= AMBIENT_CROSSFADE_SEC + 1) {
-      ambientLoopTimer = setTimeout(() => {
-        scheduleAmbientCrossfade(mode, token);
-      }, 1000);
-      return;
-    }
-
-    // 重要：
-    // 2回目以降は、次の音声がすでに数秒進んだ状態でactiveになる。
-    // そのため duration だけでなく currentTime を引いて予約する。
-    const secondsUntilFade =
-      duration - currentTime - AMBIENT_CROSSFADE_SEC;
-
-    const delayMs = Math.max(100, secondsUntilFade * 1000);
-
-    ambientLoopTimer = setTimeout(() => {
-      crossfadeAmbient(mode, token);
-    }, delayMs);
-
-    console.log(
-      "[ambient] 次のクロスフェード予約:",
-      {
-        mode,
-        duration,
-        currentTime,
-        delaySec: delayMs / 1000
-      }
-    );
-  };
-
-  if (activeAudio.readyState >= 1) {
-    setupSchedule();
-  } else {
-    activeAudio.onloadedmetadata = setupSchedule;
-  }
-}
-
 function ensureVoiceObject() {
   if (!currentVoiceAudio) {
     currentVoiceAudio = createManagedAudio();
@@ -287,19 +228,49 @@ function stopVoice() {
 }
 
 function stopAmbient() {
-  ambientLoopToken += 1;
-  clearAmbientTimers();
+  ambientWebAudioToken += 1;
 
-  ambientAudios.forEach((audio) => {
-    if (!audio) return;
+  try {
+    if (ambientGainNode && ambientAudioContext) {
+      fadeGainTo(ambientGainNode, 0, WEB_AMBIENT_FADE_SEC);
+    }
 
-    try {
-      audio.pause();
-      audio.currentTime = 0;
-      audio.volume = 0;
-      audio.onloadedmetadata = null;
-    } catch (e) {}
-  });
+    if (ambientSourceNode && ambientAudioContext) {
+      const sourceToStop = ambientSourceNode;
+      const stopAt = ambientAudioContext.currentTime + WEB_AMBIENT_FADE_SEC + 0.05;
+
+      try {
+        sourceToStop.stop(stopAt);
+      } catch (e) {}
+    }
+  } catch (e) {
+    console.error("[ambient-web] 停止処理エラー:", e);
+  }
+
+  ambientSourceNode = null;
+  ambientGainNode = null;
+  ambientWebAudioMode = "";
+
+  // 念のため、旧HTML Audio方式の音も止める
+  try {
+    if (typeof clearAmbientTimers === "function") {
+      clearAmbientTimers();
+    }
+  } catch (e) {}
+
+  try {
+    if (Array.isArray(ambientAudios)) {
+      ambientAudios.forEach((audio) => {
+        if (!audio) return;
+        try {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.volume = 0;
+          audio.onloadedmetadata = null;
+        } catch (e) {}
+      });
+    }
+  } catch (e) {}
 
   if (currentAudio) {
     try {
@@ -309,6 +280,7 @@ function stopAmbient() {
     } catch (e) {}
   }
 }
+
 
 function ensureBreakCafeAudio() {
   if (!breakCafeAudio) {
@@ -349,63 +321,71 @@ function stopBreakCafeBgm() {
     console.error("[breakCafe] 停止失敗:", e);
   }
 }
-// iPad / iPhone 向け：最初のユーザー操作時に環境音を準備
+
 async function primeAmbient(mode) {
   if (!mode) return;
 
   try {
-    ensureAmbientObject(mode);
+    await resumeAudioContextIfNeeded();
+    await loadAmbientBuffer(mode);
+
+    console.log("[ambient-web] 環境音の準備完了:", mode);
   } catch (e) {
-    console.error("環境音の準備失敗:", e);
+    console.error("[ambient-web] 環境音の準備失敗:", e);
   }
 }
+
 
 async function startAmbient(mode) {
   if (!mode) return;
 
+  const token = ambientWebAudioToken + 1;
+  ambientWebAudioToken = token;
+
   try {
     await unlockAudioSystem();
+    const ctx = await resumeAudioContextIfNeeded();
+    const buffer = await loadAmbientBuffer(mode);
 
-    const token = ambientLoopToken + 1;
-    ambientLoopToken = token;
+    if (token !== ambientWebAudioToken) return;
 
-    const audio = ensureAmbientObject(mode);
-    if (!audio) return;
-
-    clearAmbientTimers();
-
-    ambientActiveIndex = 0;
-    currentAudio = ambientAudios[ambientActiveIndex];
-
-    ambientAudios.forEach((item, index) => {
-      if (!item) return;
-
-      try {
-        item.pause();
-        item.currentTime = 0;
-        item.loop = false;
-        item.volume = index === ambientActiveIndex ? AMBIENT_VOLUME : 0;
-      } catch (e) {}
-    });
-
+    // すでに鳴っている環境音があれば先に止める
     try {
-      await currentAudio.play();
-    } catch (e) {
-      console.warn("[ambient] 通常再生失敗、再試行します:", e);
+      if (ambientSourceNode) {
+        ambientSourceNode.stop();
+      }
+    } catch (e) {}
 
-      currentAudio.muted = true;
-      await currentAudio.play().catch(() => {});
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-      currentAudio.muted = false;
+    const source = ctx.createBufferSource();
+    const gain = ctx.createGain();
 
-      await currentAudio.play();
-    }
+    source.buffer = buffer;
+    source.loop = true;
 
-    scheduleAmbientCrossfade(mode, token);
-    console.log("[ambient] クロスフェード環境音開始:", mode);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+
+    source.connect(gain);
+    gain.connect(ctx.destination);
+
+    source.start(0);
+
+    ambientSourceNode = source;
+    ambientGainNode = gain;
+    ambientWebAudioMode = mode;
+
+    fadeGainTo(gain, WEB_AMBIENT_VOLUME, WEB_AMBIENT_FADE_SEC);
+
+    source.onended = () => {
+      if (ambientSourceNode === source) {
+        ambientSourceNode = null;
+        ambientGainNode = null;
+        ambientWebAudioMode = "";
+      }
+    };
+
+    console.log("[ambient-web] 環境音開始:", mode);
   } catch (e) {
-    console.error("環境音再生エラー:", e);
+    console.error("[ambient-web] 環境音再生エラー:", e);
   }
 }
 
