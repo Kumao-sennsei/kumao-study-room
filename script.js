@@ -76,6 +76,12 @@ let ambientWebAudioToken = 0;
 const WEB_AMBIENT_VOLUME = 0.5;
 const WEB_AMBIENT_FADE_SEC = 0.8;
 
+const WEB_AMBIENT_VOLUME_BY_MODE = {
+  sea: 0.5,
+  fire: 0.5,
+  forest: 0.32
+};
+
 function getAudioContext() {
   if (!ambientAudioContext) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -384,7 +390,7 @@ async function startAmbient(mode) {
     ambientGainNode = gain;
     ambientWebAudioMode = mode;
 
-  　fadeGainTo(gain, targetVolume, WEB_AMBIENT_FADE_SEC);
+  　    fadeGainTo(gain, targetVolume, WEB_AMBIENT_FADE_SEC);
 
     source.onended = () => {
       if (ambientSourceNode === source) {
