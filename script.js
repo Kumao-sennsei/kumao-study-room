@@ -375,6 +375,11 @@ async function startAmbient(mode) {
 
     fadeGainTo(gain, WEB_AMBIENT_VOLUME, WEB_AMBIENT_FADE_SEC);
 
+    const targetVolume =
+  WEB_AMBIENT_VOLUME_BY_MODE[mode] ?? WEB_AMBIENT_VOLUME;
+
+fadeGainTo(gain, targetVolume, WEB_AMBIENT_FADE_SEC);
+
     source.onended = () => {
       if (ambientSourceNode === source) {
         ambientSourceNode = null;
