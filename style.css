@@ -809,15 +809,35 @@ body{
 #studyRoom {
   position: absolute;
   top: 4px;
-  left: 8px;
+  left: 4px;
   z-index: 20;
-  background: rgba(34, 34, 34, 0.96);
+  background: rgba(34, 34, 34, 0.62);
   color: #fff;
-  padding: 12px;
+  padding: 10px;
   border-radius: 14px;
   min-width: 150px;
   box-sizing: border-box;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(168, 85, 247, 0.55);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
 }
+
+#studyRoom button {
+  border: 2px solid #a855f7 !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #111827 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 10px rgba(168, 85, 247, 0.35) !important;
+  cursor: pointer !important;
+}
+
+#studyRoom button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(168, 85, 247, 0.28) !important;
+}
+
 
 #studyRoom ul {
   list-style: none;
