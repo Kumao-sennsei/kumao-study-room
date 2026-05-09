@@ -808,8 +808,8 @@ body{
 
 #studyRoom {
   position: absolute;
-  top: 72px;
-  left: 16px;
+  top: 12px;
+  left: 8px;
   z-index: 20;
   background: rgba(34, 34, 34, 0.96);
   color: #fff;
