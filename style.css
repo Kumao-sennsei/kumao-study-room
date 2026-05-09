@@ -504,17 +504,17 @@ body{
 }
 
 #goStudyRoomBtn {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  z-index: 20;
-  padding: 10px 14px;
+  position: static;
+  display: block;
+  margin: 10px auto 0;
+  padding: 8px 12px;
   border: none;
   border-radius: 10px;
   background: #ffffff;
-  color: #111;
+  color: #111827;
   font-weight: bold;
   cursor: pointer;
+  line-height: 1.4;
 }
 
 #studyRoom {
