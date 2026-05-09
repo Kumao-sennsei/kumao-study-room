@@ -1449,3 +1449,9 @@ grid-column: span 1;
   border: 1px solid rgba(168, 85, 247, 0.55) !important;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25) !important;
 }
+
+/* ===== FINAL：自習室タイトルと入室/退出ボタンを少し離す ===== */
+#right #studyRoom .studyRoomButtons {
+  margin-top: 8px !important;
+  margin-bottom: 6px !important;
+}
