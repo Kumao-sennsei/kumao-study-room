@@ -1230,3 +1230,59 @@ grid-column: span 1;
   justify-content: center !important;
 }
 }
+
+/* ======================
+   Clickable button style
+   押せる場所を紫ふち＋影で統一
+====================== */
+
+/* かけら図鑑ボタン */
+#storyBookBtn {
+  border: 2px solid #a855f7 !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: #111827 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 6px 14px rgba(168, 85, 247, 0.38) !important;
+  cursor: pointer !important;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease !important;
+}
+
+#storyBookBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(168, 85, 247, 0.48) !important;
+}
+
+#storyBookBtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 8px rgba(168, 85, 247, 0.30) !important;
+}
+
+/* Goodayロゴ全体を「押せるボタン」に見せる */
+#brandBox {
+  border: 2px solid rgba(168, 85, 247, 0.75) !important;
+  border-radius: 14px !important;
+  padding: 8px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 6px 16px rgba(168, 85, 247, 0.36) !important;
+  cursor: pointer !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+#brandBox:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(168, 85, 247, 0.48) !important;
+}
+
+#brandBox:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 8px rgba(168, 85, 247, 0.30) !important;
+}
+
+/* Goodayロゴ画像もボタン感を出す */
+#goodayLogo {
+  border: 2px solid #a855f7 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.32) !important;
+}
