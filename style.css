@@ -1260,14 +1260,14 @@ grid-column: span 1;
 
 /* Goodayロゴ全体を「押せるボタン」に見せる */
 #brandBox {
-  border: 2px solid rgba(168, 85, 247, 0.75) !important;
-  border-radius: 14px !important;
-  padding: 8px !important;
-  background: rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 6px 16px rgba(168, 85, 247, 0.36) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
   cursor: pointer !important;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 #brandBox:hover {
@@ -1282,7 +1282,69 @@ grid-column: span 1;
 
 /* Goodayロゴ画像もボタン感を出す */
 #goodayLogo {
-  border: 2px solid #a855f7 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.32) !important;
+  border: 3px solid #a855f7 !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.85),
+    0 8px 18px rgba(168, 85, 247, 0.42) !important;
+  transition: transform 0.16s ease, box-shadow 0.16s ease !important;
+}
+
+#brandBox:hover #goodayLogo {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.95),
+    0 12px 26px rgba(168, 85, 247, 0.55) !important;
+}
+
+/* モード入口3つ */
+.modeBtn {
+  border: 3px solid #a855f7 !important;
+  border-radius: 16px !important;
+  box-shadow:
+    0 6px 14px rgba(168, 85, 247, 0.35),
+    0 8px 18px rgba(0, 0, 0, 0.12) !important;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease !important;
+}
+
+.modeBtn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 24px rgba(168, 85, 247, 0.48),
+    0 10px 22px rgba(0, 0, 0, 0.14) !important;
+}
+
+.modeBtn:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 3px 8px rgba(168, 85, 247, 0.30),
+    0 4px 10px rgba(0, 0, 0, 0.10) !important;
+}
+
+/* ログアウトボタン */
+#logoutBtn {
+  border: 3px solid #a855f7 !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: #111827 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 6px 14px rgba(168, 85, 247, 0.35) !important;
+  transition: transform 0.16s ease, box-shadow 0.16s ease !important;
+}
+
+#logoutBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(168, 85, 247, 0.48) !important;
+}
+
+#logoutBtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 8px rgba(168, 85, 247, 0.30) !important;
+}
+
+#brandBox:active #goodayLogo {
+  transform: translateY(1px);
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.8),
+    0 4px 10px rgba(168, 85, 247, 0.34) !important;
 }
