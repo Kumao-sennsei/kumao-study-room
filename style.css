@@ -565,6 +565,20 @@ body{
 
 /* ===== スマホ縦画面対応 ===== */
 @media (max-width: 768px) {
+   #right {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#character {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 320px !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
           
   /* メイン画面 */
   #app {
