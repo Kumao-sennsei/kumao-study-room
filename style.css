@@ -1348,3 +1348,85 @@ grid-column: span 1;
     0 0 0 3px rgba(255, 255, 255, 0.8),
     0 4px 10px rgba(168, 85, 247, 0.34) !important;
 }
+
+/* ======================
+   Final floating button style
+   右下に影を落として、ボタンを浮かせる
+====================== */
+
+#storyBookBtn,
+#studyRoom button,
+.modeBtn,
+#logoutBtn {
+  border: 2px solid #a855f7 !important;
+  outline: 2px solid rgba(168, 85, 247, 0.35) !important;
+  outline-offset: 0 !important;
+  box-shadow:
+    7px 8px 0 rgba(88, 28, 135, 0.38),
+    0 10px 20px rgba(0, 0, 0, 0.18) !important;
+  transform: translate(-2px, -2px);
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    opacity 0.16s ease !important;
+}
+
+#storyBookBtn:hover,
+#studyRoom button:hover,
+.modeBtn:hover,
+#logoutBtn:hover {
+  transform: translate(-4px, -4px);
+  box-shadow:
+    9px 10px 0 rgba(88, 28, 135, 0.42),
+    0 14px 26px rgba(0, 0, 0, 0.22) !important;
+}
+
+#storyBookBtn:active,
+#studyRoom button:active,
+.modeBtn:active,
+#logoutBtn:active {
+  transform: translate(0, 0);
+  box-shadow:
+    3px 4px 0 rgba(88, 28, 135, 0.32),
+    0 5px 12px rgba(0, 0, 0, 0.16) !important;
+}
+
+/* Goodayは白ロゴ画像の外側だけを紫でふちどる */
+#brandBox {
+  border: none !important;
+  outline: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
+#goodayLogo {
+  border: none !important;
+  outline: 3px solid #a855f7 !important;
+  outline-offset: 3px !important;
+  border-radius: 12px !important;
+  box-shadow:
+    7px 8px 0 rgba(88, 28, 135, 0.38),
+    0 10px 20px rgba(0, 0, 0, 0.20) !important;
+  transform: translate(-2px, -2px);
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    outline-color 0.16s ease !important;
+}
+
+#brandBox:hover #goodayLogo {
+  transform: translate(-4px, -4px);
+  outline-color: #c084fc !important;
+  box-shadow:
+    9px 10px 0 rgba(88, 28, 135, 0.44),
+    0 14px 26px rgba(0, 0, 0, 0.24) !important;
+}
+
+#brandBox:active #goodayLogo {
+  transform: translate(0, 0);
+  box-shadow:
+    3px 4px 0 rgba(88, 28, 135, 0.32),
+    0 5px 12px rgba(0, 0, 0, 0.16) !important;
+}
