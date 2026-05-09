@@ -1603,6 +1603,52 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
     localStorage.setItem("kumaoMemberPlan", safePlan);
   }
 
+async function refreshCurrentMemberPlanFromSupabase() {
+  try {
+    const {
+      data: { session },
+      error: sessionError
+    } = await supabaseClient.auth.getSession();
+
+    if (sessionError) {
+      console.error("membership session確認エラー", sessionError);
+      setCurrentMemberPlan("free");
+      return "free";
+    }
+
+    if (!session?.user?.id) {
+      setCurrentMemberPlan("free");
+      return "free";
+    }
+
+    const { data, error } = await supabaseClient
+      .from("memberships")
+      .select("plan_type, status")
+      .eq("user_id", session.user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("memberships取得エラー", error);
+      setCurrentMemberPlan("free");
+      return "free";
+    }
+
+    const isPaid =
+      data?.plan_type === "paid" &&
+      data?.status === "active";
+
+    const nextPlan = isPaid ? "paid" : "free";
+    setCurrentMemberPlan(nextPlan);
+
+    return nextPlan;
+  } catch (e) {
+    console.error("refreshCurrentMemberPlanFromSupabase エラー", e);
+    setCurrentMemberPlan("free");
+    return "free";
+  }
+}
+  
+  
   function syncMemberPlanUI() {
   const select = document.getElementById("memberPlanSelect");
   const status = document.getElementById("memberPlanStatus");
@@ -2397,9 +2443,11 @@ function closePaidOnlyModal() {
   modal.style.display = "none";
 }
   
-  function handleModeStart(mode) {
-  const plan = getCurrentMemberPlan();
+  async function handleModeStart(mode) {
   const FORCE_AUDIO_TEST = false; // 本番用：無料会員はポモドーロ不可
+
+  const plan = await refreshCurrentMemberPlanFromSupabase();
+  syncMemberPlanUI();
 
   if (plan !== "paid" && !FORCE_AUDIO_TEST) {
     openPaidOnlyModal();
@@ -2421,6 +2469,7 @@ async function initNotesFeature() {
   syncMemberPlanUI();
   syncCurrentUserNameUI();
   syncProfileFromSupabase();
+  await refreshCurrentMemberPlanFromSupabase();
   setComposerOpen(false);
 
   const goStudyRoomBtn = document.getElementById("goStudyRoomBtn");
