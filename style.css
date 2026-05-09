@@ -808,7 +808,7 @@ body{
 
 #studyRoom {
   position: absolute;
-  top: 12px;
+  top: 4px;
   left: 8px;
   z-index: 20;
   background: rgba(34, 34, 34, 0.96);
