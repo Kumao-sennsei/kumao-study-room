@@ -1999,35 +1999,38 @@ function syncCurrentUserNameUI() {
             "
           >
             <div class="note-avatar-box">
-              <img
-                src="kumao_baby.png"
-                alt="アバター"
-                style="
-                  width:64px;
-                  height:64px;
-                  border-radius:12%;
-                  object-fit:cover;
-                  border:2px solid #60a5fa;
-                  background:#111;
-                "
-              />
-            </div>
+  <img
+    src="kumao_baby.png"
+    alt="アバター"
+    style="
+      width:64px;
+      height:64px;
+      border-radius:12px;
+      object-fit:cover;
+      border:2px solid #60a5fa;
+      background:#111;
+    "
+  />
 
-            <div class="note-main-text" style="min-width:0;">
-              <div style="font-size:16px; font-weight:800; color:#fff; line-height:1.4;">
-                ${escapeHtml(note.author)} ・ ${escapeHtml(formatDate(note.createdAt))}
-              </div>
+  <div class="note-avatar-name">
+    ${escapeHtml(note.author)}
+  </div>
 
-              <div style="font-size:13px; color:#facc15; font-weight:700; margin-top:4px;">
-                ${note.author === "くまお太郎" ? "高2 京大農志望" : "未設定"}
-              </div>
+  <div class="note-avatar-profile">
+    ${note.author === "くまお太郎" ? "高2 京大農志望" : "未設定"}
+  </div>
+</div>
 
-              ${subjectHtml}
+<div class="note-main-text" style="min-width:0;">
+  ${subjectHtml}
 
-              <div style="margin-top:8px; white-space:pre-wrap; word-break:break-word; line-height:1.55; color:#fff;">
-                ${escapeHtml(note.text)}
-              </div>
-            </div>
+  <div
+    class="note-body-text"
+    style="margin-top:6px; white-space:pre-wrap; word-break:break-word; line-height:1.45; color:#fff;"
+  >
+    ${escapeHtml(note.text)}
+  </div>
+</div>
 
             <div class="note-image-box">
   ${imageHtml || `<div style="height:58px; border-radius:10px; border:1px dashed #444; display:flex; align-items:center; justify-content:center; color:#666; font-size:11px;">画像なし</div>`}
