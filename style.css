@@ -1729,3 +1729,48 @@ grid-column: span 1;
 #noteGrid .noteCard .delete-note-btn {
   margin-right: 0 !important;
 }
+
+/* ======================
+   PC：学習ノートカードを広げてボタン切れ防止
+====================== */
+@media (min-width: 769px) {
+  #noteGrid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 18px !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #noteGrid .noteCard {
+    width: 520px !important;
+    max-width: 520px !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  #noteGrid .noteCard .like-btn,
+  #noteGrid .noteCard .comment-send-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #noteGrid .noteCard .edit-note-btn,
+  #noteGrid .noteCard .delete-note-btn {
+    width: calc(50% - 12px) !important;
+    max-width: calc(50% - 12px) !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin-top: 10px !important;
+    margin-left: 0 !important;
+    margin-right: 8px !important;
+    white-space: nowrap !important;
+  }
+
+  #noteGrid .noteCard .delete-note-btn {
+    margin-right: 0 !important;
+  }
+}
