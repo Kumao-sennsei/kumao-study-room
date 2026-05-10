@@ -2254,3 +2254,64 @@ grid-column: span 1;
     margin-bottom: 2px !important;
   }
 }
+
+/* ======================
+   学習ノートカード：薄い白枠＋余白最終調整
+====================== */
+
+/* ピンク枠をやめて、薄い白枠にする */
+#noteGrid .noteCard {
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28) !important;
+  background: rgba(26, 26, 26, 0.92) !important;
+}
+
+/* PC：カード内の下余白をさらに詰める */
+@media (min-width: 769px) {
+  #noteGrid {
+    gap: 8px !important;
+  }
+
+  #noteGrid .noteCard {
+    padding: 10px 14px 6px !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  #noteGrid .noteCard .note-card-top {
+    margin-bottom: 0 !important;
+    align-items: start !important;
+  }
+
+  #noteGrid .noteCard .note-image-box,
+  #noteGrid .noteCard .note-image-box img,
+  #noteGrid .noteCard .note-image-box > div {
+    height: 82px !important;
+  }
+
+  #noteGrid .noteCard .note-reaction-under-image {
+    margin-top: 3px !important;
+  }
+}
+
+/* スマホ：カード同士の隙間を詰める */
+@media (max-width: 768px) {
+  #noteGrid {
+    gap: 6px !important;
+  }
+
+  #noteGrid .noteCard {
+    padding: 10px 12px 7px !important;
+    margin-bottom: 4px !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  #noteGrid .noteCard .note-card-top {
+    margin-bottom: 0 !important;
+  }
+
+  #noteGrid .noteCard .note-reaction-under-image {
+    margin-top: 3px !important;
+  }
+}
