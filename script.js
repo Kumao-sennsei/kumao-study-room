@@ -1724,7 +1724,26 @@ function joinRoom() {
   if (typeof showStudyRoomTicker === "function") {
     showStudyRoomTicker(`🐻 ${CURRENT_USER_NAME}さんが入室しました！`);
   }
+
+  const studyRoomView = document.getElementById("studyRoomView");
+  const backMainBtn = document.getElementById("backMainBtn");
+  const goStudyRoomBtn = document.getElementById("goStudyRoomBtn");
+
+  if (studyRoomView) {
+    studyRoomView.style.display = "block";
+  }
+
+  if (backMainBtn) {
+    backMainBtn.style.display = "block";
+  }
+
+  if (goStudyRoomBtn) {
+    goStudyRoomBtn.style.display = "none";
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
 
 function leaveRoom() {
   if (!isInRoom) return;
