@@ -2738,3 +2738,42 @@ grid-column: span 1;
     min-width: 30px !important;
   }
 }
+
+/* ======================
+   スマホ：写真枠を少し小さくして本文エリアを広げる
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .note-card-top {
+    grid-template-columns: 74px minmax(0, 1fr) 98px !important;
+    gap: 10px !important;
+  }
+
+  #noteGrid .noteCard .note-image-box {
+    width: 98px !important;
+    max-width: 98px !important;
+    min-width: 98px !important;
+  }
+
+  #noteGrid .noteCard .note-image-box img,
+  #noteGrid .noteCard .note-image-box > div:not(.note-reaction-under-image) {
+    width: 98px !important;
+    max-width: 98px !important;
+    height: 62px !important;
+    max-height: 62px !important;
+    border-radius: 12px !important;
+    object-fit: cover !important;
+  }
+
+  #noteGrid .noteCard .note-reaction-under-image {
+    width: 98px !important;
+    margin-top: 1px !important;
+    gap: 10px !important;
+    font-size: 14px !important;
+  }
+
+  #noteGrid .noteCard .note-reaction-under-image .like-btn,
+  #noteGrid .noteCard .note-reaction-under-image .note-comment-count-btn {
+    font-size: 14px !important;
+    min-width: 28px !important;
+  }
+}
