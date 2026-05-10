@@ -1545,3 +1545,17 @@ grid-column: span 1;
     white-space: nowrap !important;
   }
 }
+
+/* ======================
+   スマホ縦：ルーム選択ボタンの上下間隔を少し詰める
+====================== */
+@media (max-width: 768px) {
+  #roomButtons {
+    gap: 10px !important;
+    margin: 14px 0 18px !important;
+  }
+
+  #roomButtons button {
+    padding: 9px 16px !important;
+  }
+}
