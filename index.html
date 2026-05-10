@@ -2013,8 +2013,8 @@ function syncCurrentUserNameUI() {
   />
 
   <div class="note-avatar-name">
-    ${escapeHtml(note.author)}
-  </div>
+  ${escapeHtml(note.author).replace("（", "<br>（")}
+</div>
 
   
 </div>
