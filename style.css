@@ -1559,3 +1559,41 @@ grid-column: span 1;
     padding: 9px 16px !important;
   }
 }
+
+/* ======================
+   スマホ縦：自習室全体の左寄りを補正
+====================== */
+@media (max-width: 768px) {
+  #studyRoomView {
+    padding: 18px 24px !important;
+    box-sizing: border-box !important;
+  }
+
+  #studyRoomLayout,
+  #studyRoomContent,
+  .studyRoomSide,
+  #noticeBox,
+  #noteGrid,
+  #archiveList {
+    width: 100% !important;
+    max-width: 680px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+  }
+
+  #roomButtons {
+    align-items: stretch !important;
+  }
+
+  #roomButtons button {
+    width: 100% !important;
+    max-width: 360px !important;
+  }
+
+  #toggleNoteComposerBtn {
+    width: 100% !important;
+    max-width: 360px !important;
+  }
+}
+
