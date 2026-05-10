@@ -2010,6 +2010,15 @@ ${profileHtml}
     const subjectEl = document.getElementById("noteSubjectInput");
     const textEl = document.getElementById("noteTextInput");
     const imageEl = document.getElementById("noteImageInput");
+    const addBtn = document.getElementById("addNoteBtn");
+const originalAddBtnText = addBtn ? addBtn.textContent : "投稿する";
+
+if (addBtn && addBtn.disabled) return;
+
+if (addBtn) {
+  addBtn.disabled = true;
+  addBtn.textContent = "投稿中…";
+} 
 
     if (!subjectEl || !textEl || !imageEl) return;
 
@@ -2129,16 +2138,39 @@ showStudyRoomTicker(`📒 ${currentAuthor}さんがノートを投稿しまし�
 resetComposer();
     }
 
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        commitNoteWithImage(event?.target?.result || "");
-      };
-      reader.readAsDataURL(file);
-      return;
-    }
+   try {
+  if (file) {
+    const reader = new FileReader();
 
-    commitNoteWithImage("");
+    reader.onload = async function (event) {
+      await commitNoteWithImage(event?.target?.result || "");
+
+      if (addBtn) {
+        addBtn.disabled = false;
+        addBtn.textContent = originalAddBtnText;
+      }
+    };
+
+    reader.onerror = function () {
+      showMessage("画像の読み込みに失敗しました。もう一度試してね。", true);
+
+      if (addBtn) {
+        addBtn.disabled = false;
+        addBtn.textContent = originalAddBtnText;
+      }
+    };
+
+    reader.readAsDataURL(file);
+    return;
+  }
+
+  await commitNoteWithImage("");
+} finally {
+  if (!file && addBtn) {
+    addBtn.disabled = false;
+    addBtn.textContent = originalAddBtnText;
+  }
+}
   }
     
   async function editNote(noteId) {
