@@ -3047,7 +3047,7 @@ grid-column: span 1;
 ====================== */
 @media (max-width: 768px) {
   #noteGrid .noteCard .note-avatar-name {
-    margin-top: 13px !important;
+    margin-top: 15px !important;
     font-size: 11px !important;
     line-height: 1.12 !important;
     font-weight: 900 !important;
