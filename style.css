@@ -2207,3 +2207,50 @@ grid-column: span 1;
 #noteGrid .noteCard .note-reaction-under-image .note-comment-count-btn {
   color: #ddd !important;
 }
+
+/* ======================
+   学習ノートカード：余白をさらに圧縮
+====================== */
+
+/* PC・スマホ共通：カード内の下余白を減らす */
+#noteGrid .noteCard {
+  padding-bottom: 10px !important;
+}
+
+/* 反応ボタン周りの余白を減らす */
+#noteGrid .noteCard .note-reaction-under-image {
+  margin-top: 4px !important;
+}
+
+/* PC：カード内の縦余白を圧縮 */
+@media (min-width: 769px) {
+  #noteGrid {
+    gap: 12px !important;
+  }
+
+  #noteGrid .noteCard {
+    padding-top: 12px !important;
+    padding-bottom: 8px !important;
+  }
+
+  #noteGrid .noteCard .note-card-top {
+    margin-bottom: 2px !important;
+  }
+}
+
+/* スマホ：カード同士の間隔を詰める */
+@media (max-width: 768px) {
+  #noteGrid {
+    gap: 10px !important;
+  }
+
+  #noteGrid .noteCard {
+    padding-top: 10px !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 8px !important;
+  }
+
+  #noteGrid .noteCard .note-card-top {
+    margin-bottom: 2px !important;
+  }
+}
