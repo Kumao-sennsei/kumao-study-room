@@ -1610,3 +1610,38 @@ grid-column: span 1;
     justify-content: center !important;
   }
 }
+
+/* ======================
+   スマホ縦：投稿カードをピンク枠にしてボタンはみ出し防止
+====================== */
+@media (max-width: 768px) {
+  #noteGrid {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+  }
+
+  #noteGrid .noteCard {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 18px 0 !important;
+    padding: 14px !important;
+    border: 2px solid #f472b6 !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  #noteGrid .noteCard button {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  #noteGrid .noteCard .like-btn {
+    margin-top: 10px !important;
+  }
+}
