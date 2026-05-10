@@ -1901,9 +1901,24 @@ function syncCurrentUserNameUI() {
     if (!noteGrid) return;
 
     const notes = getNotes();
+      const latestVisibleNotes = notes
+  .filter(note => isNoteWithinLastDays(note, 7))
+  .sort((a, b) => {
+    const bTime = new Date(b.updatedAt || b.createdAt || 0).getTime();
+    const aTime = new Date(a.updatedAt || a.createdAt || 0).getTime();
+    return bTime - aTime;
+  })
+  .slice(0, 10);
     renderNoteArchiveList(notes);
 
-    const recentNotes = notes.filter(note => isNoteWithinLastDays(note, 7));
+   const recentNotes = notes
+  .filter(note => isNoteWithinLastDays(note, 7))
+  .sort((a, b) => {
+    const bTime = new Date(b.updatedAt || b.createdAt || 0).getTime();
+    const aTime = new Date(a.updatedAt || a.createdAt || 0).getTime();
+    return bTime - aTime;
+  })
+  .slice(0, 10);
 
     noteGrid.innerHTML = recentNotes.map(note => {
       const imageHtml = note.image
