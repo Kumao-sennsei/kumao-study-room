@@ -2301,5 +2301,22 @@ function playStoryAudio(startMonth) {
   playNext();
 }
 
+/* ======================
+   スマホ縦：ノートカード内ボタンのはみ出し防止
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard {
+    overflow: hidden !important;
+  }
+
+  #noteGrid .noteCard button {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
  
 
