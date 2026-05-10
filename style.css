@@ -2315,3 +2315,19 @@ grid-column: span 1;
     margin-top: 3px !important;
   }
 }
+
+/* ======================
+   学習ノート：アバター・投稿画像を角丸四角に統一
+====================== */
+
+/* ノートカード内のアバターを角丸四角にする */
+#noteGrid .noteCard .note-avatar-box img {
+  border-radius: 12px !important;
+  object-fit: cover !important;
+}
+
+/* 投稿画像・画像なし枠も角丸四角に統一 */
+#noteGrid .noteCard .note-image-box img,
+#noteGrid .noteCard .note-image-box > div {
+  border-radius: 12px !important;
+}
