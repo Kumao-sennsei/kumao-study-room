@@ -2878,3 +2878,18 @@ grid-column: span 1;
   line-height: 1.2 !important;
   min-height: 24px !important;
 }
+
+/* ======================
+   ノートカード：アバター下の名前を2行・太字で表示
+====================== */
+#noteGrid .noteCard .note-avatar-name {
+  font-weight: 900 !important;
+  font-size: 10px !important;
+  line-height: 1.15 !important;
+  text-align: center !important;
+  color: #ffffff !important;
+  white-space: normal !important;
+  overflow: hidden !important;
+  display: block !important;
+  max-width: 74px !important;
+}
