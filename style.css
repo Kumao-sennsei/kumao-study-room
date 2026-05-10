@@ -2801,3 +2801,62 @@ grid-column: span 1;
     max-height: 2.7em !important;
   }
 }
+
+/* ======================
+   ノートカード：名前・プロフィール・教科・本文の整理
+====================== */
+
+/* アバター下の名前 */
+#noteGrid .noteCard .note-avatar-name {
+  margin-top: 4px !important;
+  max-width: 74px !important;
+  font-size: 10px !important;
+  line-height: 1.15 !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* 中央上のプロフィール：水色っぽい薄青 */
+#noteGrid .noteCard .note-center-profile {
+  color: #93c5fd !important;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  margin-bottom: 2px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* 本文：最大2行 */
+#noteGrid .noteCard .note-body-text {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  white-space: normal !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+  margin-top: 4px !important;
+}
+
+/* スマホ微調整 */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .note-avatar-name {
+    font-size: 10px !important;
+  }
+
+  #noteGrid .noteCard .note-center-profile {
+    font-size: 11px !important;
+  }
+
+  #noteGrid .noteCard .note-body-text {
+    font-size: 12px !important;
+  }
+}
