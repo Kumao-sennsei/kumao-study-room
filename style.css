@@ -1774,3 +1774,67 @@ grid-column: span 1;
     margin-right: 0 !important;
   }
 }
+
+/* ======================
+   学習ノート：操作ボタンを役割別に整える
+   上段：いいね・送信
+   下段：編集・削除
+====================== */
+
+/* まず全ボタンをカード内に収める */
+#noteGrid .noteCard .like-btn,
+#noteGrid .noteCard .note-comment-btn,
+#noteGrid .noteCard .note-edit-btn,
+#noteGrid .noteCard .note-delete-btn {
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  white-space: nowrap !important;
+}
+
+/* いいねボタン */
+#noteGrid .noteCard .like-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: calc(50% - 6px) !important;
+  margin: 10px 6px 0 0 !important;
+}
+
+/* 送信ボタン */
+#noteGrid .noteCard .note-comment-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: calc(50% - 6px) !important;
+  margin: 10px 0 0 6px !important;
+}
+
+/* 編集ボタン */
+#noteGrid .noteCard .note-edit-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: calc(50% - 6px) !important;
+  margin: 10px 6px 0 0 !important;
+}
+
+/* 削除ボタン */
+#noteGrid .noteCard .note-delete-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: calc(50% - 6px) !important;
+  margin: 10px 0 0 6px !important;
+}
+
+/* スマホも同じ2列配置で収める */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .like-btn,
+  #noteGrid .noteCard .note-comment-btn,
+  #noteGrid .noteCard .note-edit-btn,
+  #noteGrid .noteCard .note-delete-btn {
+    width: calc(50% - 6px) !important;
+    max-width: calc(50% - 6px) !important;
+  }
+}
