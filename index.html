@@ -2163,12 +2163,16 @@ resetComposer();
   return;
 }
 
+
 await commitNoteWithImage("");
 
 if (addBtn) {
   addBtn.disabled = false;
   addBtn.textContent = originalAddBtnText;
 }
+　}
+  }
+    
     
   async function editNote(noteId) {
   const notes = getNotes();
