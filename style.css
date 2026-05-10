@@ -3041,3 +3041,15 @@ grid-column: span 1;
     min-width: 30px !important;
   }
 }
+
+/* ======================
+   ノートカード：アバター下の名前を中央高さへ微調整
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .note-avatar-name {
+    margin-top: 13px !important;
+    font-size: 11px !important;
+    line-height: 1.12 !important;
+    font-weight: 900 !important;
+  }
+}
