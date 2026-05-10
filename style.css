@@ -2613,3 +2613,56 @@ grid-column: span 1;
     min-width: 32px !important;
   }
 }
+
+/* ======================
+   スマホ：アバターと写真の高さをそろえて下余白を詰める
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard {
+    padding: 10px 12px 6px !important;
+  }
+
+  #noteGrid .noteCard .note-card-top {
+    grid-template-columns: 74px minmax(0, 1fr) 118px !important;
+    gap: 10px !important;
+    align-items: center !important;
+    margin-bottom: 0 !important;
+  }
+
+  #noteGrid .noteCard .note-avatar-box img {
+    width: 66px !important;
+    height: 66px !important;
+    border-radius: 12px !important;
+  }
+
+  #noteGrid .noteCard .note-image-box {
+    width: 118px !important;
+    max-width: 118px !important;
+    min-width: 118px !important;
+  }
+
+  #noteGrid .noteCard .note-image-box img,
+  #noteGrid .noteCard .note-image-box > div:not(.note-reaction-under-image) {
+    width: 118px !important;
+    max-width: 118px !important;
+    height: 66px !important;
+    max-height: 66px !important;
+    border-radius: 12px !important;
+    object-fit: cover !important;
+  }
+
+  #noteGrid .noteCard .note-reaction-under-image {
+    width: 118px !important;
+    margin-top: 2px !important;
+    gap: 12px !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+  }
+
+  #noteGrid .noteCard .note-reaction-under-image .like-btn,
+  #noteGrid .noteCard .note-reaction-under-image .note-comment-count-btn {
+    font-size: 14px !important;
+    padding: 0 !important;
+    min-width: 30px !important;
+  }
+}
