@@ -2957,3 +2957,87 @@ grid-column: span 1;
     margin-bottom: 0 !important;
   }
 }
+
+/* ======================
+   ノートカード：最終微調整
+   名前位置・画像枠・リアクション調整
+====================== */
+@media (max-width: 768px) {
+  /* カード全体：下余白を詰めつつ、最低限の余裕を残す */
+  #noteGrid .noteCard {
+    padding: 8px 10px 6px !important;
+  }
+
+  /* アバター列 */
+  #noteGrid .noteCard .note-avatar-box {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: center !important;
+    width: 74px !important;
+    min-width: 74px !important;
+  }
+
+  /* 名前：アバター枠の下から少し離して、やや大きく */
+  #noteGrid .noteCard .note-avatar-name {
+    width: 74px !important;
+    max-width: 74px !important;
+    margin-top: 7px !important;
+    text-align: center !important;
+
+    font-size: 11px !important;
+    line-height: 1.12 !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+
+    white-space: normal !important;
+    overflow: hidden !important;
+    display: block !important;
+  }
+
+  /* 画像枠：少しだけ下へ */
+  #noteGrid .noteCard .note-image-box {
+    margin-top: 4px !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    width: 98px !important;
+    max-width: 98px !important;
+    min-width: 98px !important;
+  }
+
+  #noteGrid .noteCard .note-image-box img,
+  #noteGrid .noteCard .note-image-box > div:not(.note-reaction-under-image) {
+    width: 98px !important;
+    max-width: 98px !important;
+    height: 62px !important;
+    max-height: 62px !important;
+    border-radius: 12px !important;
+    object-fit: cover !important;
+  }
+
+  /* 👍💬：少し大きく、下余白は増やしすぎない */
+  #noteGrid .noteCard .note-reaction-under-image {
+    width: 98px !important;
+    margin-top: 2px !important;
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+
+    font-size: 16px !important;
+    line-height: 1 !important;
+  }
+
+  #noteGrid .noteCard .note-reaction-under-image .like-btn,
+  #noteGrid .noteCard .note-reaction-under-image .note-comment-count-btn {
+    font-size: 16px !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 30px !important;
+  }
+}
