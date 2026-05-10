@@ -2030,39 +2030,58 @@ function syncCurrentUserNameUI() {
             </div>
 
             <div class="note-image-box">
-              ${imageHtml || `<div style="height:100px; border-radius:12px; border:1px dashed #444; display:flex; align-items:center; justify-content:center; color:#666; font-size:12px;">画像なし</div>`}
-            </div>
+  ${imageHtml || `<div style="height:58px; border-radius:10px; border:1px dashed #444; display:flex; align-items:center; justify-content:center; color:#666; font-size:11px;">画像なし</div>`}
+
+  <div
+    class="note-reaction-under-image"
+    style="
+      margin-top:6px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+      font-size:12px;
+      color:#ddd;
+      white-space:nowrap;
+    "
+  >
+    <button
+      type="button"
+      class="like-btn"
+      data-note-id="${escapeHtml(note.id)}"
+      style="
+        border:none;
+        background:transparent;
+        color:${note.liked ? "#aaa" : "#facc15"};
+        font-weight:bold;
+        cursor:pointer;
+        padding:0;
+        font-size:13px;
+      "
+    >
+      👍 ${Number(note.likes) || 0}
+    </button>
+
+    <button
+      type="button"
+      class="note-comment-count-btn"
+      data-note-id="${escapeHtml(note.id)}"
+      style="
+        border:none;
+        background:transparent;
+        color:#ddd;
+        cursor:pointer;
+        padding:0;
+        font-size:13px;
+      "
+    >
+      💬 ${(note.comments || []).length}
+    </button>
+  </div>
+</div>
           </div>
           <!-- 一覧カードでは今日の投稿詳細は非表示。後で詳細画面に移動予定 -->
-          <div style="margin-top:6px;">
-            <button 
-              class="like-btn" 
-              data-note-id="${escapeHtml(note.id)}"
-              style="
-                background:${note.liked ? '#555' : '#ffd54f'};
-                color:${note.liked ? '#aaa' : '#111'};
-                border:none;
-                border-radius:6px;
-                padding:4px 8px;
-                cursor:${note.liked ? 'default' : 'pointer'};
-                font-weight:bold;
-              "
-            >
-              👍 ${Number(note.likes) || 0}
-            </button>
-          </div>
-         <div
-  style="
-    margin-top:10px;
-    display:flex;
-    align-items:center;
-    gap:18px;
-    font-size:14px;
-    color:#ddd;
-  "
->
-  <span>💬 ${(note.comments || []).length}</span>
-</div>
+         
           <!-- 一覧カードでは編集・削除は非表示。後で詳細画面に移動予定 -->
         </div>
       `;
