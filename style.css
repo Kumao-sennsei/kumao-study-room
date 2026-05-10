@@ -2777,3 +2777,27 @@ grid-column: span 1;
     min-width: 28px !important;
   }
 }
+
+/* ======================
+   スマホ：ノート本文を最大2行で表示
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .note-main-text div {
+    line-height: 1.25 !important;
+  }
+
+  /* 本文っぽい最後のテキスト行を最大2行にする */
+  #noteGrid .noteCard .note-main-text div:last-child {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+
+    white-space: normal !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+    max-height: 2.7em !important;
+  }
+}
