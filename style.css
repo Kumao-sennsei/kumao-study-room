@@ -1984,3 +1984,112 @@ grid-column: span 1;
     font-size: 11px !important;
   }
 }
+
+/* ======================
+   学習ノートカード：スクショ風コンパクト仕上げ
+====================== */
+
+/* カード全体を少し締める */
+#noteGrid .noteCard {
+  padding: 14px 16px !important;
+  min-height: 0 !important;
+}
+
+/* 上段の余白を少しコンパクトに */
+#noteGrid .noteCard .note-card-top {
+  margin-bottom: 8px !important;
+}
+
+/* 本文エリアの文字を詰めすぎず、でも縦長にしない */
+#noteGrid .noteCard .note-main-text {
+  line-height: 1.45 !important;
+}
+
+/* いいねボタンを巨大ボタンではなく反応ボタン風にする */
+#noteGrid .noteCard .like-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  min-width: 82px !important;
+  max-width: none !important;
+  padding: 7px 16px !important;
+  border-radius: 999px !important;
+  font-size: 14px !important;
+  box-shadow: none !important;
+  margin: 8px 14px 0 0 !important;
+}
+
+/* コメント数表示をいいね横に寄せる */
+#noteGrid .noteCard .like-btn + div,
+#noteGrid .noteCard div:has(> span) {
+  display: inline-flex !important;
+  align-items: center !important;
+  margin-top: 8px !important;
+  font-size: 14px !important;
+}
+
+/* 画像なしボックスを少し小さく */
+#noteGrid .noteCard .note-image-box > div {
+  opacity: 0.75 !important;
+}
+
+/* PCではカード内を横長カードっぽく見せる */
+@media (min-width: 769px) {
+  #noteGrid .noteCard {
+    padding: 16px 18px !important;
+  }
+
+  #noteGrid .noteCard .note-card-top {
+    grid-template-columns: 78px minmax(0, 1fr) 180px !important;
+    gap: 16px !important;
+  }
+
+  #noteGrid .noteCard .note-avatar-box img {
+    width: 64px !important;
+    height: 64px !important;
+  }
+
+  #noteGrid .noteCard .note-image-box img,
+  #noteGrid .noteCard .note-image-box > div {
+    width: 180px !important;
+    height: 104px !important;
+    max-width: 180px !important;
+  }
+}
+
+/* スマホでも横型カードを維持しつつコンパクト化 */
+@media (max-width: 768px) {
+  #noteGrid .noteCard {
+    padding: 14px !important;
+  }
+
+  #noteGrid .noteCard .note-card-top {
+    grid-template-columns: 62px minmax(0, 1fr) 96px !important;
+    gap: 10px !important;
+  }
+
+  #noteGrid .noteCard .note-avatar-box img {
+    width: 54px !important;
+    height: 54px !important;
+  }
+
+  #noteGrid .noteCard .note-main-text div:first-child {
+    font-size: 14px !important;
+    line-height: 1.35 !important;
+  }
+
+  #noteGrid .noteCard .note-image-box,
+  #noteGrid .noteCard .note-image-box img,
+  #noteGrid .noteCard .note-image-box > div {
+    width: 96px !important;
+    max-width: 96px !important;
+    height: 72px !important;
+  }
+
+  #noteGrid .noteCard .like-btn {
+    min-width: 76px !important;
+    padding: 6px 14px !important;
+    margin-top: 8px !important;
+  }
+}
