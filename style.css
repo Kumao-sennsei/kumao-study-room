@@ -2159,3 +2159,51 @@ grid-column: span 1;
     font-size: 12px !important;
   }
 }
+
+/* ======================
+   画像下のリアクションを小さく横並びに固定
+====================== */
+#noteGrid .noteCard .note-image-box {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+}
+
+#noteGrid .noteCard .note-reaction-under-image {
+  width: 100% !important;
+  margin-top: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+}
+
+#noteGrid .noteCard .note-reaction-under-image .like-btn,
+#noteGrid .noteCard .note-reaction-under-image .note-comment-count-btn {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+#noteGrid .noteCard .note-reaction-under-image .like-btn {
+  color: #facc15 !important;
+}
+
+#noteGrid .noteCard .note-reaction-under-image .note-comment-count-btn {
+  color: #ddd !important;
+}
