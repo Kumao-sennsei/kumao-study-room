@@ -2331,3 +2331,18 @@ grid-column: span 1;
 #noteGrid .noteCard .note-image-box > div {
   border-radius: 12px !important;
 }
+
+/* ======================
+   スマホ：ノートカードのアバターを少し大きくする
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .note-card-top {
+    grid-template-columns: 70px minmax(0, 1fr) 96px !important;
+  }
+
+  #noteGrid .noteCard .note-avatar-box img {
+    width: 58px !important;
+    height: 58px !important;
+    border-radius: 12px !important;
+  }
+}
