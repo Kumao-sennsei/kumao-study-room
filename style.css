@@ -1884,3 +1884,45 @@ grid-column: span 1;
     box-sizing: border-box !important;
   }
 }
+
+/* ======================
+   スマホ：ノートカード上段を1列にして縦文字化を防止
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .note-card-top {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  #noteGrid .noteCard .note-avatar-box {
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  #noteGrid .noteCard .note-main-text {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    text-align: left !important;
+  }
+
+  #noteGrid .noteCard .note-main-text div {
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
+  }
+
+  #noteGrid .noteCard .note-image-box {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #noteGrid .noteCard .note-image-box img {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 180px !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+  }
+}
