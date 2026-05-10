@@ -2666,3 +2666,75 @@ grid-column: span 1;
     min-width: 30px !important;
   }
 }
+
+/* ======================
+   スマホ：ノートカード内を上揃え＋下余白を圧縮
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard {
+    padding: 8px 10px 4px !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  #noteGrid .noteCard .note-card-top {
+    align-items: flex-start !important;
+    grid-template-columns: 74px minmax(0, 1fr) 122px !important;
+    gap: 10px !important;
+    margin-bottom: 0 !important;
+  }
+
+  #noteGrid .noteCard .note-avatar-box {
+    align-self: flex-start !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  #noteGrid .noteCard .note-avatar-box img {
+    width: 66px !important;
+    height: 66px !important;
+    border-radius: 12px !important;
+  }
+
+  #noteGrid .noteCard .note-main-text {
+    align-self: flex-start !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  #noteGrid .noteCard .note-image-box {
+    align-self: flex-start !important;
+    margin-top: 0 !important;
+    width: 122px !important;
+    max-width: 122px !important;
+    min-width: 122px !important;
+  }
+
+  #noteGrid .noteCard .note-image-box img,
+  #noteGrid .noteCard .note-image-box > div:not(.note-reaction-under-image) {
+    width: 122px !important;
+    max-width: 122px !important;
+    height: 66px !important;
+    max-height: 66px !important;
+    border-radius: 12px !important;
+    object-fit: cover !important;
+  }
+
+  #noteGrid .noteCard .note-reaction-under-image {
+    width: 122px !important;
+    margin-top: 1px !important;
+    padding: 0 !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+  }
+
+  #noteGrid .noteCard .note-reaction-under-image .like-btn,
+  #noteGrid .noteCard .note-reaction-under-image .note-comment-count-btn {
+    font-size: 14px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 30px !important;
+  }
+}
