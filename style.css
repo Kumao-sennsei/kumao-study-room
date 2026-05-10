@@ -1838,3 +1838,49 @@ grid-column: span 1;
     max-width: calc(50% - 6px) !important;
   }
 }
+
+/* ======================
+   学習ノート一覧：スマホ1列 / PCは左1〜5・右6〜10
+====================== */
+
+/* PC：左列に1〜5、右列に6〜10 */
+@media (min-width: 769px) {
+  #noteGrid {
+    display: grid !important;
+    grid-auto-flow: column !important;
+    grid-template-rows: repeat(5, auto) !important;
+    grid-template-columns: repeat(2, minmax(0, 520px)) !important;
+    gap: 18px !important;
+    align-items: start !important;
+    justify-content: start !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #noteGrid .noteCard {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* スマホ：上から1〜10の1列 */
+@media (max-width: 768px) {
+  #noteGrid {
+    display: grid !important;
+    grid-auto-flow: row !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: none !important;
+    gap: 18px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #noteGrid .noteCard {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
