@@ -2893,3 +2893,67 @@ grid-column: span 1;
   display: block !important;
   max-width: 74px !important;
 }
+
+/* ======================
+   ノートカード：ラスト余白調整
+   名前中央寄せ＋下余白圧縮
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard {
+    padding-top: 8px !important;
+    padding-bottom: 4px !important;
+  }
+
+  /* アバター列を中央寄せ */
+  #noteGrid .noteCard .note-avatar-box {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: center !important;
+  }
+
+  /* アバター下の名前を中央に */
+  #noteGrid .noteCard .note-avatar-name {
+    width: 74px !important;
+    max-width: 74px !important;
+    margin-top: 4px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+    font-weight: 900 !important;
+    line-height: 1.12 !important;
+  }
+
+  /* 写真エリアの余白を詰める */
+  #noteGrid .noteCard .note-image-box {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* 👍💬の下余白を詰める */
+  #noteGrid .noteCard .note-reaction-under-image {
+    margin-top: 1px !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1 !important;
+  }
+
+  #noteGrid .noteCard .note-reaction-under-image .like-btn,
+  #noteGrid .noteCard .note-reaction-under-image .note-comment-count-btn {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1 !important;
+  }
+
+  /* 中央本文側も下を少し詰める */
+  #noteGrid .noteCard .note-main-text {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  #noteGrid .noteCard .note-body-text {
+    margin-top: 3px !important;
+    margin-bottom: 0 !important;
+  }
+}
