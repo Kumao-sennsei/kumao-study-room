@@ -2158,11 +2158,9 @@ resetComposer();
       addBtn.textContent = originalAddBtnText;
     }
   };
-
-  reader.readAsDataURL(file);
-  return;
+reader.readAsDataURL(file);
+return;
 }
-
 
 await commitNoteWithImage("");
 
@@ -2170,10 +2168,9 @@ if (addBtn) {
   addBtn.disabled = false;
   addBtn.textContent = originalAddBtnText;
 }
-　}
-  }
-    
-    
+
+}
+
   async function editNote(noteId) {
   const notes = getNotes();
   const target = notes.find(note => note.id === noteId);
