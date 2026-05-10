@@ -1645,3 +1645,65 @@ grid-column: span 1;
     margin-top: 10px !important;
   }
 }
+
+/* ======================
+   学習ノートカード：PC/スマホ共通のピンク枠＋はみ出し防止
+====================== */
+#noteGrid {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#noteGrid .noteCard {
+  border: 2px solid #f472b6 !important;
+  border-radius: 16px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+/* カード内ボタン共通：カード外にはみ出さない */
+#noteGrid .noteCard button {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
+/* ======================
+   スマホ縦：ノートカードとボタンを画面内に収める
+====================== */
+@media (max-width: 768px) {
+  #noteGrid {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding: 0 !important;
+  }
+
+  #noteGrid .noteCard {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 18px 0 !important;
+    padding: 14px !important;
+  }
+
+  #noteGrid .noteCard .like-btn,
+  #noteGrid .noteCard .comment-send-btn,
+  #noteGrid .noteCard .edit-note-btn,
+  #noteGrid .noteCard .delete-note-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  #noteGrid .noteCard input,
+  #noteGrid .noteCard textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
