@@ -1926,3 +1926,61 @@ grid-column: span 1;
     border-radius: 12px !important;
   }
 }
+
+/* ======================
+   スマホ：ノートカードを横型コンパクト表示にする
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .note-card-top {
+    display: grid !important;
+    grid-template-columns: 64px minmax(0, 1fr) 96px !important;
+    gap: 10px !important;
+    align-items: start !important;
+  }
+
+  #noteGrid .noteCard .note-avatar-box {
+    display: block !important;
+  }
+
+  #noteGrid .noteCard .note-avatar-box img {
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+  }
+
+  #noteGrid .noteCard .note-main-text {
+    min-width: 0 !important;
+    width: 100% !important;
+    text-align: left !important;
+  }
+
+  #noteGrid .noteCard .note-main-text div {
+    white-space: normal !important;
+    word-break: keep-all !important;
+    overflow-wrap: break-word !important;
+  }
+
+  #noteGrid .noteCard .note-main-text div:first-child {
+    font-size: 14px !important;
+    line-height: 1.35 !important;
+  }
+
+  #noteGrid .noteCard .note-image-box {
+    width: 96px !important;
+    max-width: 96px !important;
+  }
+
+  #noteGrid .noteCard .note-image-box img {
+    width: 96px !important;
+    height: 72px !important;
+    object-fit: cover !important;
+    border-radius: 10px !important;
+  }
+
+  #noteGrid .noteCard .note-image-box > div {
+    width: 96px !important;
+    height: 72px !important;
+    font-size: 11px !important;
+  }
+}
