@@ -1707,3 +1707,25 @@ grid-column: span 1;
     box-sizing: border-box !important;
   }
 }
+
+/* ======================
+   ノートカード：編集・削除ボタンの右切れ防止
+====================== */
+#noteGrid .noteCard .edit-note-btn,
+#noteGrid .noteCard .delete-note-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: calc(50% - 8px) !important;
+  max-width: calc(50% - 8px) !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  margin-top: 10px !important;
+  margin-right: 4px !important;
+  margin-left: 0 !important;
+  white-space: nowrap !important;
+}
+
+#noteGrid .noteCard .delete-note-btn {
+  margin-right: 0 !important;
+}
