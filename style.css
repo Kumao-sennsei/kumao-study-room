@@ -2860,3 +2860,21 @@ grid-column: span 1;
     font-size: 12px !important;
   }
 }
+
+/* ======================
+   ノートカード：アバター下の名前を最大2行表示
+====================== */
+#noteGrid .noteCard .note-avatar-name {
+  max-width: 74px !important;
+  white-space: normal !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+  min-height: 24px !important;
+}
