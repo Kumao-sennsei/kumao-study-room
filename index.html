@@ -2016,12 +2016,13 @@ function syncCurrentUserNameUI() {
     ${escapeHtml(note.author)}
   </div>
 
-  <div class="note-avatar-profile">
-    ${note.author === "くまお太郎" ? "高2 京大農志望" : "未設定"}
-  </div>
+  
 </div>
 
 <div class="note-main-text" style="min-width:0;">
+<div class="note-center-profile">
+  ${note.author === "くまお太郎" ? "高2 京大農志望" : "未設定"}
+</div>
   ${subjectHtml}
 
   <div
