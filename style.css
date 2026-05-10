@@ -1597,3 +1597,16 @@ grid-column: span 1;
   }
 }
 
+/* ======================
+   スマホ縦：Goodボタンのはみ出し防止
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .like-btn {
+    display: flex !important;
+    width: calc(100% - 10px) !important;
+    max-width: calc(100% - 10px) !important;
+    margin: 6px 10px 0 0 !important;
+    box-sizing: border-box !important;
+    justify-content: center !important;
+  }
+}
