@@ -3091,3 +3091,30 @@ grid-column: span 1;
     margin-top: 2px !important;
   }
 }
+
+/* ======================
+   ノートカード：頑張りコメントを約8文字×最大3行で表示
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .note-body-text {
+    width: 8.5em !important;
+    max-width: 8.5em !important;
+
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+
+    white-space: normal !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+
+    word-break: break-all !important;
+    overflow-wrap: anywhere !important;
+
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+    color: #ffffff !important;
+    margin-top: 4px !important;
+    margin-bottom: 0 !important;
+  }
+}
