@@ -2032,7 +2032,7 @@ function syncCurrentUserNameUI() {
     ${escapeHtml(note.text)}
   </div>
   <div class="note-post-time">
-  ${escapeHtml(new Date(note.createdAt).toLocaleTimeString("ja-JP", { hour: "numeric", minute: "2-digit" }))}
+  ${escapeHtml(`${new Date(note.createdAt).getMonth() + 1}/${new Date(note.createdAt).getDate()} ${new Date(note.createdAt).toLocaleTimeString("ja-JP", { hour: "numeric", minute: "2-digit" })}`)}
 </div>
 </div>
 
