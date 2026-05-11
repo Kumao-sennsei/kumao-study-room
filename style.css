@@ -3118,3 +3118,41 @@ grid-column: span 1;
     margin-bottom: 0 !important;
   }
 }
+
+/* ======================
+   ノートカード：頑張りコメントを約10字×最大3行で左揃え表示
+====================== */
+#noteGrid .noteCard .note-body-text {
+  width: 10em !important;
+  max-width: 10em !important;
+
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+
+  white-space: normal !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+
+  word-break: break-all !important;
+  overflow-wrap: anywhere !important;
+
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  color: #ffffff !important;
+}
+
+/* スマホでも同じく、10字前後で自然に折り返す */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .note-body-text {
+    width: 10em !important;
+    max-width: 10em !important;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    -webkit-line-clamp: 3 !important;
+  }
+}
