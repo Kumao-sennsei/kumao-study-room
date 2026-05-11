@@ -3242,3 +3242,34 @@ grid-column: span 1;
     line-height: 1.35 !important;
   }
 }
+
+/* ======================
+   スマホ：頑張りコメントを省略せず、10字前後で最大3行表示
+====================== */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .note-main-text {
+    min-width: 0 !important;
+    max-width: 120px !important;
+    overflow: visible !important;
+  }
+
+  #noteGrid .noteCard .note-body-text {
+    display: block !important;
+
+    width: 10em !important;
+    max-width: 10em !important;
+    min-width: 0 !important;
+
+    white-space: normal !important;
+    word-break: break-all !important;
+    overflow-wrap: anywhere !important;
+
+    overflow: hidden !important;
+    text-overflow: clip !important;
+
+    max-height: 4.05em !important; /* 3行ぶん */
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    text-align: left !important;
+  }
+}
