@@ -2031,6 +2031,9 @@ function syncCurrentUserNameUI() {
   >
     ${escapeHtml(note.text)}
   </div>
+  <div class="note-post-time">
+  ${escapeHtml(new Date(note.createdAt).toLocaleTimeString("ja-JP", { hour: "numeric", minute: "2-digit" }))}
+</div>
 </div>
 
             <div class="note-image-box">
