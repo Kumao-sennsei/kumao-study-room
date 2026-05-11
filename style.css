@@ -3194,3 +3194,51 @@ grid-column: span 1;
     font-size: 11px !important;
   }
 }
+
+/* ======================
+   ノートカード：本文折り返しのPC/スマホ分離
+====================== */
+
+/* PC：折り返さず、横長カードのまま省略 */
+@media (min-width: 769px) {
+  #noteGrid .noteCard .note-body-text {
+    width: auto !important;
+    max-width: 260px !important;
+    min-width: 0 !important;
+
+    display: block !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+  }
+}
+
+/* スマホ：10文字前後で自然に折り返し、最大3行 */
+@media (max-width: 768px) {
+  #noteGrid .noteCard .note-body-text {
+    width: 10em !important;
+    max-width: 10em !important;
+    min-width: 0 !important;
+
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    -webkit-box-orient: vertical !important;
+
+    white-space: normal !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+
+    word-break: break-all !important;
+    overflow-wrap: anywhere !important;
+
+    text-align: left !important;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+}
