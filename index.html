@@ -1713,10 +1713,10 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
   return savedPlan === "paid" ? "paid" : "free";
 }
 
-  function setCurrentMemberPlan(plan) {
-    const safePlan = plan === "free" ? "free" : "paid";
-    localStorage.setItem("kumaoMemberPlan", safePlan);
-  }
+ function setCurrentMemberPlan(plan) {
+  const safePlan = plan === "paid" ? "paid" : "free";
+  localStorage.setItem("kumaoMemberPlan", safePlan);
+} 
 
 async function refreshCurrentMemberPlanFromSupabase() {
   try {
