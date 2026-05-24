@@ -1966,10 +1966,15 @@ function syncCurrentUserNameUI() {
   .slice(0, 10);
 
     noteGrid.innerHTML = recentNotes.map(note => {
-      const imageHtml = note.image
-        ? `<img src="${escapeHtml(note.image)}" alt="ノート画像"
-            style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bottom:8px;">`
-        : "";
+     const imageHtml = note.image
+  ? `<img
+      src="${escapeHtml(note.image)}"
+      alt="ノート画像"
+      class="note-image-preview"
+      data-note-id="${escapeHtml(note.id)}"
+      style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bottom:8px; cursor:pointer;"
+    >`
+  : "";
 
       const subjectHtml = note.subject
         ? `<div style="font-size:12px; color:#ffd54f; margin-bottom:4px;">${escapeHtml(note.subject)}</div>`
@@ -2143,6 +2148,126 @@ function syncCurrentUserNameUI() {
     }).join("");
   }
 
+function openNoteDetailModal(noteId) {
+  const modal = document.getElementById("noteDetailModal");
+  const body = document.getElementById("noteDetailModalBody");
+  if (!modal || !body) return;
+
+  const notes = getNotes();
+  const note = notes.find(n => String(n.id) === String(noteId));
+  if (!note) return;
+
+  const comments = Array.isArray(note.comments) ? note.comments : [];
+
+  const commentsHtml = comments.length
+    ? comments.map(comment => {
+        const author = escapeHtml(comment.author || comment.display_name || "匿名");
+        const text = escapeHtml(comment.text || comment.body || "");
+        return `
+          <div style="
+            padding:8px 10px;
+            border-radius:10px;
+            background:#1f2937;
+            border:1px solid #374151;
+            margin-bottom:8px;
+            font-size:13px;
+            line-height:1.6;
+          ">
+            <div style="color:#93c5fd; font-weight:bold; margin-bottom:3px;">
+              ${author}
+            </div>
+            <div style="color:#e5e7eb;">
+              ${text}
+            </div>
+          </div>
+        `;
+      }).join("")
+    : `<div style="color:#9ca3af; font-size:13px;">まだコメントはありません。</div>`;
+
+  body.innerHTML = `
+    <div style="margin-bottom:14px;">
+      <div style="font-size:18px; font-weight:bold; color:#facc15; margin-bottom:6px;">
+        ${escapeHtml(note.author || "匿名")} の学習ノート
+      </div>
+
+      <div style="font-size:13px; color:#9ca3af; margin-bottom:12px;">
+        ${escapeHtml(new Date(note.createdAt).toLocaleString("ja-JP"))}
+      </div>
+
+      ${note.subject ? `
+        <div style="font-size:14px; color:#ffd54f; margin-bottom:8px;">
+          ${escapeHtml(note.subject)}
+        </div>
+      ` : ""}
+
+      <div style="
+        white-space:pre-wrap;
+        word-break:break-word;
+        line-height:1.8;
+        color:#fff;
+        background:#0b1220;
+        border:1px solid #374151;
+        border-radius:12px;
+        padding:12px;
+        margin-bottom:12px;
+      ">
+        ${escapeHtml(note.text || "")}
+      </div>
+
+      ${note.image ? `
+        <img
+          src="${escapeHtml(note.image)}"
+          alt="ノート画像"
+          style="
+            width:100%;
+            max-height:420px;
+            object-fit:contain;
+            border-radius:12px;
+            background:#000;
+            margin-bottom:14px;
+          "
+        >
+      ` : ""}
+    </div>
+
+    <div style="margin-top:16px;">
+      <div style="font-size:16px; font-weight:bold; color:#facc15; margin-bottom:10px;">
+        コメント ${(comments || []).length}件
+      </div>
+      ${commentsHtml}
+    </div>
+  `;
+
+  modal.style.display = "block";
+}
+
+function closeNoteDetailModal() {
+  const modal = document.getElementById("noteDetailModal");
+  if (!modal) return;
+  modal.style.display = "none";
+}
+
+document.addEventListener("click", (event) => {
+  const closeBtn = event.target.closest("#closeNoteDetailModalBtn");
+  if (closeBtn) {
+    closeNoteDetailModal();
+    return;
+  }
+
+  const commentBtn = event.target.closest(".note-comment-count-btn");
+  if (commentBtn) {
+    event.preventDefault();
+    event.stopPropagation();
+    openNoteDetailModal(commentBtn.dataset.noteId);
+    return;
+  }
+
+  const noteCard = event.target.closest(".noteCard");
+  if (noteCard) {
+    openNoteDetailModal(noteCard.dataset.noteId);
+  }
+});
+  
    async function addNote() {
     const subjectEl = document.getElementById("noteSubjectInput");
     const textEl = document.getElementById("noteTextInput");
