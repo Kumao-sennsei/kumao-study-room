@@ -3279,4 +3279,93 @@ grid-column: span 1;
   display: none !important;
 }
 
+/* ===== スマホ：学習ノートカード最終調整 ===== */
+@media (max-width: 768px) {
+  #noteGrid {
+    gap: 12px !important;
+  }
+
+  #noteGrid .noteCard {
+    padding: 10px 10px 8px !important;
+    min-height: 0 !important;
+    margin-bottom: 10px !important;
+  }
+
+  #noteGrid .note-card-top {
+    grid-template-columns: 74px minmax(0, 1fr) 130px !important;
+    gap: 10px !important;
+    margin-bottom: 4px !important;
+    align-items: start !important;
+  }
+
+  #noteGrid .note-main-text {
+    min-width: 0 !important;
+  }
+
+  #noteGrid .note-body-text {
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+    max-width: 10em !important;
+    max-height: 2.7em !important;
+    overflow: hidden !important;
+    word-break: break-all !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  #noteGrid .note-entry-count {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+  }
+
+  #noteGrid .note-image-box {
+    width: 130px !important;
+    max-width: 130px !important;
+    justify-self: end !important;
+  }
+
+  #noteGrid .note-image-preview,
+  #noteGrid .note-image-box img {
+    width: 130px !important;
+    height: 108px !important;
+    object-fit: cover !important;
+    border-radius: 10px !important;
+  }
+
+  #noteGrid .note-reaction-under-image {
+    margin-top: 4px !important;
+    gap: 8px !important;
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  #noteGrid .note-card-top {
+    grid-template-columns: 72px minmax(0, 1fr) 120px !important;
+    gap: 8px !important;
+  }
+
+  #noteGrid .note-image-box {
+    width: 120px !important;
+    max-width: 120px !important;
+  }
+
+  #noteGrid .note-image-preview,
+  #noteGrid .note-image-box img {
+    width: 120px !important;
+    height: 100px !important;
+  }
+
+  #noteGrid .note-entry-count {
+    font-size: 10.5px !important;
+  }
+
+  #noteGrid .note-body-text {
+    font-size: 11px !important;
+    max-width: 10em !important;
+  }
+}
 
