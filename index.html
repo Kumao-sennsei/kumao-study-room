@@ -2230,12 +2230,55 @@ function openNoteDetailModal(noteId) {
       ` : ""}
     </div>
 
-    <div style="margin-top:16px;">
-      <div style="font-size:16px; font-weight:bold; color:#facc15; margin-bottom:10px;">
-        コメント ${(comments || []).length}件
-      </div>
-      ${commentsHtml}
-    </div>
+  <div style="margin-top:16px;">
+  <div style="font-size:16px; font-weight:bold; color:#facc15; margin-bottom:10px;">
+    コメント ${(comments || []).length}件
+  </div>
+
+  <div style="
+    display:flex;
+    gap:8px;
+    margin-bottom:12px;
+    align-items:center;
+  ">
+    <input
+      id="comment-input-${escapeHtml(note.id)}"
+      type="text"
+      maxlength="20"
+      placeholder="20字以内で応援コメント"
+      style="
+        flex:1;
+        min-width:0;
+        padding:10px 12px;
+        border-radius:10px;
+        border:1px solid #4b5563;
+        background:#0b1220;
+        color:#fff;
+        font-size:14px;
+        box-sizing:border-box;
+      "
+    >
+    <button
+      type="button"
+      class="note-comment-submit-btn"
+      data-note-id="${escapeHtml(note.id)}"
+      style="
+        padding:10px 12px;
+        border:none;
+        border-radius:10px;
+        background:#facc15;
+        color:#111827;
+        font-weight:bold;
+        cursor:pointer;
+        white-space:nowrap;
+      "
+    >
+      送信
+    </button>
+  </div>
+
+  ${commentsHtml}
+</div>  
   `;
 
   modal.style.display = "block";
