@@ -2290,10 +2290,50 @@ function closeNoteDetailModal() {
   modal.style.display = "none";
 }
 
-document.addEventListener("click", (event) => {
+  document.addEventListener("click", async (event) => {
   const closeBtn = event.target.closest("#closeNoteDetailModalBtn");
   if (closeBtn) {
     closeNoteDetailModal();
+    return;
+  }
+  const submitCommentBtn = event.target.closest(".note-comment-submit-btn");
+  if (submitCommentBtn) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const noteId = submitCommentBtn.dataset.noteId;
+    const input = document.getElementById(`comment-input-${noteId}`);
+    if (!input) return;
+
+    const commentText = input.value.trim();
+
+    if (!commentText) {
+      alert("コメントを入力してね🐻✨");
+      return;
+    }
+
+    if (commentText.length > 20) {
+      alert("コメントは20字以内で入力してね🐻");
+      return;
+    }
+
+    submitCommentBtn.disabled = true;
+    submitCommentBtn.textContent = "送信中…";
+
+    try {
+      await addComment(noteId, commentText);
+      input.value = "";
+      await loadNotesFromSupabase();
+      renderNotes();
+      openNoteDetailModal(noteId);
+    } catch (e) {
+      console.error(e);
+      alert("コメント送信中にエラーが起きたよ");
+    } finally {
+      submitCommentBtn.disabled = false;
+      submitCommentBtn.textContent = "送信";
+    }
+
     return;
   }
 
