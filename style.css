@@ -3273,3 +3273,8 @@ grid-column: span 1;
     text-align: left !important;
   }
 }
+
+/* ===== 本番用：テスト用プラン切替を非表示 ===== */
+#memberPlanTestBox {
+  display: none !important;
+}
