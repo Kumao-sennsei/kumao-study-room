@@ -2034,7 +2034,7 @@ function syncCurrentUserNameUI() {
           background:#1a1a1a;
           border:1px solid #333;
           border-radius:10px;
-          padding:8px 10px 4px;
+          padding:8px 10px 2px;
 　　　　　 min-height:0;
           box-sizing:border-box;
         ">
@@ -2104,13 +2104,15 @@ function syncCurrentUserNameUI() {
 </div>
 </div>
 
-            <div class="note-image-box">
+            <div class="note-image-box" style="position:relative;">
   ${imageHtml || `<div style="height:58px; border-radius:10px; border:1px dashed #444; display:flex; align-items:center; justify-content:center; color:#666; font-size:11px;">画像なし</div>`}
 
   <div
     class="note-reaction-under-image"
     style="
-      margin-top:0;
+      position:absolute;
+      right:0;
+      bottom:-20px;
       display:flex;
       align-items:center;
       justify-content:flex-end;
@@ -2118,7 +2120,7 @@ function syncCurrentUserNameUI() {
       font-size:11px;
       color:#ddd;
       white-space:nowrap;
-      transform:translateY(-6px);
+      line-height:1;
     "
   >
   
