@@ -2860,17 +2860,21 @@ if (noteGrid) {
   noteGrid.addEventListener("click", (e) => {
     const target = e.target;
 
-    const editBtn = target.closest(".note-edit-btn");
-    if (editBtn) {
-      editNote(editBtn.dataset.noteId);
-      return;
-    }
+   const editBtn = target.closest(".note-edit-btn");
+if (editBtn) {
+  e.preventDefault();
+  e.stopPropagation();
+  editNote(editBtn.dataset.noteId);
+  return;
+}
 
-    const deleteBtn = target.closest(".note-delete-btn");
-    if (deleteBtn) {
-      deleteNote(deleteBtn.dataset.noteId);
-      return;
-    }
+const deleteBtn = target.closest(".note-delete-btn");
+if (deleteBtn) {
+  e.preventDefault();
+  e.stopPropagation();
+  deleteNote(deleteBtn.dataset.noteId);
+  return;
+}
 
     const likeBtn = target.closest(".like-btn");
     if (likeBtn) {
