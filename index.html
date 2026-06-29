@@ -128,7 +128,8 @@
     ・月替わり300種類以上のボイスガチャ😎💣<br>
     ・ノート投稿で褒め合える学習空間😊<br>
     ・アバター育成ゲームで続けたくなる🐻✨<br>
-    ・無料で始めて、あとから有料プランへ切り替えOK
+    ・7月・8月限定で有料機能を無料開放中🎁<br>
+    ・静かに燃えろ。俺たちがついている。
   </div>
 </div>
      <div
@@ -388,6 +389,7 @@
   id="memberPlanTestBox"
   class="testOnly"
   style="
+    display:none !important;    
     margin:0 0 18px;
     padding:12px 16px;
     border-radius:14px;
@@ -1779,7 +1781,6 @@ async function refreshCurrentMemberPlanFromSupabase() {
   }
 }  
   
-  
   function syncMemberPlanUI() {
   const select = document.getElementById("memberPlanSelect");
   const status = document.getElementById("memberPlanStatus");
@@ -1792,24 +1793,30 @@ async function refreshCurrentMemberPlanFromSupabase() {
   }
 
   if (status) {
-    status.textContent =
-      plan === "free"
+    status.textContent = KUMAO_SUMMER_FREE_OPEN
+      ? "現在：くまお夏の集中祭で無料開放中（1日5回）"
+      : plan === "free"
         ? "現在：無料会員（1日1回）"
         : "現在：有料会員（1日5回）";
   }
 
   if (planGuideTitle) {
-    planGuideTitle.textContent =
-      plan === "paid" ? "有料会員プラン" : "無料会員プラン";
+    planGuideTitle.textContent = KUMAO_SUMMER_FREE_OPEN
+      ? "くまお夏の集中祭 開催中🐻🔥"
+      : plan === "paid"
+        ? "有料会員プラン"
+        : "無料会員プラン";
   }
 
   if (planGuideBody) {
-  planGuideBody.innerHTML =
-    plan === "paid"
-      ? "有料会員は、自習室の閲覧・ノート閲覧・1日5回までの投稿・いいね・コメント送信・ポモドーロ学習が使えます。"
-      : "無料会員は、自習室の閲覧・ノート閲覧・1日1回の投稿・いいねが使えます。<br>ポモドーロ学習とコメント送信は、有料会員で利用できます。";
+    planGuideBody.innerHTML = KUMAO_SUMMER_FREE_OPEN
+      ? "7月・8月限定で、KUMAO STUDY ROOMの有料機能を無料開放中です。<br>ポモドーロ学習・コメント送信・音声ガチャ・くまおっち育成・1日5回までの投稿が使えます。<br><strong style='color:#facc15;'>静かに燃えろ。俺たちがついている。</strong>"
+      : plan === "paid"
+        ? "有料会員は、自習室の閲覧・ノート閲覧・1日5回までの投稿・いいね・コメント送信・ポモドーロ学習が使えます。"
+        : "無料会員は、自習室の閲覧・ノート閲覧・1日1回の投稿・いいねが使えます。<br>ポモドーロ学習とコメント送信は、有料会員で利用できます。";
+  }
 }
-}
+
 
  function getCurrentUserName() {
   const savedName = localStorage.getItem("kumaoCurrentUserName");
