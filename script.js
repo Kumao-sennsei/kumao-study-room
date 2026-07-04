@@ -1567,6 +1567,60 @@ window.addEventListener(
 let roomUsers = [];
 let isInRoom = false;
 
+let currentStudyRoomName = "";
+let studyRoomRefreshTimer = null;
+
+async function fetchStudyRoomSeats(roomName, options = {}) {
+  const { silent = false } = options;
+  const detail = document.getElementById("roomDetail");
+  if (!detail || !roomName) return [];
+
+  const { data: seats, error: seatError } = await supabaseClient
+    .from("study_room_seat_view")
+    .select("user_id, room_name, display_name, current_title, avatar_type, avatar_stage, study_label, entered_at, updated_at, profile_text")
+    .eq("room_name", roomName)
+    .order("entered_at", { ascending: true });
+
+  if (seatError) {
+    console.error("study_room_seat_view 取得エラー", seatError);
+
+    if (!silent) {
+      detail.innerHTML = `
+        <div style="color:#ff8a80; text-align:center; padding:20px;">
+          座席情報を取得できませんでした。
+        </div>
+      `;
+    }
+
+    return [];
+  }
+
+  renderStudyRoomSeats(roomName, seats || []);
+  return seats || [];
+}
+
+function startStudyRoomAutoRefresh(roomName) {
+  currentStudyRoomName = roomName;
+
+  if (studyRoomRefreshTimer) {
+    clearInterval(studyRoomRefreshTimer);
+  }
+
+  studyRoomRefreshTimer = setInterval(() => {
+    if (!currentStudyRoomName) return;
+    fetchStudyRoomSeats(currentStudyRoomName, { silent: true });
+  }, 10000);
+}
+
+function stopStudyRoomAutoRefresh() {
+  currentStudyRoomName = "";
+
+  if (studyRoomRefreshTimer) {
+    clearInterval(studyRoomRefreshTimer);
+    studyRoomRefreshTimer = null;
+  }
+}
+
 function groupPostsByUser(posts) {
   const grouped = {};
 
