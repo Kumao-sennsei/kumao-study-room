@@ -3395,6 +3395,107 @@ if (document.readyState === "loading") {
   }
 })();
 </script>
-   
+
+
+   <style>
+@media (orientation: portrait) and (min-width: 600px) and (max-width: 1100px) {
+  html,
+  body {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #000 !important;
+  }
+
+  #app {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #left,
+  #right {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 100vw !important;
+
+    height: 50dvh !important;
+    min-height: 50dvh !important;
+    max-height: 50dvh !important;
+
+    flex: 0 0 50dvh !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  #left {
+    order: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  #right {
+    order: 2 !important;
+    position: relative !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    background: #000 !important;
+    display: block !important;
+  }
+
+  #character {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+
+    width: 100vw !important;
+    max-width: none !important;
+    min-width: 100vw !important;
+
+    height: 50dvh !important;
+    min-height: 50dvh !important;
+    max-height: 50dvh !important;
+
+    object-fit: cover !important;
+    object-position: center center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #goStudyRoomBtn {
+    position: absolute !important;
+    top: 12px !important;
+    left: 12px !important;
+    z-index: 40 !important;
+    margin: 0 !important;
+  }
+
+  #studyRoom {
+    position: absolute !important;
+    top: 64px !important;
+    left: 12px !important;
+    right: auto !important;
+    z-index: 40 !important;
+  }
+
+  #brandBox {
+    display: none !important;
+  }
+}
+</style>
 </body>
 </html>
