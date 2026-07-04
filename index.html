@@ -2039,7 +2039,7 @@ const imageHtml = previewImages.length
           alt="投稿画像${imageIndex + 1}"
           style="
             width:100%;
-            height:78px;
+            height:72px;
             object-fit:cover;
             border-radius:10px;
             border:1px solid #333;
@@ -2147,17 +2147,26 @@ const commentsHtml = latestComments.length
           min-height:128px;
           box-sizing:border-box;
         ">
-           <div
+          <div
   class="note-card-top"
   style="
     display:grid;
-    grid-template-columns:82px 1fr 170px;
-    gap:14px;
+    grid-template-columns:86px 170px minmax(0, 1fr) 64px;
+    gap:12px;
     align-items:start;
-    margin-bottom:2px;
+    width:100%;
+    box-sizing:border-box;
   "
 >
-  <div class="note-avatar-box" style="text-align:center;">
+  <!-- 1：プロフィール -->
+  <div
+    class="note-avatar-box"
+    style="
+      width:86px;
+      text-align:center;
+      box-sizing:border-box;
+    "
+  >
     <img
       src="kumao_baby.png"
       alt="アバター"
@@ -2173,68 +2182,100 @@ const commentsHtml = latestComments.length
       "
     />
 
-    <div class="note-avatar-name" style="
-      color:#fff;
-      font-size:12px;
-      font-weight:bold;
-      line-height:1.35;
-      word-break:break-word;
-    ">
+    <div
+      class="note-avatar-name"
+      style="
+        color:#fff;
+        font-size:11px;
+        font-weight:bold;
+        line-height:1.35;
+        word-break:break-word;
+      "
+    >
       ${escapeHtml(displayAuthor).replace("（", "<br>（")}
+    </div>
+
+    <div
+      style="
+        color:#60a5fa;
+        font-size:10px;
+        font-weight:bold;
+        line-height:1.35;
+        margin-top:4px;
+        word-break:break-word;
+      "
+    >
+      ${displayAuthor === "くまお太郎" ? "高2 京大農志望" : "未設定"}
     </div>
   </div>
 
-  <div class="note-main-text" style="
-    min-width:0;
-    display:flex;
-    flex-direction:column;
-    gap:5px;
-  ">
-    <div class="note-center-profile" style="
-      color:#60a5fa;
-      font-size:12px;
-      font-weight:bold;
-      line-height:1.35;
-    ">
-      ${displayAuthor === "くまお太郎" ? "高2 京大農志望" : "未設定"}
-    </div>
+  <!-- 2：投稿写真 -->
+  <div
+    class="note-image-box"
+    style="
+      width:170px;
+      max-width:170px;
+      overflow:hidden;
+      box-sizing:border-box;
+    "
+  >
+    ${imageHtml}
+  </div>
 
+  <!-- 3：コメント表示 -->
+  <div
+    class="note-comment-stream"
+    style="
+      min-width:0;
+      max-width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      overflow:hidden;
+      box-sizing:border-box;
+    "
+  >
     ${note.subject ? `
-      <div style="
-        font-size:12px;
-        color:#ffd54f;
-        font-weight:bold;
-        line-height:1.35;
-      ">
+      <div
+        style="
+          color:#ffd54f;
+          font-size:12px;
+          font-weight:bold;
+          line-height:1.35;
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+        "
+      >
         ${escapeHtml(note.subject)}
       </div>
     ` : ""}
 
     <div
-      class="note-body-text"
       style="
-        max-height:36px;
-        line-height:18px;
-        font-size:12px;
         color:#fff;
-        white-space:normal;
-        word-break:break-all;
-        overflow-wrap:anywhere;
+        font-size:12px;
+        line-height:1.45;
+        max-height:34px;
         overflow:hidden;
+        word-break:break-word;
+        overflow-wrap:anywhere;
       "
     >
-      ${escapeHtml(note.text)}
+      ${escapeHtml(note.text || "")}
     </div>
 
-    <div style="
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      font-size:11px;
-      color:#9ca3af;
-      margin-top:2px;
-    ">
+    <div
+      style="
+        display:flex;
+        gap:10px;
+        align-items:center;
+        flex-wrap:wrap;
+        font-size:11px;
+        color:#9ca3af;
+        margin-top:2px;
+      "
+    >
       <span>
         ${escapeHtml(`${new Date(note.createdAt).getMonth() + 1}/${new Date(note.createdAt).getDate()} ${new Date(note.createdAt).toLocaleTimeString("ja-JP", { hour: "numeric", minute: "2-digit" })}`)}
       </span>
@@ -2244,75 +2285,66 @@ const commentsHtml = latestComments.length
       </span>
     </div>
 
-    <div style="
-      display:grid;
-      gap:4px;
-      max-height:72px;
-      overflow:hidden;
-      margin-top:4px;
-    ">
+    <div
+      style="
+        display:grid;
+        gap:4px;
+        max-height:74px;
+        overflow:hidden;
+        margin-top:4px;
+      "
+    >
       ${commentsHtml}
     </div>
   </div>
 
-  <div class="note-image-and-reaction" style="
-    position:relative;
-    min-width:0;
-  ">
-    <div class="note-image-box" style="
-      width:100%;
-      min-height:78px;
-    ">
-      ${imageHtml}
-    </div>
-
-    <div
-      class="note-reaction-under-image"
+  <!-- 4：リアクション -->
+  <div
+    class="note-reaction-box"
+    style="
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      justify-content:flex-start;
+      gap:8px;
+      font-size:13px;
+      color:#ddd;
+      white-space:nowrap;
+      padding-top:2px;
+    "
+  >
+    <button
+      type="button"
+      class="like-btn"
+      data-note-id="${escapeHtml(note.id)}"
       style="
-        display:flex;
-        align-items:center;
-        justify-content:flex-end;
-        gap:10px;
+        border:none;
+        background:transparent;
+        color:${note.liked ? "#aaa" : "#facc15"};
+        font-weight:bold;
+        cursor:pointer;
+        padding:0;
         font-size:13px;
-        color:#ddd;
-        white-space:nowrap;
-        line-height:1;
-        margin-top:8px;
       "
     >
-      <button
-        type="button"
-        class="like-btn"
-        data-note-id="${escapeHtml(note.id)}"
-        style="
-          border:none;
-          background:transparent;
-          color:${note.liked ? "#aaa" : "#facc15"};
-          font-weight:bold;
-          cursor:pointer;
-          padding:0;
-          font-size:13px;
-        "
-      >
-        👍 ${Number(note.likes) || 0}
-      </button>
+      👍 ${Number(note.likes) || 0}
+    </button>
 
-      <button
-        type="button"
-        class="note-comment-count-btn"
-        data-note-id="${escapeHtml(note.id)}"
-        style="
-          border:none;
-          background:transparent;
-          color:#ddd;
-          cursor:pointer;
-          padding:0;
-          font-size:13px;
-        "
-      >
-        💬 ${(note.comments || []).length}
-      </button>
-    </div>
+    <button
+      type="button"
+      class="note-comment-count-btn"
+      data-note-id="${escapeHtml(note.id)}"
+      style="
+        border:none;
+        background:transparent;
+        color:#ddd;
+        cursor:pointer;
+        padding:0;
+        font-size:13px;
+      "
+    >
+      💬 ${(note.comments || []).length}
+    </button>
   </div>
 </div>
           <!-- 一覧カードでは今日の投稿詳細は非表示。後で詳細画面に移動予定 -->
