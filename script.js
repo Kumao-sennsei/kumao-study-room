@@ -306,51 +306,56 @@ function playVoiceAudio(src, onEnded) {
       /iPad|iPhone|iPod/.test(navigator.userAgent) ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-    if (isAppleMobile) {
-      unlockAudioSystem()
-        .then(async (ok) => {
-          if (!ok) throw new Error("audio unlock failed");
+   if (isAppleMobile) {
+  (async () => {
+    try {
+      // iPhone/iPad用：
+      // HTML Audio の unlock を待たない。
+      // Web Audio だけを使って、保存済みmp3を直接鳴らす。
+      const ctx = getAudioContext();
 
-          const ctx = await resumeAudioContextIfNeeded();
+      if (ctx.state === "suspended") {
+        await ctx.resume();
+      }
 
-          if (!ctx || ctx.state === "suspended") {
-            throw new Error("AudioContext suspended");
-          }
+      if (ctx.state !== "running") {
+        throw new Error(`AudioContext not running: ${ctx.state}`);
+      }
 
-          const response = await fetch(src, { cache: "no-cache" });
+      const response = await fetch(src, { cache: "no-cache" });
 
-          if (!response.ok) {
-            throw new Error(`voice fetch failed: ${src}`);
-          }
+      if (!response.ok) {
+        throw new Error(`voice fetch failed: ${src}`);
+      }
 
-          const arrayBuffer = await response.arrayBuffer();
-          const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
 
-          const source = ctx.createBufferSource();
-          source.buffer = audioBuffer;
-          source.connect(ctx.destination);
+      const source = ctx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(ctx.destination);
 
-          window.currentIOSVoiceSourceNode = source;
+      window.currentIOSVoiceSourceNode = source;
 
-          source.onended = () => {
-            if (window.currentIOSVoiceSourceNode === source) {
-              window.currentIOSVoiceSourceNode = null;
-            }
+      source.onended = () => {
+        if (window.currentIOSVoiceSourceNode === source) {
+          window.currentIOSVoiceSourceNode = null;
+        }
 
-            safeFinish();
-          };
+        safeFinish();
+      };
 
-          source.start(0);
-          console.log("[voice-ios] WebAudioボイス再生開始:", src);
-        })
-        .catch((e) => {
-          console.error("[voice-ios] ボイス再生失敗:", e, src);
-          safeFinish();
-        });
-
-      return;
+      source.start(0);
+      console.log("[voice-ios] WebAudioボイス再生開始:", src);
+    } catch (e) {
+      console.error("[voice-ios] ボイス再生失敗:", e, src);
+      safeFinish();
     }
+  })();
 
+  return;
+}
+    
     const audio = ensureVoiceObject();
 
     const startPlayback = () => {
