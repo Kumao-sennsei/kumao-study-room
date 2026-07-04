@@ -322,15 +322,18 @@ function playVoiceAudio(src, onEnded) {
       safeFinish();
     };
 
-  // iPad/Safari対策：
-// ボタン押下から来ている再生は、unlock完了待ちにせず先に play() を試す。
-// then の中で play() すると、ユーザー操作扱いから外れて無音になりやすい。
-startPlayback();
-
-if (!audioUnlocked) {
-  unlockAudioSystem().catch((e) => {
-    console.warn("[voice] 後追いunlock失敗:", e);
-  });
+ if (audioUnlocked) {
+  startPlayback();
+} else {
+  unlockAudioSystem()
+    .then((ok) => {
+      if (!ok) throw new Error("audio unlock failed");
+      startPlayback();
+    })
+    .catch((e) => {
+      console.error("ボイス再生失敗:", e, src);
+      safeFinish();
+    });
 }
   } catch (e) {
     console.error("ボイス生成失敗:", e, src);
