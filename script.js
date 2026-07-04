@@ -1543,6 +1543,7 @@ playVoiceAudio(quote.audio, () => {
 });
 
 return;
+  }
 
   stopAmbient();
   stopVoice();
