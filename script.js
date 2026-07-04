@@ -168,8 +168,35 @@ async function unlockAudioSystem() {
 
   audioUnlockPromise = (async () => {
     try {
+      // iPhone/iPad対策：
+      // 1. Web Audio API側を解除する（集中TIMEの自然音用）
+      try {
+        const ctx = getAudioContext();
+
+        if (ctx.state === "suspended") {
+          await ctx.resume();
+        }
+
+        // 無音の一瞬再生で、Web Audioの出力経路を開ける
+        const buffer = ctx.createBuffer(1, 1, 22050);
+        const source = ctx.createBufferSource();
+        const gain = ctx.createGain();
+
+        gain.gain.value = 0;
+        source.buffer = buffer;
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        source.start(0);
+
+        console.log("[audio] Web Audio unlock 成功:", ctx.state);
+      } catch (e) {
+        console.warn("[audio] Web Audio unlock 失敗:", e);
+      }
+
+      // 2. HTML Audio側を解除する（休憩BGM・ボイス用）
       const silent = createManagedAudio(SILENT_WAV);
       silent.muted = true;
+      silent.volume = 0;
       await silent.play().catch(() => {});
       silent.pause();
       silent.currentTime = 0;
@@ -184,19 +211,34 @@ async function unlockAudioSystem() {
         currentVoiceAudio = createManagedAudio(SILENT_WAV);
       }
 
-      currentAudio.muted = true;
-      currentVoiceAudio.muted = true;
+      if (!breakCafeAudio) {
+        breakCafeAudio = createManagedAudio("audio/ambient/break_cafe_loop.mp3");
+        breakCafeAudio.loop = true;
+        breakCafeAudio.volume = 0.18;
+      }
 
-      await currentAudio.play().catch(() => {});
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
+      const htmlAudios = [currentAudio, currentVoiceAudio, breakCafeAudio];
 
-      await currentVoiceAudio.play().catch(() => {});
-      currentVoiceAudio.pause();
-      currentVoiceAudio.currentTime = 0;
+      for (const audio of htmlAudios) {
+        if (!audio) continue;
 
-      currentAudio.muted = false;
-      currentVoiceAudio.muted = false;
+        try {
+          const originalMuted = audio.muted;
+          const originalVolume = audio.volume;
+
+          audio.muted = true;
+          audio.volume = 0;
+
+          await audio.play().catch(() => {});
+          audio.pause();
+          audio.currentTime = 0;
+
+          audio.muted = originalMuted;
+          audio.volume = originalVolume;
+        } catch (e) {
+          console.warn("[audio] HTML Audio unlock 個別失敗:", e);
+        }
+      }
 
       audioUnlocked = true;
       console.log("[audio] unlock 成功");
