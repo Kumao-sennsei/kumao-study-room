@@ -1456,8 +1456,15 @@ function showMobileSoundUnlockButton(options = {}) {
     btn.textContent = "🔊 音を準備中...";
 
     try {
-      await unlockAudioSystem();
-      await primeAmbient(currentMode).catch(() => {});
+      // スマホで unlockAudioSystem が固まることがあるため、長く待たない
+await Promise.race([
+  unlockAudioSystem(),
+  new Promise((resolve) => setTimeout(resolve, 700))
+]);
+
+await primeAmbient(currentMode).catch((e) => {
+  console.warn("[mobile audio] primeAmbient はスキップ:", e);
+});
 
       if (phase === "focus") {
         await startAmbient(currentMode).catch((e) => {
