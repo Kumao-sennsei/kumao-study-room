@@ -2147,92 +2147,132 @@ const commentsHtml = latestComments.length
 　　　　　 min-height:0;
           box-sizing:border-box;
         ">
-                   <div
-            class="note-card-top"
-            style="
-              display:grid;
-              grid-template-columns:72px 1fr 108px;
-              gap:14px;
-              align-items:start;
-              margin-bottom:2px;
-            "
-          >
-            <div class="note-avatar-box">
-  <img
-    src="kumao_baby.png"
-    alt="アバター"
-    style="
-      width:64px;
-      height:64px;
-      border-radius:12px;
-      object-fit:cover;
-      border:2px solid #60a5fa;
-      background:#111;
-    "
-  />
+           <div
+  class="note-card-top"
+  style="
+    display:grid;
+    grid-template-columns:72px 148px 1fr 70px;
+    gap:12px;
+    align-items:start;
+    margin-bottom:2px;
+  "
+>
+  <div class="note-avatar-box">
+    <img
+      src="kumao_baby.png"
+      alt="アバター"
+      style="
+        width:64px;
+        height:64px;
+        border-radius:12px;
+        object-fit:cover;
+        border:2px solid #60a5fa;
+        background:#111;
+      "
+    />
 
-  <div class="note-avatar-name">
-  ${escapeHtml(displayAuthor).replace("（", "<br>（")}
-</div>
-
-  
-</div>
-
-<div class="note-main-text" style="min-width:0;">
-<div class="note-center-profile">
-  ${displayAuthor === "くまお太郎" ? "高2 京大農志望" : "未設定"}
-</div>
-  ${subjectHtml}
-
-<div
-    class="note-body-text"
-    style="
-      margin-top:3px;
-      width:86px;
-      max-width:86px;
-      height:30px;
-      max-height:30px;
-      line-height:15px;
-      font-size:10px;
-      color:#fff;
-      white-space:normal;
-      word-break:break-all;
-      overflow-wrap:anywhere;
-      overflow:hidden;
-      display:block;
-    "
-  >
-    ${escapeHtml(note.text)}
+    <div class="note-avatar-name">
+      ${escapeHtml(displayAuthor).replace("（", "<br>（")}
+    </div>
   </div>
-  
-  <div class="note-post-time">
-  ${escapeHtml(`${new Date(note.createdAt).getMonth() + 1}/${new Date(note.createdAt).getDate()} ${new Date(note.createdAt).toLocaleTimeString("ja-JP", { hour: "numeric", minute: "2-digit" })}`)}
-</div>
-<div class="note-entry-count">
-  今日の投稿 ${Number(note.entries?.length || 1)}件
-</div>
-</div>
 
-            <div class="note-image-box" style="position:relative;">
- ${imageHtml}
+  <div class="note-image-box">
+    ${imageHtml}
+  </div>
 
   <div
-    class="note-reaction-under-image"
+    class="note-comment-stream"
     style="
-      position:absolute;
-      right:0;
-      bottom:-20px;
+      min-width:0;
       display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      gap:8px;
-      font-size:11px;
-      color:#ddd;
-      white-space:nowrap;
-      line-height:1;
+      flex-direction:column;
+      gap:5px;
     "
   >
-  
+    <div style="
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom:2px;
+    ">
+      <span style="
+        color:#93c5fd;
+        font-size:12px;
+        font-weight:bold;
+      ">
+        ${displayAuthor === "くまお太郎" ? "高2 京大農志望" : "未設定"}
+      </span>
+
+      ${note.subject ? `
+        <span style="
+          color:#ffd54f;
+          font-size:12px;
+          font-weight:bold;
+        ">
+          ${escapeHtml(note.subject)}
+        </span>
+      ` : ""}
+    </div>
+
+    <div
+      class="note-body-text"
+      style="
+        max-height:30px;
+        line-height:15px;
+        font-size:10px;
+        color:#fff;
+        white-space:normal;
+        word-break:break-all;
+        overflow-wrap:anywhere;
+        overflow:hidden;
+      "
+    >
+      ${escapeHtml(note.text)}
+    </div>
+
+    <div style="
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      font-size:11px;
+      color:#9ca3af;
+      margin-bottom:2px;
+    ">
+      <span>
+        ${escapeHtml(`${new Date(note.createdAt).getMonth() + 1}/${new Date(note.createdAt).getDate()} ${new Date(note.createdAt).toLocaleTimeString("ja-JP", { hour: "numeric", minute: "2-digit" })}`)}
+      </span>
+
+      <span style="color:#86efac; font-weight:bold;">
+        今日の投稿 ${Number(note.entries?.length || 1)}件
+      </span>
+    </div>
+
+    <div style="
+      display:grid;
+      gap:4px;
+      max-height:78px;
+      overflow:hidden;
+    ">
+      ${commentsHtml}
+    </div>
+  </div>
+
+  <div
+    class="note-reaction-box"
+    style="
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      justify-content:flex-start;
+      gap:8px;
+      font-size:13px;
+      color:#ddd;
+      white-space:nowrap;
+      padding-top:4px;
+    "
+  >
     <button
       type="button"
       class="like-btn"
@@ -2266,8 +2306,7 @@ const commentsHtml = latestComments.length
       💬 ${(note.comments || []).length}
     </button>
   </div>
-</div>
-          </div>
+</div>       
           <!-- 一覧カードでは今日の投稿詳細は非表示。後で詳細画面に移動予定 -->
          
           <!-- 一覧カードでは編集・削除は非表示。後で詳細画面に移動予定 -->
