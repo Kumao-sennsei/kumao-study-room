@@ -1453,29 +1453,26 @@ async function goToPhase(nextPhase) {
     stopBreakCafeBgm();
     prepareFocusUI();
 
-const quote = getStartQuote();
+
+  const quote = getStartQuote();
 elQuote.textContent = quote.display;
 
 // 先にタイマーを動かす
-startTimerLoop(FOCUS_SEC); 
-
+startTimerLoop(FOCUS_SEC);
 transitionLock = false;
 
-// iPhone/iPad対策：
-// BGMはボイス終了後ではなく、集中開始直後に直接スタートさせる。
-// ボイス再生やsetTimeout経由だと、iOSでユーザー操作扱いから外れて無音になりやすい。
-startAmbient(currentMode).catch((e) => {
-  console.warn("[ambient] 集中開始直後のBGM開始に失敗:", e);
-});
-
-// ボイスは別で流す。失敗してもタイマーとBGMは止めない。
+// 以前の仕様に戻す：
+// 集中開始時はまずボイスを流す。
+// ボイスが終わったら自然音を開始する。
 playVoiceAudio(quote.audio, () => {
   if (phase !== "focus") return;
+
+  startAmbient(currentMode).catch((e) => {
+    console.warn("[ambient] ボイス終了後の自然音開始に失敗:", e);
+  });
 });
 
 return;
-  }
-  
 
   stopAmbient();
   stopVoice();
@@ -1559,22 +1556,24 @@ if (isStoryQuote) {
   return;
 }
 
-  const quote = getBreakQuoteForCurrentMonth();
-  elQuote.textContent = quote.display;
-  saveMonthlyBreakAudio(quote.audio);
-  updateVoiceCollectionStatus();
+ const quote = getBreakQuoteForCurrentMonth();
+elQuote.textContent = quote.display;
+saveMonthlyBreakAudio(quote.audio);
+updateVoiceCollectionStatus();
 
-  setTimeout(() => {
-    playVoiceAudio(quote.audio, () => {
-      if (phase !== "break") {
-        transitionLock = false;
-        return;
-      }
+// 休憩タイマーは音声と切り離して、必ず先に動かす。
+// スマホでボイス再生が詰まると、ここをボイス終了待ちにしている限りタイマーまで止まるため。
+startTimerLoop(BREAK_SEC);
+transitionLock = false;
 
-      startTimerLoop(BREAK_SEC);
-      transitionLock = false;
-    });
-  }, 180);
+// 休憩ボイスは別で流す。失敗してもタイマーは止めない。
+setTimeout(() => {
+  if (phase !== "break") return;
+
+  playVoiceAudio(quote.audio, () => {
+    // 何もしない。タイマーはすでに動いている。
+  });
+}, 180); 
 }
 
 function handlePhaseEnd() {
