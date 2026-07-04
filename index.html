@@ -80,6 +80,49 @@
     line-height: 1.95 !important;
   }
 }
+   @media (orientation: portrait) and (min-width: 768px) and (max-width: 1024px) {
+  html,
+  body {
+    height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  #app {
+    height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  #left,
+  #right {
+    width: 100% !important;
+    min-height: 0 !important;
+    height: 50dvh !important;
+    flex: 0 0 50dvh !important;
+    box-sizing: border-box !important;
+  }
+
+  #left {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  #right {
+    overflow: hidden !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+  }
+
+  #character {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    margin: 0 !important;
+  }
+}
 </style>
   
   
