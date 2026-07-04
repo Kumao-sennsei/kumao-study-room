@@ -3359,6 +3359,42 @@ if (document.readyState === "loading") {
 }
 })();
 </script>
+
+<script>
+(function () {
+  function syncKumaoPortraitSplit() {
+    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+    const isTabletWidth = window.innerWidth >= 600 && window.innerWidth <= 1100;
+
+    if (!isPortrait || !isTabletWidth) {
+      document.documentElement.style.removeProperty("--kumao-visible-height");
+      return;
+    }
+
+    const visibleHeight =
+      window.visualViewport && window.visualViewport.height
+        ? window.visualViewport.height
+        : window.innerHeight;
+
+    document.documentElement.style.setProperty(
+      "--kumao-visible-height",
+      `${visibleHeight}px`
+    );
+  }
+
+  syncKumaoPortraitSplit();
+
+  window.addEventListener("resize", syncKumaoPortraitSplit);
+  window.addEventListener("orientationchange", () => {
+    setTimeout(syncKumaoPortraitSplit, 300);
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", syncKumaoPortraitSplit);
+    window.visualViewport.addEventListener("scroll", syncKumaoPortraitSplit);
+  }
+})();
+</script>
    
 </body>
 </html>
