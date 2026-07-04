@@ -1402,6 +1402,96 @@ function prepareBreakUI() {
   if (elLoggedInGuideText) elLoggedInGuideText.classList.add("hidden");
 }
 
+function showMobileSoundUnlockButton(options = {}) {
+  const { focusVoiceAudio = "" } = options;
+
+  if (audioUnlocked) return;
+  if (!elQuote || !elQuote.parentNode) return;
+  if (document.getElementById("mobileSoundUnlockBox")) return;
+
+  const box = document.createElement("div");
+  box.id = "mobileSoundUnlockBox";
+  box.style.cssText = `
+    margin: 12px auto 10px;
+    padding: 10px 12px;
+    max-width: 360px;
+    border: 1px solid rgba(255,213,79,0.65);
+    border-radius: 12px;
+    background: rgba(255,248,225,0.12);
+    text-align: center;
+    color: #fff8dc;
+    font-size: 13px;
+  `;
+
+  box.innerHTML = `
+    <button
+      id="mobileSoundUnlockBtn"
+      type="button"
+      style="
+        width: 100%;
+        padding: 10px 12px;
+        border: none;
+        border-radius: 999px;
+        background: #ffd54f;
+        color: #3b2600;
+        font-weight: 900;
+        font-size: 14px;
+        cursor: pointer;
+      "
+    >
+      🔊 スマホで音をONにする
+    </button>
+    <div style="margin-top:6px; font-size:11px; color:#ffe9a8;">
+      スマホは最初に1回だけ押してね🐻✨
+    </div>
+  `;
+
+  elQuote.parentNode.insertBefore(box, elQuote);
+
+  const btn = document.getElementById("mobileSoundUnlockBtn");
+  if (!btn) return;
+
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    btn.textContent = "🔊 音を準備中...";
+
+    try {
+      await unlockAudioSystem();
+      await primeAmbient(currentMode).catch(() => {});
+
+      if (phase === "focus") {
+        await startAmbient(currentMode).catch((e) => {
+          console.warn("[mobile audio] 自然音開始に失敗:", e);
+        });
+
+        if (focusVoiceAudio) {
+          playVoiceAudio(focusVoiceAudio, () => {});
+        }
+      }
+
+      if (phase === "break") {
+        try {
+          startBreakCafeBgm();
+        } catch (e) {
+          console.warn("[mobile audio] 休憩BGM開始に失敗:", e);
+        }
+      }
+
+      btn.textContent = "🔊 音ONできました！";
+      box.style.borderColor = "rgba(134,239,172,0.8)";
+      box.style.background = "rgba(20,83,45,0.25)";
+
+      setTimeout(() => {
+        box.remove();
+      }, 1600);
+    } catch (e) {
+      console.warn("[mobile audio] 音ONに失敗:", e);
+      btn.disabled = false;
+      btn.textContent = "🔊 もう一度、音をONにする";
+    }
+  });
+}
+
 // ======================
 // フェーズ遷移ロジック
 // 授業開始：通年固定名言 + レアボタン
