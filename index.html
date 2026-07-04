@@ -2018,6 +2018,12 @@ function syncCurrentUserNameUI() {
   .slice(0, 10);
 
     noteGrid.innerHTML = recentNotes.map(note => {
+      const displayAuthor =
+  note.author && note.author !== "名無し" && note.author !== "匿名"
+    ? note.author
+    : note.isMine && getCurrentUserName()
+      ? getCurrentUserName()
+      : "匿名";
      const previewImages = getNotePreviewImages(note);
 
 const imageHtml = previewImages.length
