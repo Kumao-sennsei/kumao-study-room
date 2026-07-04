@@ -1945,23 +1945,8 @@ async function enterRoom(roomName) {
     return;
   }
 
-  const { data: seats, error: seatError } = await supabaseClient
-    .from("study_room_seat_view")
-    .select("user_id, room_name, display_name, current_title, avatar_type, avatar_stage, study_label, entered_at, updated_at, profile_text")
-    .eq("room_name", roomName)
-    .order("entered_at", { ascending: true });
-
-  if (seatError) {
-    console.error("study_room_seat_view 取得エラー", seatError);
-    detail.innerHTML = `
-      <div style="color:#ff8a80; text-align:center; padding:20px;">
-        座席情報を取得できませんでした。
-      </div>
-    `;
-    return;
-  }
-
-  renderStudyRoomSeats(roomName, seats || []);
+await fetchStudyRoomSeats(roomName);
+startStudyRoomAutoRefresh(roomName);
 
   if (typeof window.showStudyRoomTicker === "function") {
     window.showStudyRoomTicker(`🐻 ${studyLabel} で入室しました！`);
