@@ -263,6 +263,17 @@ function ensureVoiceObject() {
 
 
 function stopVoice() {
+  if (window.currentIOSVoiceSourceNode) {
+    try {
+      window.currentIOSVoiceSourceNode.onended = null;
+      window.currentIOSVoiceSourceNode.stop(0);
+    } catch (e) {}
+    try {
+      window.currentIOSVoiceSourceNode.disconnect();
+    } catch (e) {}
+    window.currentIOSVoiceSourceNode = null;
+  }
+
   if (currentVoiceAudio) {
     try {
       currentVoiceAudio.pause();
@@ -281,21 +292,66 @@ function playVoiceAudio(src, onEnded) {
   try {
     console.log("[voice] 再生しようとしている音声:", src);
 
-    const audio = ensureVoiceObject();
     currentVoiceEndedOnce = false;
 
     const safeFinish = () => {
-      try {
-        audio.onended = null;
-        audio.onerror = null;
-      } catch (e) {}
-
       currentVoiceEndedOnce = true;
 
       if (typeof onEnded === "function") {
         onEnded();
       }
     };
+
+    const isAppleMobile =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    if (isAppleMobile) {
+      unlockAudioSystem()
+        .then(async (ok) => {
+          if (!ok) throw new Error("audio unlock failed");
+
+          const ctx = await resumeAudioContextIfNeeded();
+
+          if (!ctx || ctx.state === "suspended") {
+            throw new Error("AudioContext suspended");
+          }
+
+          const response = await fetch(src, { cache: "no-cache" });
+
+          if (!response.ok) {
+            throw new Error(`voice fetch failed: ${src}`);
+          }
+
+          const arrayBuffer = await response.arrayBuffer();
+          const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+
+          const source = ctx.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(ctx.destination);
+
+          window.currentIOSVoiceSourceNode = source;
+
+          source.onended = () => {
+            if (window.currentIOSVoiceSourceNode === source) {
+              window.currentIOSVoiceSourceNode = null;
+            }
+
+            safeFinish();
+          };
+
+          source.start(0);
+          console.log("[voice-ios] WebAudioボイス再生開始:", src);
+        })
+        .catch((e) => {
+          console.error("[voice-ios] ボイス再生失敗:", e, src);
+          safeFinish();
+        });
+
+      return;
+    }
+
+    const audio = ensureVoiceObject();
 
     const startPlayback = () => {
       try {
@@ -322,19 +378,19 @@ function playVoiceAudio(src, onEnded) {
       safeFinish();
     };
 
- if (audioUnlocked) {
-  startPlayback();
-} else {
-  unlockAudioSystem()
-    .then((ok) => {
-      if (!ok) throw new Error("audio unlock failed");
+    if (audioUnlocked) {
       startPlayback();
-    })
-    .catch((e) => {
-      console.error("ボイス再生失敗:", e, src);
-      safeFinish();
-    });
-}
+    } else {
+      unlockAudioSystem()
+        .then((ok) => {
+          if (!ok) throw new Error("audio unlock failed");
+          startPlayback();
+        })
+        .catch((e) => {
+          console.error("ボイス再生失敗:", e, src);
+          safeFinish();
+        });
+    }
   } catch (e) {
     console.error("ボイス生成失敗:", e, src);
     currentVoiceEndedOnce = true;
