@@ -3169,34 +3169,41 @@ function closePaidOnlyModal() {
   modal.style.display = "none";
 }
   
-async function handleModeStart(mode) {
+function handleModeStart(mode) {
   const FORCE_AUDIO_TEST = false; // 本番用：無料会員はポモドーロ不可
 
   try {
-    // iPhone対策：ユーザーが押した直後に、先に音声ロック解除を走らせる
-    if (typeof unlockAudioSystem === "function") {
-      unlockAudioSystem().catch((e) => {
-        console.warn("[audio] 事前ロック解除に失敗:", e);
-      });
-    }
-
-    const plan = await refreshCurrentMemberPlanFromSupabase();
-    syncMemberPlanUI();
-
-    if (plan !== "paid" && !FORCE_AUDIO_TEST) {
-      openPaidOnlyModal();
-      return;
-    }
-
+    // iPhone/iPad対策：
+    // 押した瞬間に await を挟まず、先にタイマー開始処理へ進ませる
     if (typeof startStudy !== "function") {
       alert("ポモドーロの準備がまだ完了していません。ページを再読み込みしてね🐻");
       return;
     }
 
-    await startStudy(mode);
+    const localPlan = getCurrentMemberPlan();
+
+    if (localPlan !== "paid" && !FORCE_AUDIO_TEST) {
+      openPaidOnlyModal();
+      return;
+    }
+
+    startStudy(mode);
+
+    // Supabaseのプラン確認は開始後に裏で行う
+    refreshCurrentMemberPlanFromSupabase()
+      .then((plan) => {
+        syncMemberPlanUI();
+
+        if (plan !== "paid" && !FORCE_AUDIO_TEST) {
+          console.warn("[plan] ポモドーロ開始後に無料判定:", plan);
+        }
+      })
+      .catch((e) => {
+        console.warn("[plan] ポモドーロ開始後の確認に失敗:", e);
+      });
   } catch (e) {
     console.error("handleModeStart エラー", e);
-    alert("ポモドーロを開始できませんでした。SafariまたはChromeで開き直して試してね🐻");
+    alert("ポモドーロを開始できませんでした。Safariで開き直して試してね🐻");
   }
 }
 
