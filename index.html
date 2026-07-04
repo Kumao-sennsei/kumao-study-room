@@ -2073,12 +2073,46 @@ const imageHtml = previewImages.length
         `
         : "";
 
-      const commentsHtml = (note.comments || []).map(comment => `
-        <div style="margin-top:6px; padding:6px 8px; background:#111; border:1px solid #333; border-radius:8px; font-size:12px; line-height:1.5;">
-          <div style="color:#ffd54f; font-weight:bold; margin-bottom:2px;">${escapeHtml(comment.author)}</div>
-          <div style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(comment.text)}</div>
-        </div>
-      `).join("");
+     const latestComments = [...(note.comments || [])]
+  .sort((a, b) => {
+    const bTime = new Date(b.createdAt || 0).getTime();
+    const aTime = new Date(a.createdAt || 0).getTime();
+    return bTime - aTime;
+  })
+  .slice(0, 3);
+
+const commentsHtml = latestComments.length
+  ? latestComments.map(comment => `
+    <div style="
+      padding:4px 7px;
+      background:#111827;
+      border:1px solid #374151;
+      border-radius:8px;
+      font-size:11px;
+      line-height:1.45;
+      color:#e5e7eb;
+      overflow:hidden;
+    ">
+      <span style="color:#93c5fd; font-weight:bold;">
+        ${escapeHtml(comment.author || "匿名")}
+      </span>
+      <span>
+        ${escapeHtml(comment.text || "")}
+      </span>
+    </div>
+  `).join("")
+  : `
+    <div style="
+      padding:6px 8px;
+      border:1px dashed #374151;
+      border-radius:8px;
+      font-size:11px;
+      color:#6b7280;
+      text-align:center;
+    ">
+      コメント待ち🐻
+    </div>
+  `;
       const entryList = Array.isArray(note.entries) ? note.entries : [];
 
       const entriesHtml = entryList.length > 0
