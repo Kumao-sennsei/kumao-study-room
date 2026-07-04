@@ -1413,6 +1413,20 @@ style="width:100%; height:100px; object-fit:cover; border-radius:8px; margin-bot
 
   async function updateNoteInSupabase(noteId, { subject, text, image }) {
   const notes = getNotes();
+
+    function getNotePreviewImages(note) {
+  const entries = Array.isArray(note.entries) ? note.entries : [];
+
+  const images = entries
+    .map(entry => entry?.image || "")
+    .filter(Boolean);
+
+  if (note.image) {
+    images.push(note.image);
+  }
+
+  return [...new Set(images)].slice(-2).reverse();
+}
   const target = notes.find(note => note.id === noteId);
 
   if (!target || !target.isMine) {
@@ -2002,14 +2016,31 @@ function syncCurrentUserNameUI() {
   .slice(0, 10);
 
     noteGrid.innerHTML = recentNotes.map(note => {
-     const imageHtml = note.image
-  ? `<img
-      src="${escapeHtml(note.image)}"
-      alt="ノート画像"
-      class="note-image-preview"
-      data-note-id="${escapeHtml(note.id)}"
-      style="width:108px; max-width:100%; height:90px; object-fit:cover; border-radius:10px; margin-bottom:4px; cursor:pointer;"
-    >`
+     const previewImages = getNotePreviewImages(note);
+
+const imageHtml = previewImages.length
+  ? `
+    <div style="
+      display:grid;
+      grid-template-columns:${previewImages.length >= 2 ? "1fr 1fr" : "1fr"};
+      gap:6px;
+    ">
+      ${previewImages.map((imageUrl, imageIndex) => `
+        <img
+          src="${escapeHtml(imageUrl)}"
+          alt="投稿画像${imageIndex + 1}"
+          style="
+            width:100%;
+            height:78px;
+            object-fit:cover;
+            border-radius:10px;
+            border:1px solid #333;
+            background:#000;
+          "
+        >
+      `).join("")}
+    </div>
+  `
   : "";
 
       const subjectHtml = note.subject
@@ -2141,7 +2172,7 @@ function syncCurrentUserNameUI() {
 </div>
 
             <div class="note-image-box" style="position:relative;">
-  ${imageHtml || `<div style="height:58px; border-radius:10px; border:1px dashed #444; display:flex; align-items:center; justify-content:center; color:#666; font-size:11px;">画像なし</div>`}
+ ${imageHtml}
 
   <div
     class="note-reaction-under-image"
@@ -2213,6 +2244,12 @@ function openNoteDetailModal(noteId) {
   if (!note) return;
 
   const comments = Array.isArray(note.comments) ? note.comments : [];
+  const displayAuthor =
+  note.author && note.author !== "名無し" && note.author !== "匿名"
+    ? note.author
+    : note.isMine && getCurrentUserName()
+      ? getCurrentUserName()
+      : "匿名";
   const entryList =
   Array.isArray(note.entries) && note.entries.length > 0
     ? note.entries
@@ -2329,7 +2366,7 @@ const noteEntriesHtml = entryList.map((entry, index) => `
     ${ownerActionsHtml}
     <div style="margin-bottom:14px;">
       <div style="font-size:18px; font-weight:bold; color:#facc15; margin-bottom:6px;">
-        ${escapeHtml(note.author || "匿名")} の学習ノート
+       ${escapeHtml(displayAuthor)} の学習ノート
       </div>
 
       <div style="font-size:13px; color:#9ca3af; margin-bottom:12px;">
