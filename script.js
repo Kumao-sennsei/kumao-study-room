@@ -1513,6 +1513,8 @@ async function goToPhase(nextPhase) {
 const quote = getStartQuote();
 elQuote.textContent = quote.display;
 
+showMobileSoundUnlockButton({ focusVoiceAudio: quote.audio });
+
 // 先にタイマーを動かす
 startTimerLoop(FOCUS_SEC);
 transitionLock = false;
