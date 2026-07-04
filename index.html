@@ -83,44 +83,80 @@
    @media (orientation: portrait) and (min-width: 768px) and (max-width: 1024px) {
   html,
   body {
-    height: 100dvh !important;
+    width: 100% !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
     overflow: hidden !important;
   }
 
   #app {
-    height: 100dvh !important;
-    display: flex !important;
-    flex-direction: column !important;
+    width: 100% !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    grid-template-rows: 50vh 50vh !important;
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+    overflow: hidden !important;
   }
 
   #left,
   #right {
     width: 100% !important;
-    min-height: 0 !important;
-    height: 50dvh !important;
-    flex: 0 0 50dvh !important;
+    height: 50vh !important;
+    min-height: 50vh !important;
+    max-height: 50vh !important;
+    margin: 0 !important;
     box-sizing: border-box !important;
   }
 
   #left {
+    grid-row: 1 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
   }
 
   #right {
+    grid-row: 2 !important;
+    position: relative !important;
     overflow: hidden !important;
     padding: 0 !important;
-    display: flex !important;
-    align-items: stretch !important;
-    justify-content: stretch !important;
+    display: block !important;
   }
 
   #character {
+    position: absolute !important;
+    inset: 0 !important;
     display: block !important;
     width: 100% !important;
     height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
     object-fit: cover !important;
     margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #goStudyRoomBtn,
+  #studyRoom {
+    position: absolute !important;
+    left: 16px !important;
+    z-index: 5 !important;
+  }
+
+  #goStudyRoomBtn {
+    top: 16px !important;
+  }
+
+  #studyRoom {
+    top: 64px !important;
+  }
+
+  #brandBox {
+    display: none !important;
   }
 }
 </style>
