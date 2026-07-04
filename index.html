@@ -3561,21 +3561,21 @@ if (document.readyState === "loading") {
     box-sizing: border-box !important;
   }
 
-   #goStudyRoomBtn {
+  #goStudyRoomBtn {
     display: flex !important;
     position: absolute !important;
     top: 96px !important;
 
-    /* 自習室パネル left 12px + 内側 padding 10px に合わせる */
-    left: 22px !important;
+    /* 入室ボタンの左端に合わせる */
+    left: 12px !important;
     right: auto !important;
     z-index: 50 !important;
     margin: 0 !important;
 
-    /* 自習室パネル幅210px - 左右padding20px に合わせる */
-    width: 190px !important;
-    min-width: 190px !important;
-    max-width: 190px !important;
+    /* 右端は今の位置に合わせたまま、左へ広げる */
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
 
     height: 42px !important;
     padding: 8px 10px !important;
