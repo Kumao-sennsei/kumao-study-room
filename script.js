@@ -302,9 +302,9 @@ function playVoiceAudio(src, onEnded) {
       }
     };
 
-    const isAppleMobile =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+   const isAppleMobile =
+  /iPad|iPhone|iPod|Android/.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
    if (isAppleMobile) {
   (async () => {
