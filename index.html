@@ -80,12 +80,12 @@
     line-height: 1.95 !important;
   }
 }
- @media (orientation: portrait) and (min-width: 600px) and (max-width: 1100px) {
+@media (orientation: portrait) and (min-width: 600px) and (max-width: 1100px) {
   html,
   body {
     width: 100% !important;
-    height: 100% !important;
-    min-height: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
@@ -94,25 +94,29 @@
 
   #app {
     position: fixed !important;
-    inset: 0 !important;
+    left: 0 !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
     width: 100vw !important;
-    height: 100svh !important;
-    max-height: 100svh !important;
-    min-height: 100svh !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
     margin: 0 !important;
     padding: 0 !important;
-    display: block !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 1fr 1fr !important;
+    gap: 0 !important;
     overflow: hidden !important;
   }
 
   #left {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
+    grid-row: 1 !important;
     width: 100vw !important;
-    height: 50svh !important;
-    min-height: 50svh !important;
-    max-height: 50svh !important;
+    height: 50dvh !important;
+    min-height: 50dvh !important;
+    max-height: 50dvh !important;
     margin: 0 !important;
     box-sizing: border-box !important;
     overflow-y: auto !important;
@@ -120,13 +124,12 @@
   }
 
   #right {
-    position: absolute !important;
-    left: 0 !important;
-    top: 50svh !important;
+    grid-row: 2 !important;
+    position: relative !important;
     width: 100vw !important;
-    height: 50svh !important;
-    min-height: 50svh !important;
-    max-height: 50svh !important;
+    height: 50dvh !important;
+    min-height: 50dvh !important;
+    max-height: 50dvh !important;
     margin: 0 !important;
     padding: 0 !important;
     box-sizing: border-box !important;
@@ -139,9 +142,9 @@
     inset: 0 !important;
     display: block !important;
     width: 100vw !important;
-    height: 50svh !important;
+    height: 50dvh !important;
     min-width: 100vw !important;
-    min-height: 50svh !important;
+    min-height: 50dvh !important;
     max-width: none !important;
     max-height: none !important;
     object-fit: cover !important;
@@ -168,7 +171,7 @@
   #brandBox {
     display: none !important;
   }
-} 
+}
 </style>
   
   
