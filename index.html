@@ -771,7 +771,14 @@
   const SUPABASE_URL = "https://jhsoakmlxbanbxlrhngb.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_veO7IC4DhSERkOMfsBPpMA_57UeYuwO";
 
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storage: window.localStorage
+  }
+});
 
  function updateTopVisibility(isLoggedIn) {
   document.querySelectorAll(".guestOnly").forEach((el) => {
@@ -2206,6 +2213,63 @@ function openNoteDetailModal(noteId) {
   if (!note) return;
 
   const comments = Array.isArray(note.comments) ? note.comments : [];
+  const entryList =
+  Array.isArray(note.entries) && note.entries.length > 0
+    ? note.entries
+    : [{
+        id: note.id,
+        subject: note.subject || "",
+        text: note.text || "",
+        image: note.image || "",
+        createdAt: note.createdAt || note.updatedAt || new Date().toISOString()
+      }];
+
+const noteEntriesHtml = entryList.map((entry, index) => `
+  <div style="
+    background:#0b1220;
+    border:1px solid #374151;
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:12px;
+  ">
+    <div style="font-size:13px; color:#9ca3af; margin-bottom:8px;">
+      ${escapeHtml(`投稿 ${index + 1}：${formatDate(entry.createdAt)}`)}
+    </div>
+
+    ${entry.subject ? `
+      <div style="font-size:14px; color:#ffd54f; margin-bottom:8px;">
+        ${escapeHtml(entry.subject)}
+      </div>
+    ` : ""}
+
+    ${entry.text ? `
+      <div style="
+        white-space:pre-wrap;
+        word-break:break-word;
+        line-height:1.8;
+        color:#fff;
+        margin-bottom:12px;
+      ">
+        ${escapeHtml(entry.text)}
+      </div>
+    ` : ""}
+
+    ${entry.image ? `
+      <img
+        src="${escapeHtml(entry.image)}"
+        alt="ノート画像"
+        style="
+          width:100%;
+          max-height:420px;
+          object-fit:contain;
+          border-radius:12px;
+          background:#000;
+          margin-top:8px;
+        "
+      >
+    ` : ""}
+  </div>
+`).join("");
 
   const commentsHtml = comments.length
     ? comments.map(comment => {
@@ -2272,40 +2336,7 @@ function openNoteDetailModal(noteId) {
         ${escapeHtml(new Date(note.createdAt).toLocaleString("ja-JP"))}
       </div>
 
-      ${note.subject ? `
-        <div style="font-size:14px; color:#ffd54f; margin-bottom:8px;">
-          ${escapeHtml(note.subject)}
-        </div>
-      ` : ""}
-
-      <div style="
-        white-space:pre-wrap;
-        word-break:break-word;
-        line-height:1.8;
-        color:#fff;
-        background:#0b1220;
-        border:1px solid #374151;
-        border-radius:12px;
-        padding:12px;
-        margin-bottom:12px;
-      ">
-        ${escapeHtml(note.text || "")}
-      </div>
-
-      ${note.image ? `
-        <img
-          src="${escapeHtml(note.image)}"
-          alt="ノート画像"
-          style="
-            width:100%;
-            max-height:420px;
-            object-fit:contain;
-            border-radius:12px;
-            background:#000;
-            margin-bottom:14px;
-          "
-        >
-      ` : ""}
+     ${noteEntriesHtml}
     </div>
 
   <div style="margin-top:16px;">
@@ -2980,18 +3011,35 @@ function closePaidOnlyModal() {
   modal.style.display = "none";
 }
   
-  async function handleModeStart(mode) {
+async function handleModeStart(mode) {
   const FORCE_AUDIO_TEST = false; // 本番用：無料会員はポモドーロ不可
 
-  const plan = await refreshCurrentMemberPlanFromSupabase();
-  syncMemberPlanUI();
+  try {
+    // iPhone対策：ユーザーが押した直後に、先に音声ロック解除を走らせる
+    if (typeof unlockAudioSystem === "function") {
+      unlockAudioSystem().catch((e) => {
+        console.warn("[audio] 事前ロック解除に失敗:", e);
+      });
+    }
 
-  if (plan !== "paid" && !FORCE_AUDIO_TEST) {
-    openPaidOnlyModal();
-    return;
+    const plan = await refreshCurrentMemberPlanFromSupabase();
+    syncMemberPlanUI();
+
+    if (plan !== "paid" && !FORCE_AUDIO_TEST) {
+      openPaidOnlyModal();
+      return;
+    }
+
+    if (typeof startStudy !== "function") {
+      alert("ポモドーロの準備がまだ完了していません。ページを再読み込みしてね🐻");
+      return;
+    }
+
+    await startStudy(mode);
+  } catch (e) {
+    console.error("handleModeStart エラー", e);
+    alert("ポモドーロを開始できませんでした。SafariまたはChromeで開き直して試してね🐻");
   }
-
-  startStudy(mode);
 }
 
 window.handleModeStart = handleModeStart;
