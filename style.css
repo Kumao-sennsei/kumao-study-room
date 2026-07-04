@@ -3623,3 +3623,14 @@ grid-column: span 1;
     white-space: nowrap !important;
   }
 }
+
+/* ======================
+   FINAL：プロフィール下の余白だけ調整
+====================== */
+#noteGrid .noteCard .note-avatar-box {
+  padding-bottom: 10px !important;
+}
+
+#noteGrid .noteCard .note-avatar-box > div:last-child {
+  margin-bottom: 8px !important;
+}
