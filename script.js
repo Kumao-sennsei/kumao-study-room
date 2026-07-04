@@ -1587,6 +1587,7 @@ function handlePhaseEnd() {
     goToPhase("focus");
   }
 }
+
 function startStudy(mode) {
   if (isStarting) return;
   isStarting = true;
@@ -1596,34 +1597,19 @@ function startStudy(mode) {
     totalSetIndex = 1;
     transitionLock = false;
 
-    // iPhone/iPad対策：
-    // ボタンを押した直後に、まず音声ロック解除を開始する。
-    // ただし await しない。待つと画面切り替えが止まる可能性があるため。
-    const audioReadyPromise = unlockAudioSystem().catch((e) => {
+    // 音声ロック解除は開始ボタン直後に走らせる。
+    // ただし await しない。待つとスマホで画面切り替えが止まる可能性がある。
+    unlockAudioSystem().catch((e) => {
       console.warn("[audio] 開始直後の解除に失敗:", e);
-      return false;
     });
 
-    // 画面切り替えとタイマー開始はすぐ行う
+    // 画面切り替え・タイマー・自然音・ボイス開始は goToPhase に一本化する
     goToPhase("focus");
 
-    // WakeLockは後回しでOK
-    Promise.resolve()
-      .then(() => requestWakeLock())
-      .catch((e) => {
-        console.warn("[wakeLock] 開始後の取得に失敗:", e);
-      });
-
-    // 音声解除が終わったら、集中TIMEの自然音をもう一度開始する
-    audioReadyPromise
-      .then(() => primeAmbient(mode))
-      .then(() => {
-        if (phase !== "focus") return;
-        return startAmbient(mode);
-      })
-      .catch((e) => {
-        console.warn("[audio] 開始後の自然音開始に失敗:", e);
-      });
+    // WakeLockは音声と切り離して後ろで実行
+    requestWakeLock().catch((e) => {
+      console.warn("[wakeLock] 開始後の取得に失敗:", e);
+    });
   } catch (e) {
     console.error("startStudy エラー:", e);
     alert("ポモドーロを開始できませんでした。ページを再読み込みしてね🐻");
