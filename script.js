@@ -1723,27 +1723,17 @@ function startStudy(mode) {
     totalSetIndex = 1;
     transitionLock = false;
 
-    const isAppleMobile =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    // 音声ロック解除は開始ボタン直後に走らせる。
+    // ただし待たずに goToPhase へ進める。
+    // iPad/iPhoneで unlock が詰まっても、開始ボタン自体を止めない。
+    unlockAudioSystem().catch((e) => {
+      console.warn("[audio] 開始直後の解除に失敗:", e);
+    });
 
-    if (isAppleMobile) {
-      unlockAudioSystem()
-        .then(() => {
-          goToPhase("focus");
-        })
-        .catch((e) => {
-          console.warn("[audio] iPhone/iPad開始直後の解除に失敗:", e);
-          goToPhase("focus");
-        });
-    } else {
-      unlockAudioSystem().catch((e) => {
-        console.warn("[audio] 開始直後の解除に失敗:", e);
-      });
+    // 画面切り替え・タイマー・自然音・ボイス開始は goToPhase に一本化する
+    goToPhase("focus");
 
-      goToPhase("focus");
-    }
-
+    // WakeLockは音声と切り離して後ろで実行
     requestWakeLock().catch((e) => {
       console.warn("[wakeLock] 開始後の取得に失敗:", e);
     });
@@ -1756,9 +1746,6 @@ function startStudy(mode) {
     }, 500);
   }
 }
-
-// 初期化
-showHomeUI();
 window.startStudy = startStudy;
 
 document.addEventListener("visibilitychange", async () => {
