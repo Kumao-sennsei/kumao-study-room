@@ -383,15 +383,13 @@ async function primeAmbient(mode) {
   }
 }
 
-
 async function startAmbient(mode) {
   if (!mode) return;
 
-    const targetVolume =
+  const targetVolume =
     WEB_AMBIENT_VOLUME_BY_MODE[mode] ?? WEB_AMBIENT_VOLUME;
 
   // すでに同じ環境音が鳴っているなら、再起動しない
-  // セリフ音声終了後に startAmbient が再度呼ばれても、音を止めないための安全策
   if (ambientSourceNode && ambientGainNode && ambientWebAudioMode === mode) {
     fadeGainTo(ambientGainNode, targetVolume, WEB_AMBIENT_FADE_SEC);
     console.log("[ambient-web] すでに再生中なので再起動しません:", mode);
@@ -402,13 +400,20 @@ async function startAmbient(mode) {
   ambientWebAudioToken = token;
 
   try {
-    await unlockAudioSystem();
+    // スマホ対策：
+    // ここで unlockAudioSystem() を await しない。
+    // ここで待つと、スマホで自然音開始が大きく遅れることがある。
     const ctx = await resumeAudioContextIfNeeded();
+
+    if (!ctx || ctx.state === "suspended") {
+      console.warn("[ambient-web] AudioContext がまだ suspended のため自然音開始を見送ります:", ctx?.state);
+      return;
+    }
+
     const buffer = await loadAmbientBuffer(mode);
 
     if (token !== ambientWebAudioToken) return;
 
-    // すでに鳴っている環境音があれば先に止める
     try {
       if (ambientSourceNode) {
         ambientSourceNode.stop();
@@ -421,7 +426,8 @@ async function startAmbient(mode) {
     source.buffer = buffer;
     source.loop = true;
 
-    gain.gain.setValueAtTime(0, ctx.currentTime);
+    // 最初から少し音量を入れる。スマホでフェード開始が分かりにくいのを防ぐ
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
 
     source.connect(gain);
     gain.connect(ctx.destination);
@@ -432,7 +438,7 @@ async function startAmbient(mode) {
     ambientGainNode = gain;
     ambientWebAudioMode = mode;
 
-  　    fadeGainTo(gain, targetVolume, WEB_AMBIENT_FADE_SEC);
+    fadeGainTo(gain, targetVolume, 0.8);
 
     source.onended = () => {
       if (ambientSourceNode === source) {
@@ -448,74 +454,6 @@ async function startAmbient(mode) {
   }
 }
 
-function playVoiceAudio(src, onEnded) {
-  stopVoice();
-
-  try {
-    console.log("[voice] 再生しようとしている音声:", src);
-
-    const audio = ensureVoiceObject();
-    currentVoiceEndedOnce = false;
-
-    const safeFinish = () => {
-      try {
-        audio.onended = null;
-        audio.onerror = null;
-      } catch (e) {}
-
-      currentVoiceEndedOnce = true;
-
-      if (typeof onEnded === "function") {
-        onEnded();
-      }
-    };
-
-    const startPlayback = () => {
-      try {
-        const result = audio.play();
-        if (result && typeof result.then === "function") {
-          result.catch((e) => {
-            console.error("ボイス再生失敗:", e, src);
-            safeFinish();
-          });
-        }
-      } catch (e) {
-        console.error("ボイス再生失敗:", e, src);
-        safeFinish();
-      }
-    };
-
-    audio.src = src;
-    audio.load();
-
-    audio.onended = safeFinish;
-    audio.onerror = (e) => {
-      console.error("ボイス再生エラー:", e, src);
-      safeFinish();
-    };
-
-    if (audioUnlocked) {
-      startPlayback();
-    } else {
-      unlockAudioSystem()
-        .then((ok) => {
-          if (!ok) throw new Error("audio unlock failed");
-          startPlayback();
-        })
-        .catch((e) => {
-          console.error("ボイス再生失敗:", e, src);
-          safeFinish();
-        });
-    }
-  } catch (e) {
-    console.error("ボイス生成失敗:", e, src);
-    currentVoiceEndedOnce = true;
-
-    if (typeof onEnded === "function") {
-      onEnded();
-    }
-  }
-}
 
 function setCharacterImage(mode, setInRound) {
   if (!bgImages[mode]) return;
@@ -1515,15 +1453,12 @@ async function goToPhase(nextPhase) {
     stopBreakCafeBgm();
     prepareFocusUI();
 
-
-    
 const quote = getStartQuote();
 elQuote.textContent = quote.display;
 
-showMobileSoundUnlockButton({ focusVoiceAudio: quote.audio });
-
 // 先にタイマーを動かす
-startTimerLoop(FOCUS_SEC);
+startTimerLoop(FOCUS_SEC); 
+
 transitionLock = false;
 
 // iPhone/iPad対策：
