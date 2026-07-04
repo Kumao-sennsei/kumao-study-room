@@ -275,6 +275,76 @@ function stopVoice() {
   currentVoiceEndedOnce = false;
 }
 
+function playVoiceAudio(src, onEnded) {
+  stopVoice();
+
+  try {
+    console.log("[voice] 再生しようとしている音声:", src);
+
+    const audio = ensureVoiceObject();
+    currentVoiceEndedOnce = false;
+
+    const safeFinish = () => {
+      try {
+        audio.onended = null;
+        audio.onerror = null;
+      } catch (e) {}
+
+      currentVoiceEndedOnce = true;
+
+      if (typeof onEnded === "function") {
+        onEnded();
+      }
+    };
+
+    const startPlayback = () => {
+      try {
+        const result = audio.play();
+
+        if (result && typeof result.then === "function") {
+          result.catch((e) => {
+            console.error("ボイス再生失敗:", e, src);
+            safeFinish();
+          });
+        }
+      } catch (e) {
+        console.error("ボイス再生失敗:", e, src);
+        safeFinish();
+      }
+    };
+
+    audio.src = src;
+    audio.load();
+
+    audio.onended = safeFinish;
+    audio.onerror = (e) => {
+      console.error("ボイス再生エラー:", e, src);
+      safeFinish();
+    };
+
+    if (audioUnlocked) {
+      startPlayback();
+    } else {
+      unlockAudioSystem()
+        .then((ok) => {
+          if (!ok) throw new Error("audio unlock failed");
+          startPlayback();
+        })
+        .catch((e) => {
+          console.error("ボイス再生失敗:", e, src);
+          safeFinish();
+        });
+    }
+  } catch (e) {
+    console.error("ボイス生成失敗:", e, src);
+    currentVoiceEndedOnce = true;
+
+    if (typeof onEnded === "function") {
+      onEnded();
+    }
+  }
+}
+
 function stopAmbient() {
   ambientWebAudioToken += 1;
 
