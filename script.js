@@ -472,6 +472,64 @@ function ensureBreakCafeAudio() {
 }
 
 async function startBreakCafeBgm() {
+  const isAppleMobile =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  if (isAppleMobile) {
+    try {
+      const ctx = await resumeAudioContextIfNeeded();
+
+      if (!ctx || ctx.state === "suspended") {
+        throw new Error(`AudioContext suspended: ${ctx?.state}`);
+      }
+
+      if (!window.breakCafeWebAudioBuffer) {
+        const response = await fetch("audio/ambient/break_cafe_loop.mp3", {
+          cache: "no-cache"
+        });
+
+        if (!response.ok) {
+          throw new Error("break cafe bgm fetch failed");
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        window.breakCafeWebAudioBuffer = await ctx.decodeAudioData(arrayBuffer);
+      }
+
+      if (window.currentIOSBreakCafeSourceNode) {
+        try {
+          window.currentIOSBreakCafeSourceNode.stop(0);
+        } catch (e) {}
+        try {
+          window.currentIOSBreakCafeSourceNode.disconnect();
+        } catch (e) {}
+        window.currentIOSBreakCafeSourceNode = null;
+      }
+
+      const source = ctx.createBufferSource();
+      const gain = ctx.createGain();
+
+      source.buffer = window.breakCafeWebAudioBuffer;
+      source.loop = true;
+      gain.gain.value = 0.18;
+
+      source.connect(gain);
+      gain.connect(ctx.destination);
+
+      window.currentIOSBreakCafeSourceNode = source;
+      window.currentIOSBreakCafeGainNode = gain;
+
+      source.start(0);
+
+      console.log("[breakCafe-ios] WebAudio休憩BGM再生開始");
+      return;
+    } catch (e) {
+      console.error("[breakCafe-ios] WebAudio休憩BGM再生失敗:", e);
+      return;
+    }
+  }
+
   try {
     await unlockAudioSystem();
 
@@ -490,6 +548,20 @@ async function startBreakCafeBgm() {
 }
 
 function stopBreakCafeBgm() {
+  if (window.currentIOSBreakCafeSourceNode) {
+    try {
+      window.currentIOSBreakCafeSourceNode.stop(0);
+    } catch (e) {}
+    try {
+      window.currentIOSBreakCafeSourceNode.disconnect();
+    } catch (e) {}
+
+    window.currentIOSBreakCafeSourceNode = null;
+    window.currentIOSBreakCafeGainNode = null;
+
+    console.log("[breakCafe-ios] 停止");
+  }
+
   if (!breakCafeAudio) return;
 
   try {
