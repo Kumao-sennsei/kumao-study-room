@@ -1667,16 +1667,27 @@ function startStudy(mode) {
     totalSetIndex = 1;
     transitionLock = false;
 
-    // 音声ロック解除は開始ボタン直後に走らせる。
-    // ただし await しない。待つとスマホで画面切り替えが止まる可能性がある。
-    unlockAudioSystem().catch((e) => {
-      console.warn("[audio] 開始直後の解除に失敗:", e);
-    });
+    const isAppleMobile =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-    // 画面切り替え・タイマー・自然音・ボイス開始は goToPhase に一本化する
-    goToPhase("focus");
+    if (isAppleMobile) {
+      unlockAudioSystem()
+        .then(() => {
+          goToPhase("focus");
+        })
+        .catch((e) => {
+          console.warn("[audio] iPhone/iPad開始直後の解除に失敗:", e);
+          goToPhase("focus");
+        });
+    } else {
+      unlockAudioSystem().catch((e) => {
+        console.warn("[audio] 開始直後の解除に失敗:", e);
+      });
 
-    // WakeLockは音声と切り離して後ろで実行
+      goToPhase("focus");
+    }
+
     requestWakeLock().catch((e) => {
       console.warn("[wakeLock] 開始後の取得に失敗:", e);
     });
