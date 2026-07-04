@@ -3561,18 +3561,21 @@ if (document.readyState === "loading") {
     box-sizing: border-box !important;
   }
 
-  #goStudyRoomBtn {
+   #goStudyRoomBtn {
     display: flex !important;
     position: absolute !important;
     top: 96px !important;
-    left: 12px !important;
+
+    /* 自習室パネル left 12px + 内側 padding 10px に合わせる */
+    left: 22px !important;
     right: auto !important;
     z-index: 50 !important;
     margin: 0 !important;
 
-    width: 210px !important;
-    min-width: 210px !important;
-    max-width: 210px !important;
+    /* 自習室パネル幅210px - 左右padding20px に合わせる */
+    width: 190px !important;
+    min-width: 190px !important;
+    max-width: 190px !important;
 
     height: 42px !important;
     padding: 8px 10px !important;
