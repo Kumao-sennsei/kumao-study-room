@@ -1512,7 +1512,7 @@ function handlePhaseEnd() {
   }
 }
 
-async function startStudy(mode) {
+function startStudy(mode) {
   if (isStarting) return;
   isStarting = true;
 
@@ -1521,12 +1521,30 @@ async function startStudy(mode) {
     totalSetIndex = 1;
     transitionLock = false;
 
-    await unlockAudioSystem();
-    await requestWakeLock();
-    await primeAmbient(mode);
-    await goToPhase("focus");
+    // iPhone/iPad対策：
+    // 画面切り替えとタイマー開始を最優先にする。
+    // 音声・WakeLock・環境音準備は後回しにしないと、iOSで無反応に見えることがある。
+    goToPhase("focus");
+
+    Promise.resolve()
+      .then(() => requestWakeLock())
+      .catch((e) => {
+        console.warn("[wakeLock] 開始後の取得に失敗:", e);
+      });
+
+    Promise.resolve()
+      .then(() => unlockAudioSystem())
+      .then(() => primeAmbient(mode))
+      .catch((e) => {
+        console.warn("[audio] 開始後の準備に失敗:", e);
+      });
+  } catch (e) {
+    console.error("startStudy エラー:", e);
+    alert("ポモドーロを開始できませんでした。ページを再読み込みしてね🐻");
   } finally {
-    isStarting = false;
+    setTimeout(() => {
+      isStarting = false;
+    }, 500);
   }
 }
 
