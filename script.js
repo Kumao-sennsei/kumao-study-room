@@ -1385,17 +1385,17 @@ elQuote.textContent = quote.display;
 startTimerLoop(FOCUS_SEC);
 transitionLock = false;
 
-// 音声は別で流す
-playVoiceAudio(quote.audio, async () => {
-  if (phase !== "focus") return;
-  await startAmbient(currentMode);
+// iPhone/iPad対策：
+// BGMはボイス終了後ではなく、集中開始直後に直接スタートさせる。
+// ボイス再生やsetTimeout経由だと、iOSでユーザー操作扱いから外れて無音になりやすい。
+startAmbient(currentMode).catch((e) => {
+  console.warn("[ambient] 集中開始直後のBGM開始に失敗:", e);
 });
 
-// 音声側で詰まってもBGMだけは保険で開始
-setTimeout(async () => {
+// ボイスは別で流す。失敗してもタイマーとBGMは止めない。
+playVoiceAudio(quote.audio, () => {
   if (phase !== "focus") return;
-  await startAmbient(currentMode);
-}, 600);
+});
 
 return;
   }
