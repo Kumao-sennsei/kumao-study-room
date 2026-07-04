@@ -1553,7 +1553,6 @@ function handlePhaseEnd() {
     goToPhase("focus");
   }
 }
-
 function startStudy(mode) {
   if (isStarting) return;
   isStarting = true;
@@ -1564,21 +1563,32 @@ function startStudy(mode) {
     transitionLock = false;
 
     // iPhone/iPad対策：
-    // 画面切り替えとタイマー開始を最優先にする。
-    // 音声・WakeLock・環境音準備は後回しにしないと、iOSで無反応に見えることがある。
+    // ボタンを押した直後に、まず音声ロック解除を開始する。
+    // ただし await しない。待つと画面切り替えが止まる可能性があるため。
+    const audioReadyPromise = unlockAudioSystem().catch((e) => {
+      console.warn("[audio] 開始直後の解除に失敗:", e);
+      return false;
+    });
+
+    // 画面切り替えとタイマー開始はすぐ行う
     goToPhase("focus");
 
+    // WakeLockは後回しでOK
     Promise.resolve()
       .then(() => requestWakeLock())
       .catch((e) => {
         console.warn("[wakeLock] 開始後の取得に失敗:", e);
       });
 
-    Promise.resolve()
-      .then(() => unlockAudioSystem())
+    // 音声解除が終わったら、集中TIMEの自然音をもう一度開始する
+    audioReadyPromise
       .then(() => primeAmbient(mode))
+      .then(() => {
+        if (phase !== "focus") return;
+        return startAmbient(mode);
+      })
       .catch((e) => {
-        console.warn("[audio] 開始後の準備に失敗:", e);
+        console.warn("[audio] 開始後の自然音開始に失敗:", e);
       });
   } catch (e) {
     console.error("startStudy エラー:", e);
